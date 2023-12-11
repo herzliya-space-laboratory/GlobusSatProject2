@@ -235,6 +235,23 @@ static Boolean EPS_TelemetryHKGeneral(void)
 	return TRUE;
 }
 
+static Boolean EPS_Status(void)
+{
+	gom_eps_hk_t myEpsStatus_hk;
+
+	printf("\r\nEPS Status HK General \r\n\n");
+	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
+	if(myEpsStatus_hk.fields.vbatt > 7400)
+		printf("EPS status is Operational\r\n");
+	else if(myEpsStatus_hk.fields.vbatt > 7000)
+		printf("EPS status is Cruise\r\n");
+	else
+		printf("The satellite is in Power Safe mode\r\n");
+
+	return TRUE;
+}
+
+
 static Boolean EPS_TelemetryHKParam(void)
 {
 	gom_eps_hkparam_t myEpsTelemetry_param;
@@ -388,8 +405,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 8) EPS Enable channel \n\r");
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
+	printf("\t 11) EPS status \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 10) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
 
 	switch(selection) {
 	case 0:
@@ -425,6 +443,8 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 10:
     	offerMoreTests = EPS_Reboot();
     	break;
+    case 11:
+    	offerMoreTests = EPS_Status();
 	default:
 		break;
 	}
