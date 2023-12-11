@@ -445,6 +445,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     	break;
     case 11:
     	offerMoreTests = EPS_Status();
+    	break;
 	default:
 		break;
 	}
