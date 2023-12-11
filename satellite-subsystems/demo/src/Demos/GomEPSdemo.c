@@ -242,11 +242,11 @@ static Boolean EPS_Status(void)
 	printf("\r\nEPS Status HK General \r\n\n");
 	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
 	if(myEpsStatus_hk.fields.vbatt > 7400)
-		printf("EPS status is Operational\r\n");
+		printf("EPS status is Operational \nThe vbatt equal to %d\r\n", myEpsStatus_hk / 1000.0);
 	else if(myEpsStatus_hk.fields.vbatt > 7000)
-		printf("EPS status is Cruise\r\n");
+		printf("EPS status is Cruise \nThe vbatt equal to %d\r\n", myEpsStatus_hk / 1000.0);
 	else
-		printf("The satellite is in Power Safe mode\r\n");
+		printf("The satellite is in Power Safe mode \nThe vbatt equal to %d\r\n", myEpsStatus_hk / 1000.0);
 
 	return TRUE;
 }
