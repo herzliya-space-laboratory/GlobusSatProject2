@@ -72,7 +72,7 @@ Boolean selectAndExecuteTest()
 	printf( "\n\r Select the device to be tested to perform: \n\r");
 	printf("\t 1) TRXVU test \n\r");
 	printf("\t 2) Solar Panels V2 test \n\r");
-	printf("\t 3) ISIS EPS Test \n\r");
+	printf("\t 3) Gom EPS Test \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 3) == 0);
 
@@ -85,7 +85,7 @@ Boolean selectAndExecuteTest()
 			offerMoreTests = SolarPanelv2test();
 			break;
 		case 3:
-			offerMoreTests = isis_eps__test();
+			offerMoreTests = GomEPStest();
 			break;
 
 		default:
