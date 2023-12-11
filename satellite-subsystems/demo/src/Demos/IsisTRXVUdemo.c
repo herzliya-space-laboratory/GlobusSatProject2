@@ -56,20 +56,11 @@ static Boolean softResetVUTest(void)
 	return TRUE;
 }
 
-static Boolean hardResetVUTest(void)
-{
-	printf("\r\n Hard Reset of both receiver and transmitter microcontrollers \r\n");
-	print_error(IsisTrxvu_componentHardReset(0, trxvu_rc));
-	vTaskDelay(1 / portTICK_RATE_MS);
-	print_error(IsisTrxvu_componentHardReset(0, trxvu_tc));
 
-	return TRUE;
-}
-
-static Boolean vutc_sendDefClSignTest(void)
+static Boolean vutc_sendEmptyPacketTest(void)
 {
 	//Buffers and variables definition
-	unsigned char testBuffer1[10]  = {0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x40};
+	unsigned char testBuffer1[10]  = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 	unsigned char txCounter = 0;
 	unsigned char avalFrames = 0;
 	unsigned int timeoutCounter = 0;
@@ -94,6 +85,50 @@ static Boolean vutc_sendDefClSignTest(void)
 	return TRUE;
 }
 
+
+
+static Boolean vutc_sendPacketInsertedByTheUser(void)
+{
+	//Buffers and variables definition
+	unsigned char testBuffer2[10];
+	int amountOfRepetitions;
+	unsigned char txCounter = 0;
+	unsigned char avalFrames = 0;
+	int timeoutCounter = 0;
+	int i;
+	unsigned int temp;
+	printf("\r\nEnter buffer: \r\n");
+	for(i = 0; i < 10 ; i++)
+	{
+		if (UTIL_DbguGetHexa32(&temp) == 1)
+			testBuffer2[i] = (unsigned char)temp;
+		else
+			i--;
+	}
+	printf("\r\nEnter amount of repetitions: \r\n");
+	while(UTIL_DbguGetIntegerMinMax(&amountOfRepetitions, 1, 1000) == 0);
+	while(txCounter < amountOfRepetitions && timeoutCounter < amountOfRepetitions)
+	{
+		printf("\r\n Transmission of single buffers with default callsign. AX25 Format. \r\n");
+		print_error(IsisTrxvu_tcSendAX25DefClSign(0, testBuffer2, 10, &avalFrames));
+
+		if ((avalFrames != 0)&&(avalFrames != 255))
+		{
+			printf("\r\n Number of frames in the buffer: %d  \r\n", avalFrames);
+			txCounter++;
+		}
+		else
+		{
+			vTaskDelay(100 / portTICK_RATE_MS);
+			timeoutCounter++;
+		}
+	}
+
+	return TRUE;
+}
+
+
+
 static Boolean vutc_toggleIdleStateTest(void)
 {
 	static Boolean toggle_flag = 0;
@@ -108,20 +143,6 @@ static Boolean vutc_toggleIdleStateTest(void)
 	    print_error(IsisTrxvu_tcSetIdlestate(0, trxvu_idle_state_on));
 		toggle_flag = TRUE;
 	}
-
-	return TRUE;
-}
-
-static Boolean vutc_setTxBitrate9600Test(void)
-{
-    print_error(IsisTrxvu_tcSetAx25Bitrate(0, trxvu_bitrate_9600));
-
-	return TRUE;
-}
-
-static Boolean vutc_setTxBitrate1200Test(void)
-{
-    print_error(IsisTrxvu_tcSetAx25Bitrate(0, trxvu_bitrate_1200));
 
 	return TRUE;
 }
@@ -427,6 +448,28 @@ static Boolean vutc_getTxTelemTest_revD(void)
 	return TRUE;
 }
 
+static Boolean TransponderOn()
+{
+	unsigned char data[] = {0x38, 0x02};
+	if(I2C_write(0x61, data, 2))
+		printf("ohhh no. \r\n");
+	else
+		printf("It work \r\n");
+
+	return TRUE;
+}
+
+static Boolean TransponderOff()
+{
+	unsigned char data[] = {0x38, 0x01};
+	if(I2C_write(0x61, data, 2))
+		printf("ohhh no. \r\n");
+	else
+		printf("It work \r\n");
+
+	return TRUE;
+}
+
 static Boolean selectAndExecuteTRXVUDemoTest(void)
 {
 	int selection = 0;
@@ -434,17 +477,17 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 
 	printf( "\n\r Select a test to perform: \n\r");
 	printf("\t 1) Soft Reset TRXVU both microcontrollers \n\r");
-	printf("\t 2) Hard Reset TRXVU both microcontrollers \n\r");
-	printf("\t 3) Default Callsign Send Test\n\r");
-	printf("\t 4) Toggle Idle state \n\r");
-	printf("\t 5) Change transmission bitrate to 9600  \n\r");
-	printf("\t 6) Change transmission bitrate to 1200 \n\r");
-	printf("\t 7) Get frame count \n\r");
-	printf("\t 8) Get command frame \n\r");
-	printf("\t 9) Get command frame and retransmit \n\r");
-	printf("\t 10) (revD) Get command frame by interrupt \n\r");
-	printf("\t 11) (revD) Get receiver telemetry \n\r");
-	printf("\t 12) (revD) Get transmitter telemetry \n\r");
+	printf("\t 2) Empty Callsign Send Test\n\r");
+	printf("\t 3) Toggle Idle state \n\r");
+	printf("\t 4) Get frame count \n\r");
+	printf("\t 5) Get command frame \n\r");
+	printf("\t 6) Get command frame and retransmit \n\r");
+	printf("\t 7) (revD) Get command frame by interrupt \n\r");
+	printf("\t 8) (revD) Get receiver telemetry \n\r");
+	printf("\t 9) (revD) Get transmitter telemetry \n\r");
+	printf("\t 10) Send packet inserted by the user\n\r");
+	printf("\t 11) Get the transponder on \n\r");
+	printf("\t 12) Get the transponder off \n\r");
 	printf("\t 13) Return to main menu \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 13) == 0);
@@ -454,42 +497,41 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = softResetVUTest();
 		break;
 	case 2:
-		offerMoreTests = hardResetVUTest();
+		offerMoreTests = vutc_sendEmptyPacketTest();
 		break;
 	case 3:
-		offerMoreTests = vutc_sendDefClSignTest();
-		break;
-	case 4:
 		offerMoreTests = vutc_toggleIdleStateTest();
 		break;
-	case 5:
-		offerMoreTests = vutc_setTxBitrate9600Test();
-		break;
-	case 6:
-		offerMoreTests = vutc_setTxBitrate1200Test();
-		break;
-	case 7:
+	case 4:
 		offerMoreTests = vurc_getFrameCountTest();
 		break;
-	case 8:
+	case 5:
 		offerMoreTests = vurc_getFrameCmdTest();
 		break;
-	case 9:
+	case 6:
 		offerMoreTests = vurc_getFrameCmdAndTxTest();
 		break;
-    case 10:
+    case 7:
         offerMoreTests = vurc_getFrameCmdInterruptTest();
         break;
-	case 11:
+	case 8:
 		offerMoreTests = vurc_getRxTelemTest_revD();
 		break;
-	case 12:
+	case 9:
 		offerMoreTests = vutc_getTxTelemTest_revD();
+		break;
+	case 10:
+		offerMoreTests = vutc_sendPacketInsertedByTheUser();
+		break;
+	case 11:
+		offerMoreTests = TransponderOn();
+		break;
+	case 12:
+		offerMoreTests = TransponderOff();
 		break;
 	case 13:
 		offerMoreTests = FALSE;
 		break;
-
 	default:
 		break;
 	}

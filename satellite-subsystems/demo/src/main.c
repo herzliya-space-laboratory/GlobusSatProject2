@@ -71,14 +71,10 @@ Boolean selectAndExecuteTest()
 
 	printf( "\n\r Select the device to be tested to perform: \n\r");
 	printf("\t 1) TRXVU test \n\r");
-	printf("\t 2) HSTxS Test \n\r");
-	printf("\t 3) AntS test \n\r");
-	printf("\t 4) Solar Panels V2 test \n\r");
-	printf("\t 5) MTQv2 test \n\r");
-	printf("\t 6) ISIS EPS Test \n\r");
-	printf("\t 7) TAUSAT2 PDHU test\n\r");
+	printf("\t 2) Solar Panels V2 test \n\r");
+	printf("\t 3) ISIS EPS Test \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 7) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 3) == 0);
 
 	switch(selection)
 	{
@@ -86,22 +82,10 @@ Boolean selectAndExecuteTest()
 			offerMoreTests = TRXVUtest();
 			break;
 		case 2:
-			offerMoreTests = HSTxStest();
-			break;
-		case 3:
-			offerMoreTests = AntStest();
-			break;
-		case 4:
 			offerMoreTests = SolarPanelv2test();
 			break;
-		case 5:
-			offerMoreTests = IsisMTQv2test();
-			break;
-		case 6:
+		case 3:
 			offerMoreTests = isis_eps__test();
-			break;
-		case 7:
-			offerMoreTests = TAUSAT2PdhuDemoMain();
 			break;
 
 		default:
