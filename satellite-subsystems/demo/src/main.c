@@ -17,6 +17,7 @@
 #include "Demos/IsisHSTxSdemo.h"
 #include "Demos/isis_eps_demo.h"
 #include "Demos/tausat2_pdhudemo.h"
+#include "Demos/isis_OBC_demo.h"
 #include <satellite-subsystems/version/version.h>
 
 #include <at91/utility/exithandler.h>
@@ -73,8 +74,9 @@ Boolean selectAndExecuteTest()
 	printf("\t 1) TRXVU test \n\r");
 	printf("\t 2) Solar Panels V2 test \n\r");
 	printf("\t 3) Gom EPS Test \n\r");
+	printf("\t 4) OBC Test \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 3) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 4) == 0);
 
 	switch(selection)
 	{
@@ -86,6 +88,9 @@ Boolean selectAndExecuteTest()
 			break;
 		case 3:
 			offerMoreTests = GomEPStest();
+			break;
+		case 4:
+			offerMoreTests = OBCtest();
 			break;
 
 		default:
