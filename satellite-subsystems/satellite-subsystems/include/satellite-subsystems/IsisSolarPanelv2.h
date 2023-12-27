@@ -53,7 +53,7 @@ typedef enum _IsisSolarPanel_panel_t
 	ISIS_SOLAR_PANEL_6     = 6,
 /*	ISIS_SOLAR_PANEL_7     = 7,
 	ISIS_SOLAR_PANEL_8     = 8,*/
-	ISIS_SOLAR_PANEL_COUNT = 6
+	ISIS_SOLAR_PANEL_COUNT = 7
 }
 IsisSolarPanelv2_Panel_t;
 
