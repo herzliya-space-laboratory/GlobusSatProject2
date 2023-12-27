@@ -6,12 +6,48 @@
  */
 #include "isis_OBC_demo.h"
 
-#include <satellite-subsystems/GomEPS.h>
 
+#include <satellite-subsystems/GomEPS.h>
+#include <satellite-subsystems/IsisSolarPanelv2.h>
+#include <hal/supervisor.h>
 #include <hal/errors.h>
 #include <hal/Utility/util.h>
 #include <stdio.h>
+#include <freertos/task.h>
 
+
+Boolean SolarPanelv2_Temperature2()
+{
+	int error;
+	int panel;
+	uint8_t status = 0;
+	int32_t paneltemp = 0;
+	float conv_temp;
+
+	IsisSolarPanelv2_wakeup();
+
+	printf("\r\n Temperature values \r\n");
+
+	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ )
+	{
+		error = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status);
+		if( error )
+		{
+			printf("\t Panel %d : Error (%d), Status (0x%X) \r\n", panel, error, status);
+			continue;
+		}
+
+		conv_temp = (float)(paneltemp) * ISIS_SOLAR_PANEL_CONV;
+
+		printf("\t Panel %d : %f [°C]\n", panel, conv_temp);
+	}
+
+	IsisSolarPanelv2_sleep();
+
+	vTaskDelay( 1 / portTICK_RATE_MS );
+
+	return TRUE;
+}
 /*Boolean IsisOBCdemoMain(void)
 {
 	if(IsisOBCdemoInit())									// initialize of I2C and IsisOBC subsystem drivers succeeded?
@@ -27,10 +63,31 @@
 
 static Boolean PrintBeacon(void)
 {
+	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
 	gom_eps_hk_t myEpsStatus_hk;
 	printf("\n\r EPS: \n\r");
-	printf("\tVolt battery [mV]:  %lf\r\n", (double)(myEpsStatus_hk.fields.vbatt));
-	printf("\tCurrent [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin));
+	printf("\t Volt battery [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.vbatt));
+	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V זה במילי אמפר לא צריך להיות במילי וולט
+	printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V
+	//printf("\t Charging power [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
+	printf("\t Consumed power [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.cursys));
+	printf("\t electric current [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[0]));
+	printf("\t current 3.3V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[1]));
+	printf("\t current 5V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
+	printf("\t MCU Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[3]));
+	printf("\t battery Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[4]));
+
+	printf("\n\r Solar panel: \n\r");
+	SolarPanelv2_Temperature2();
+
+	printf("\n\r OBC: \n\r");
+	printf("\t number of resets: %lu \n\r", mySupervisor_housekeeping_hk.fields.iobcResetCount);
+	printf("\t satellite uptime: %lu \n\r", mySupervisor_housekeeping_hk.fields.iobcUptime);
+
+	printf("\n\r SD: \n\r");
+
+	printf("\n\r ADC: \n\r");
+
 	return TRUE;
 }
 
