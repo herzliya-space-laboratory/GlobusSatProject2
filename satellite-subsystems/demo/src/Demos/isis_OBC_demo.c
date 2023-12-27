@@ -9,9 +9,12 @@
 
 #include <satellite-subsystems/GomEPS.h>
 #include <satellite-subsystems/IsisSolarPanelv2.h>
+
 #include <hal/supervisor.h>
 #include <hal/errors.h>
 #include <hal/Utility/util.h>
+
+#include <hcc/api_fat.h>
 #include <stdio.h>
 #include <freertos/task.h>
 
@@ -85,9 +88,12 @@ static Boolean PrintBeacon(void)
 	printf("\t satellite uptime: %lu \n\r", mySupervisor_housekeeping_hk.fields.iobcUptime);
 
 	printf("\n\r SD: \n\r");
+	printf("\t free memory [byte]: ");
 
 	printf("\n\r ADC: \n\r");
-
+	int i;
+	for(i = 0; i < 5; i++)
+		printf("\t ADC channel %d [mV]: %u", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);
 	return TRUE;
 }
 
