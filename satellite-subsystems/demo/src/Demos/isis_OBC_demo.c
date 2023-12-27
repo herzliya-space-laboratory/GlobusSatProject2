@@ -29,20 +29,20 @@ Boolean SolarPanelv2_Temperature2()
 
 	IsisSolarPanelv2_wakeup();
 
-	printf("\r\n Temperature values \r\n");
+	printf("\t Temperature values \r\n");
 
 	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ )
 	{
 		error = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status);
 		if( error )
 		{
-			printf("\t Panel %d : Error (%d), Status (0x%X) \r\n", panel, error, status);
+			printf("\t\t Panel %d : Error (%d), Status (0x%X) \r\n", panel, error, status);
 			continue;
 		}
 
 		conv_temp = (float)(paneltemp) * ISIS_SOLAR_PANEL_CONV;
 
-		printf("\t Panel %d : %f [°C]\n", panel, conv_temp);
+		printf("\t\t Panel %d : %f [°C]\n", panel, conv_temp);
 	}
 
 	IsisSolarPanelv2_sleep();
@@ -84,15 +84,15 @@ static Boolean PrintBeacon(void)
 	SolarPanelv2_Temperature2();
 
 	printf("\n\r OBC: \n\r");
-	printf("\t number of resets: %lu \n\r", mySupervisor_housekeeping_hk.fields.iobcResetCount);
-	printf("\t satellite uptime: %lu \n\r", mySupervisor_housekeeping_hk.fields.iobcUptime);
+	printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
+	printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
 
 	printf("\n\r SD: \n\r");
 	printf("\t free memory [byte]: ");
 
 	printf("\n\r ADC: \n\r");
 	int i;
-	for(i = 0; i < 5; i++)
+	for(i = 0; i < 10; i++)
 		printf("\t ADC channel %d [mV]: %u", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);
 	return TRUE;
 }
