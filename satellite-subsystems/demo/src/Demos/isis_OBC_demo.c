@@ -5,6 +5,7 @@
  *      Author: maaya
  */
 #include "isis_OBC_demo.h"
+#include  "common.h"
 
 
 #include <satellite-subsystems/GomEPS.h>
