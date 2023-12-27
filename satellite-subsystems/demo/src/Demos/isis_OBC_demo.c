@@ -109,6 +109,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 1) == 0);
 
 	switch(selection) {
+	case 0:
+		offerMoreTests = FALSE;
+		break;
 	case 1:
 		offerMoreTests = PrintBeacon();
 		break;
