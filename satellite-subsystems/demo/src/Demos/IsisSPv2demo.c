@@ -116,3 +116,14 @@ Boolean SolarPanelv2test()
 	return TRUE;
 }
 
+Boolean InitSolarPanels(void){
+	if(IsisSolarPanelv2_initialize(slave0_spi)!=0)
+	{
+		return FALSE;
+	}
+	if(IsisSolarPanelv2_sleep()!=0)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}

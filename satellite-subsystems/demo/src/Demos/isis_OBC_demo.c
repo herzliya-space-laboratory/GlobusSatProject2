@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <freertos/task.h>
 
+#include "GomEPSdemo.h"
+#include "IsisSPv2demo.h"
 
 Boolean SolarPanelv2_Temperature2()
 {
@@ -72,8 +74,8 @@ static Boolean PrintBeacon(void)
 	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
 	printf("\n\r EPS: \n\r");
-	printf("\t Volt battery [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.vbatt));
-	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V זה במילי אמפר לא צריך להיות במילי וולט
+	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
+	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V
 	printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V
 	//printf("\t Charging power [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
 	printf("\t Consumed power [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.cursys));
@@ -140,9 +142,26 @@ void IsisOBCdemoLoop(void)
 	}
 }
 
+Boolean InitOBCtests(void)
+{
+	if(!GomEPSdemoInit())
+	{
+		return FALSE;
+	}
+	/*if(!InitSolarPanels())
+	{
+		return FALSE;
+	}*/
+	return TRUE;
+}
+
 Boolean OBCtest(void)
 {
-	IsisOBCdemoLoop();
+	if (InitOBCtests())
+	{
+		IsisOBCdemoLoop();
+	}
+
 	//IsisOBCdemoMain();
 	return TRUE;
 }

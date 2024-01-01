@@ -12,4 +12,6 @@
 
 Boolean SolarPanelv2test();
 
+Boolean InitSolarPanels();
+
 #endif /* ISISSPTEST_H_ */
