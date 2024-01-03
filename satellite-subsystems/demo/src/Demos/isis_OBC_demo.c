@@ -16,7 +16,7 @@
 #include "hal/Utility/util.h"
 #include "hal/Drivers/ADC.h"
 
-#include "hcc/api_fat.h"
+#include <hcc/api_fat.h>
 #include <stdio.h>
 #include <freertos/task.h>
 
@@ -102,7 +102,7 @@ static Boolean PrintBeacon(void)
 	if(!ret)
 	{
 		printf("\t free memory [byte]: %lu \r\n", space.free);
-		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);
+		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);
 	}
 	else
 		printf("\t ERROR %d reading drive \r\n", ret);
@@ -153,7 +153,45 @@ void IsisOBCdemoLoop(void)
 		}
 	}
 }
+Boolean InitSDFat(void)
+{
+	// in FS init we don't want to use a log file !
+	// Initialize the memory for the FS
+	int err = hcc_mem_init();
+	if (err != E_NO_SS_ERR){
+		return FALSE;
+	}
+	// Initialize the FS
+	err = fs_init();
+	if (err != E_NO_SS_ERR){
+		return FALSE;
+	}
 
+	fs_start();
+
+	// Tell the OS (freeRTOS) about our FS
+	err = f_enterFS();
+	if (err != E_NO_SS_ERR){
+		return FALSE;
+	}
+
+	// Initialize the volume of SD card 0 (A)
+	err=f_initvolume( 0, atmel_mcipdc_initfunc, 0 );
+	if (err != E_NO_SS_ERR){
+	// erro init SD 0 so de-itnit and init SD 1
+	//printf("f_initvolume primary error:%d\n",err);
+	DeInitializeFS(0);
+	hcc_mem_init();
+		fs_init();
+		f_enterFS();
+		err = f_initvolume( 0, atmel_mcipdc_initfunc, 1 );
+		if (err != E_NO_SS_ERR){
+				//printf("f_initvolume secondary error:%d\n",err);
+		}
+	}
+
+	return TRUE;
+}
 Boolean InitOBCtests(void)
 {
 	if(!GomEPSdemoInit())

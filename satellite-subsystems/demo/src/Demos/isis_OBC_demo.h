@@ -9,6 +9,7 @@
 #define ISIS_OBC_DEMO_H_
 
 #include <hal/boolean.h>
+#include <hcc/api_hcc_mem.h>
 
 Boolean IsisOBCdemoMain(void);
 
