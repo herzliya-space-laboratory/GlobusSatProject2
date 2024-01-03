@@ -8,14 +8,15 @@
 #include  "common.h"
 
 
-#include <satellite-subsystems/GomEPS.h>
-#include <satellite-subsystems/IsisSolarPanelv2.h>
+#include "satellite-subsystems/GomEPS.h"
+#include "satellite-subsystems/IsisSolarPanelv2.h"
 
-#include <hal/supervisor.h>
-#include <hal/errors.h>
-#include <hal/Utility/util.h>
+#include "hal/supervisor.h"
+#include "hal/errors.h"
+#include "hal/Utility/util.h"
+#include "hal/Drivers/ADC.h"
 
-#include <hcc/api_fat.h>
+#include "hcc/api_fat.h"
 #include <stdio.h>
 #include <freertos/task.h>
 
@@ -71,8 +72,9 @@ static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
 	gom_eps_hk_t myEpsStatus_hk;
-	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
-	print_error(Supervisor_getHousekeeping(mySupervisor_housekeeping_hk, 0));
+	F_SPACE space;
+	int ret = f_getfreespace(f_getdrive(),&space);
+
 	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
 	printf("\n\r EPS: \n\r");
@@ -87,7 +89,7 @@ static Boolean PrintBeacon(void)
 	printf("\t MCU Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[3]));
 	printf("\t battery0 Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[4]));
 	printf("\t battery1 Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[5]));
-
+	printf("\t number of reboots to EPS: %d\r\n", (int)myEpsStatus_hk.fields.counter_boot);
 
 	printf("\n\r Solar panel: \n\r");
 	SolarPanelv2_Temperature2();
@@ -97,12 +99,18 @@ static Boolean PrintBeacon(void)
 	printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
 
 	printf("\n\r SD: \n\r");
-	printf("\t free memory [byte]: ");
+	if(!ret)
+	{
+		printf("\t free memory [byte]: %lu \r\n", space.free);
+		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);
+	}
+	else
+		printf("\t ERROR %d reading drive \r\n", ret);
 
 	printf("\n\r ADC: \n\r");
-	int i;
+	/*int i;
 	for(i = 0; i < 10; i++)
-		printf("\t ADC channel %d [mV]: %u", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);
+		printf("\t ADC channel %d [mV]: %u\r\n", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);*/
 	return TRUE;
 }
 
