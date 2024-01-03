@@ -1,8 +1,8 @@
 /*
  * isis_OBC_demo.c
  *
- *  Created on: 20 ·„ˆÓ 2023
- *      Author: maaya
+ *  Created on: 20 12 2023
+ *      Author: maayan
  */
 #include "isis_OBC_demo.h"
 #include  "common.h"
@@ -71,19 +71,23 @@ static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
 	gom_eps_hk_t myEpsStatus_hk;
+	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
+	print_error(Supervisor_getHousekeeping(mySupervisor_housekeeping_hk, 0));
 	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
 	printf("\n\r EPS: \n\r");
 	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
-	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V
+	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V mA
 	printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V
 	//printf("\t Charging power [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
 	printf("\t Consumed power [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.cursys));
-	printf("\t electric current [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[0]));
-	printf("\t current 3.3V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[1]));
-	printf("\t current 5V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
+	printf("\t Electric current [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[0]));
+	printf("\t Current 3.3V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[1]));
+	printf("\t Current 5V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
 	printf("\t MCU Temperature [∞C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[3]));
-	printf("\t battery Temperature [∞C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[4]));
+	printf("\t battery0 Temperature [∞C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[4]));
+	printf("\t battery1 Temperature [∞C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[5]));
+
 
 	printf("\n\r Solar panel: \n\r");
 	SolarPanelv2_Temperature2();
