@@ -193,7 +193,7 @@ Boolean InitSDFat(void)
 }
 Boolean InitOBCtests(void)
 {
-	if(!GomEPSdemoInit())
+	if(!GomEPSdemoInit() || !InitSDFat())
 	{
 		return FALSE;
 	}
