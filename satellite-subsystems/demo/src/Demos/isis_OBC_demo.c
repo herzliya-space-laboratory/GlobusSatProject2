@@ -176,11 +176,10 @@ Boolean InitSDFat(void)
 	}
 
 	// Initialize the volume of SD card 0 (A)
-	err=f_initvolume( 0, atmel_mcipdc_initfunc, 0 );
+	err = f_initvolume( 0, atmel_mcipdc_initfunc, 0 );
 	if (err != E_NO_SS_ERR){
 	// erro init SD 0 so de-itnit and init SD 1
 	//printf("f_initvolume primary error:%d\n",err);
-	DeInitializeFS(0);
 	hcc_mem_init();
 		fs_init();
 		f_enterFS();

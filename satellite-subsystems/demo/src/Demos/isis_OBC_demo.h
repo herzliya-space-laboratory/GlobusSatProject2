@@ -10,6 +10,7 @@
 
 #include <hal/boolean.h>
 #include <hcc/api_hcc_mem.h>
+#include <hcc/api_mdriver_atmel_mcipdc.h>
 
 Boolean IsisOBCdemoMain(void);
 
