@@ -103,9 +103,7 @@ static Boolean PrintBeacon(void)
 	{
 		/*printf("\t free memory [byte]: %lu \r\n", space.free);
 		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);*/
-		printf("\t There are %d bytes total\n\t%d bytes free\n\t\
-		%d bytes used\n\t%d bytes bad.\r\n",
-		space.total, space.free, space.used, space.bad);
+		printf("\t There are:\n\t %d bytes total\n\t %d bytes free\n\t %d bytes used\n\t %d bytes bad.\r\n",space.total, space.free, space.used, space.bad);
 	}
 	else
 		printf("\t ERROR %d reading drive \r\n", ret);
