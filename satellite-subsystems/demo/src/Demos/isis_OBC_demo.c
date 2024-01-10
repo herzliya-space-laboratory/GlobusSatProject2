@@ -113,8 +113,12 @@ static Boolean PrintBeacon(void)
 	int i;
 	int work = ADC_SingleShot(&adcSamples);
 	if(!work)
+	{
 		for(i = 0; i < 8; i++)
 			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]);
+		for(i = 0; i < 8; i++)
+			printf("\t ADC channel %d: %d", i, adcSamples[i]);
+	}
 	else
 		printf("\t ERROR %d reading drive \r\n", work);
 	/*int i;
