@@ -82,13 +82,13 @@ static Boolean PrintBeacon(void)
 	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V mA
 	printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V
 	//printf("\t Charging power [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
-	printf("\t Consumed power [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.cursys));
-	printf("\t Electric current [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[0]));
-	printf("\t Current 3.3V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[1]));
-	printf("\t Current 5V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
-	printf("\t MCU Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[3]));
-	printf("\t battery0 Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[4]));
-	printf("\t battery1 Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[5]));
+	printf("\t Consumed power [mA]: %d\r\n", (int)myEpsStatus_hk.fields.cursys);
+	printf("\t Electric current [mA]: %d\r\n", (int)myEpsStatus_hk.fields.curin[0]);
+	printf("\t Current 3.3V [mA]: %d\r\n", (int)myEpsStatus_hk.fields.curin[1]);
+	printf("\t Current 5V [mA]: %d\r\n", (int)myEpsStatus_hk.fields.curin[2]);
+	printf("\t MCU Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[3]);
+	printf("\t battery0 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[4]);
+	printf("\t battery1 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[5]);
 	printf("\t number of reboots to EPS: %d\r\n", (int)myEpsStatus_hk.fields.counter_boot);
 
 	printf("\n\r Solar panel: \n\r");
@@ -115,6 +115,8 @@ static Boolean PrintBeacon(void)
 	if(!work)
 		for(i = 0; i < 8; i++)
 			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]);
+	else
+		printf("\t ERROR %d reading drive \r\n", work);
 	/*int i;
 	for(i = 0; i < 10; i++)
 		printf("\t ADC channel %d [mV]: %u\r\n", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);*/
