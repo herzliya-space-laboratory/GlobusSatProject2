@@ -109,6 +109,12 @@ static Boolean PrintBeacon(void)
 		printf("\t ERROR %d reading drive \r\n", ret);
 
 	printf("\n\r ADC: \n\r");
+	int adcSamples[8];
+	int i;
+	long unsigned int work = ADC_SingleShot(adcSamples);
+	if(!work)
+		for(i = 0; i < 8; i++)
+			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]);
 	/*int i;
 	for(i = 0; i < 10; i++)
 		printf("\t ADC channel %d [mV]: %u\r\n", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);*/
