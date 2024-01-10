@@ -111,7 +111,7 @@ static Boolean PrintBeacon(void)
 	printf("\n\r ADC: \n\r");
 	int adcSamples[8];
 	int i;
-	long unsigned int work = ADC_SingleShot(adcSamples);
+	int work = ADC_SingleShot(&adcSamples);
 	if(!work)
 		for(i = 0; i < 8; i++)
 			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]);
