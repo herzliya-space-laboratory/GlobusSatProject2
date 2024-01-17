@@ -388,40 +388,6 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
     return TRUE;
 }
 
-static Boolean PrintBeacon(void)
-{
-	// supervisor_housekeeping_t mySupervisor_housekeeping_hk;
-	gom_eps_hk_t myEpsStatus_hk;
-	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
-	//print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
-	printf("\n\r EPS: \n\r");
-	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
-	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V
-	printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V
-	//printf("\t Charging power [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
-	printf("\t Consumed power [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.cursys));
-	printf("\t electric current [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[0]));
-	printf("\t current 3.3V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[1]));
-	printf("\t current 5V [mA]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
-	printf("\t MCU Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[3]));
-	printf("\t battery Temperature [°C]: %d\r\n", (int)(myEpsStatus_hk.fields.temp[4]));
-
-	printf("\n\r Solar panel: \n\r");
-	//SolarPanelv2_Temperature2();
-
-	printf("\n\r OBC: \n\r");
-	//printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
-	//printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
-
-	printf("\n\r SD: \n\r");
-	printf("\t free memory [byte]: ");
-
-	printf("\n\r ADC: \n\r");
-	int i;
-	//for(i = 0; i < 10; i++)
-		//printf("\t ADC channel %d [mV]: %u", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);
-	return TRUE;
-}
 
 static Boolean selectAndExecuteGomEPSDemoTest(void)
 {
@@ -441,9 +407,8 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
 	printf("\t 11) EPS status \n\r");
-	printf("\t 12) PrintBeacon(void) \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
 
 	switch(selection) {
 	case 0:
@@ -482,9 +447,6 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 11:
     	offerMoreTests = EPS_Status();
     	break;
-    case 12:
-		offerMoreTests = PrintBeacon();
-		break;
 	default:
 		break;
 	}

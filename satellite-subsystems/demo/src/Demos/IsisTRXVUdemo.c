@@ -56,6 +56,14 @@ static Boolean softResetVUTest(void)
 	return TRUE;
 }
 
+static Boolean vutc_sendBeacon(void)
+{
+	unsigned char data[10]  = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+	IsisTrxvu_tcSetAx25BeaconDefClSign(0, data, 10, 20);
+
+
+	return TRUE;
+}
 
 static Boolean vutc_sendEmptyPacketTest(void)
 {
@@ -476,6 +484,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	Boolean offerMoreTests = TRUE;
 
 	printf( "\n\r Select a test to perform: \n\r");
+	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Soft Reset TRXVU both microcontrollers \n\r");
 	printf("\t 2) Empty Callsign Send Test\n\r");
 	printf("\t 3) Toggle Idle state \n\r");
@@ -488,11 +497,14 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 10) Send packet inserted by the user\n\r");
 	printf("\t 11) Get the transponder on \n\r");
 	printf("\t 12) Get the transponder off \n\r");
-	printf("\t 13) Return to main menu \n\r");
+	printf("\t 13) send beacon every 20 seconds \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 13) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 13) == 0);
 
 	switch(selection) {
+	case 0:
+		offerMoreTests = FALSE;
+		break;
 	case 1:
 		offerMoreTests = softResetVUTest();
 		break;
@@ -530,7 +542,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = TransponderOff();
 		break;
 	case 13:
-		offerMoreTests = FALSE;
+		offerMoreTests = vutc_sendBeacon();
 		break;
 	default:
 		break;

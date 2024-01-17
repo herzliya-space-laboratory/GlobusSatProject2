@@ -23,7 +23,7 @@
 #include "GomEPSdemo.h"
 #include "IsisSPv2demo.h"
 
-Boolean SolarPanelv2_Temperature2()
+static Boolean SolarPanelv2_Temperature2()
 {
 	int error;
 	int panel;
@@ -68,6 +68,7 @@ Boolean SolarPanelv2_Temperature2()
 	}
 }*/
 
+
 static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
@@ -79,8 +80,8 @@ static Boolean PrintBeacon(void)
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
 	printf("\n\r EPS: \n\r");
 	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
-	printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V mA
-	printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V
+	//printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V mA //not right
+	//printf("\t Volt 3.3V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[0]); //curout[0] - 3.3V //not right
 	//printf("\t Charging power [mV]: %d\r\n", (int)(myEpsStatus_hk.fields.curin[2]));
 	printf("\t Consumed power [mA]: %d\r\n", (int)myEpsStatus_hk.fields.cursys);
 	printf("\t Electric current [mA]: %d\r\n", (int)myEpsStatus_hk.fields.curin[0]);
@@ -103,15 +104,15 @@ static Boolean PrintBeacon(void)
 	{
 		/*printf("\t free memory [byte]: %lu \r\n", space.free);
 		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);*/
-		printf("\t There are:\n\t %d bytes total\n\t %d bytes free\n\t %d bytes used\n\t %d bytes bad.\r\n",space.total, space.free, space.used, space.bad);
+		printf("\t There are:\n\t %lu bytes total\n\t %lu bytes free\n\t %lu bytes used\n\t %lu bytes bad.\r\n",space.total, space.free, space.used, space.bad);
 	}
 	else
 		printf("\t ERROR %d reading drive \r\n", ret);
 
 	printf("\n\r ADC: \n\r");
-	int adcSamples[8];
+	unsigned short adcSamples[8];
 	int i;
-	int work = ADC_SingleShot(&adcSamples);
+	int work = ADC_SingleShot(adcSamples);
 	if(!work)
 	{
 		for(i = 0; i < 8; i++)
@@ -126,6 +127,7 @@ static Boolean PrintBeacon(void)
 		printf("\t ADC channel %d [mV]: %u\r\n", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);*/
 	return TRUE;
 }
+
 
 static Boolean selectAndExecuteTRXVUDemoTest(void)
 {
