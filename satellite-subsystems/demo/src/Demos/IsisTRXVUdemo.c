@@ -65,6 +65,12 @@ static Boolean vutc_sendBeacon(void)
 	return TRUE;
 }
 
+static Boolean vutc_stopSendingBeacon(void)
+{
+	IsisTrxvu_tcClearBeacon(0);
+	return TRUE;
+}
+
 static Boolean vutc_sendEmptyPacketTest(void)
 {
 	//Buffers and variables definition
@@ -498,8 +504,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 11) Get the transponder on \n\r");
 	printf("\t 12) Get the transponder off \n\r");
 	printf("\t 13) send beacon every 20 seconds \n\r");
+	printf("\t 14) Stop sending beacon \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 13) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0);
 
 	switch(selection) {
 	case 0:
@@ -543,6 +550,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 13:
 		offerMoreTests = vutc_sendBeacon();
+		break;
+	case 14:
+		offerMoreTests = vutc_stopSendingBeacon();
 		break;
 	default:
 		break;
