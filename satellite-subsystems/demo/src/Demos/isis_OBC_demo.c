@@ -128,6 +128,11 @@ static Boolean PrintBeacon(void)
 	return TRUE;
 }
 
+static Boolean yuve(void)
+{
+	printf("The all mighty yuve was here\n\r");
+	return TRUE;
+}
 
 static Boolean selectAndExecuteTRXVUDemoTest(void)
 {
@@ -137,8 +142,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf( "\n\r Select a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
+	printf("\t 2) Print Yuval \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 1) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0);
 
 	switch(selection) {
 	case 0:
@@ -146,6 +152,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 1:
 		offerMoreTests = PrintBeacon();
+		break;
+	case 2:
+		offerMoreTests = yuve();
 		break;
 	default:
 		break;
