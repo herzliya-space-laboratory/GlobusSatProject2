@@ -74,7 +74,7 @@ static Boolean PrintBeacon(void)
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
 	gom_eps_hk_t myEpsStatus_hk;
 	F_SPACE space;
-	int ret = f_getfreespace(f_getdrive(),&space);
+	int ret = f_getfreespace(f_getdrive(), &space);
 
 	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
