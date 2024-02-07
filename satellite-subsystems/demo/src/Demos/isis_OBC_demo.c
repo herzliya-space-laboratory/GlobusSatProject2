@@ -134,7 +134,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
-	printf( "\n\r Select a test to perform: \n\r");
+	printf("\n\r Select a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 
