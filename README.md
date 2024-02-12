@@ -1,5 +1,3 @@
-https://drive.google.com/file/d/1S1JTHGlHGBIdDuXs49dvlr_Vj969hPQx/view
-
 # TEVEL-2 Flight Software
 This repository contains the flight software for the TEVEL-2 program CubeSat developed by Tel Aviv University in collaboration with ISIS - Innovative Solutions In Space.
 
