@@ -129,7 +129,7 @@ static Boolean PrintBeacon(void)
 }
 
 
-static Boolean selectAndExecuteTRXVUDemoTest(void)
+static Boolean selectAndExecuteOBCDemoTest(void)
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
@@ -160,7 +160,7 @@ void IsisOBCdemoLoop(void)
 
 	while(1)
 	{
-		offerMoreTests = selectAndExecuteTRXVUDemoTest();	// show the demo command line interface and handle commands
+		offerMoreTests = selectAndExecuteOBCDemoTest();	// show the demo command line interface and handle commands
 
 		if(offerMoreTests == FALSE)							// was exit/back selected?
 		{
