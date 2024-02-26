@@ -75,8 +75,9 @@ Boolean selectAndExecuteTest()
 	printf("\t 2) Solar Panels V2 test \n\r");
 	printf("\t 3) Gom EPS Test \n\r");
 	printf("\t 4) OBC Test \n\r");
+	printf("\t 5) ISIS EPS Test \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 4) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 5) == 0);
 
 	switch(selection)
 	{
@@ -92,7 +93,9 @@ Boolean selectAndExecuteTest()
 		case 4:
 			offerMoreTests = OBCtest();
 			break;
-
+		case 5:
+			offerMoreTests = isis_eps__test();
+			break;
 		default:
 			break;
 	}
