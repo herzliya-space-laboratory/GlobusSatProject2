@@ -81,7 +81,7 @@ Boolean selectAndExecuteSolarPanelsv2DemoTest()
 	Boolean offerMoreTests = TRUE;
 
 	printf("\n\r Select a test to perform: \n\r");
-	printf("\t 1) Solar Panel Temperature \n\r");
+	printf("\t 1) Solar internal temperature sensor State \n\r");
 	printf("\t 2) Solar Panel State \n\r");
 	printf("\t 3) Return to main menu \n\r");
 
