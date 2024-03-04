@@ -34,6 +34,8 @@
 ////General Variables
 #define	AUTO_DEPLOYMENT_TIME	10
 #define MANUAL_DEPLOYMENT_TIME  10
+// #define AUTO_DPLOYMENT
+// #define MANUAL_DPLOYMENT
 
 // Function calls to reset both sides of the AntS
 static Boolean resetAntSTest(unsigned char index)
@@ -206,7 +208,7 @@ static Boolean autoDeploymentAntSTest(unsigned char index, ISISantsSide side)
 {
 	unsigned char antennaSystemsIndex = index;
 	int rv;
-
+#ifdef AUTO_DPLOYMENT
 	printf("Auto deployment side %c ...\n\r", side + 'A');
 
 	{	// check ARM status; if not ARMed no actual deployment will result
@@ -240,6 +242,7 @@ static Boolean autoDeploymentAntSTest(unsigned char index, ISISantsSide side)
 		printf( "Auto-deployment command side %c successfully issued. \n\r", side + 'A');
 	}
 
+#endif
 	return TRUE;
 }
 
@@ -249,7 +252,7 @@ static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
     int antennaSelection = 0;
     unsigned char antennaSystemsIndex = index;
     int rv;
-
+#ifdef MANUAL_DPLOYMENT
 	printf("Manual deployment side %c ...\n\r", side + 'A');
 
 	{	// check ARM status; if not ARMed no actual deployment will result
@@ -279,7 +282,7 @@ static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
 	print_error(IsisAntS_attemptDeployment(antennaSystemsIndex, side, antennaSelection-1, isisants_normalDeployment, MANUAL_DEPLOYMENT_TIME));
 	printf( "Waiting %ds. for deployment of antenna %d on side %c\n\r...", MANUAL_DEPLOYMENT_TIME, antennaSelection, side + 'A');
 	vTaskDelay(MANUAL_DEPLOYMENT_TIME*1000 / portTICK_RATE_MS);
-    
+#endif
     return TRUE;
 }
 
