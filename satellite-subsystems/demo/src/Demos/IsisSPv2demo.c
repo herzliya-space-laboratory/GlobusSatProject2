@@ -51,7 +51,30 @@ Boolean SolarPanelv2_Temperature()
 
 	return TRUE;
 }
+Boolean SolarPanelv2_State() {
+	IsisSolarPanelv2_State_t state;
 
+	IsisSolarPanelv2_wakeup();
+
+	state = IsisSolarPanelv2_getState();
+	switch (state) {
+	case ISIS_SOLAR_PANEL_STATE_NOINIT:
+		printf("the current state is: NOINIT /r/n");
+		break;
+	case ISIS_SOLAR_PANEL_STATE_SLEEP:
+		printf("the current state is: SLEEP /r/n");
+		break;
+	case ISIS_SOLAR_PANEL_STATE_AWAKE:
+		printf("the current state is: AWAKE /r/n");
+		break;
+
+	default:
+		break;
+	}
+	IsisSolarPanelv2_sleep();
+
+	return TRUE;
+}
 Boolean selectAndExecuteSolarPanelsv2DemoTest()
 {
 	int selection = 0;
@@ -59,9 +82,10 @@ Boolean selectAndExecuteSolarPanelsv2DemoTest()
 
 	printf("\n\r Select a test to perform: \n\r");
 	printf("\t 1) Solar Panel Temperature \n\r");
-	printf("\t 2) Return to main menu \n\r");
+	printf("\t 2) Solar Panel State \n\r");
+	printf("\t 3) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 2) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 3) == 0);
 
 	switch(selection)
 	{
@@ -69,6 +93,9 @@ Boolean selectAndExecuteSolarPanelsv2DemoTest()
 		offerMoreTests = SolarPanelv2_Temperature();
 		break;
 	case 2:
+		offerMoreTests = SolarPanelv2_State();
+		break;
+	case 3:
 		offerMoreTests = FALSE;
 		break;
 
@@ -116,3 +143,14 @@ Boolean SolarPanelv2test()
 	return TRUE;
 }
 
+Boolean InitSolarPanels(void){
+	if(IsisSolarPanelv2_initialize(slave0_spi)!=0)
+	{
+		return FALSE;
+	}
+	if(IsisSolarPanelv2_sleep()!=0)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
