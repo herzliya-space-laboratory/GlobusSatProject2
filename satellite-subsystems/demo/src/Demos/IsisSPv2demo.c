@@ -51,6 +51,31 @@ Boolean SolarPanelv2_Temperature()
 
 	return TRUE;
 }
+
+Boolean SolarPanelv2_State() {
+	IsisSolarPanelv2_State_t state;
+
+	IsisSolarPanelv2_wakeup();
+
+	state = IsisSolarPanelv2_getState();
+	switch (state) {
+	case ISIS_SOLAR_PANEL_STATE_NOINIT:
+		printf("the current state is: NOINIT \r\n");
+		break;
+	case ISIS_SOLAR_PANEL_STATE_SLEEP:
+		printf("the current state is: SLEEP \r\n");
+		break;
+	case ISIS_SOLAR_PANEL_STATE_AWAKE:
+		printf("the current state is: AWAKE \r\n");
+		break;
+
+	default:
+		break;
+	}
+	IsisSolarPanelv2_sleep();
+
+	return TRUE;
+}
 Boolean selectAndExecuteSolarPanelsv2DemoTest()
 {
 	int selection = 0;
