@@ -59,13 +59,13 @@ Boolean SolarPanelv2_State() {
 	state = IsisSolarPanelv2_getState();
 	switch (state) {
 	case ISIS_SOLAR_PANEL_STATE_NOINIT:
-		printf("the current state is: NOINIT /r/n");
+		printf("the current state is: NOINIT \r\n");
 		break;
 	case ISIS_SOLAR_PANEL_STATE_SLEEP:
-		printf("the current state is: SLEEP /r/n");
+		printf("the current state is: SLEEP \r\n");
 		break;
 	case ISIS_SOLAR_PANEL_STATE_AWAKE:
-		printf("the current state is: AWAKE /r/n");
+		printf("the current state is: AWAKE \r\n");
 		break;
 
 	default:
