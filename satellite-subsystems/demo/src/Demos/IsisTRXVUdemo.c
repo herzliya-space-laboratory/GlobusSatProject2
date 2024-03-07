@@ -248,7 +248,29 @@ static void vurc_revDInterruptCallback()
         portYIELD_FROM_ISR();
     }
 }
-
+static Boolean Get_transmitter_Bitrate_Test() {
+	ISIStrxvuTransmitterState currentstate;
+	int error = IsisTrxvu_tcGetState(0, &currentstate);
+	if (!error) printf("there was an error getting the state of the transmitter: %d", error);
+    switch (currentstate.fields.transmitter_bitrate) {
+        case trxvu_bitratestatus_1200:
+            printf("\r\n Transmitter bitrate: 1200 bps\r\n");
+            break;
+        case trxvu_bitratestatus_2400:
+            printf("\r\n Transmitter bitrate: 2400 bps\r\n");
+            break;
+        case trxvu_bitratestatus_4800:
+            printf("\r\nTransmitter bitrate: 4800 bps\r\n");
+            break;
+        case trxvu_bitratestatus_9600:
+            printf("\r\n Transmitter bitrate: 9600 bps\r\n");
+            break;
+        default:
+            printf("\r\n Unknown transmitter bitrate\r\n");
+            break;
+    }
+	return TRUE;
+}
 static Boolean vurc_getFrameCmdInterruptTest(void)
 {
     //Using a binary semaphore for syncronization between the interrupt and this task
@@ -457,9 +479,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 10) (revD) Get command frame by interrupt \n\r");
 	printf("\t 11) (revD) Get receiver telemetry \n\r");
 	printf("\t 12) (revD) Get transmitter telemetry \n\r");
-	printf("\t 13) Return to main menu \n\r");
+	printf("\t 13) get the current bitrate");
+	printf("\t 14) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 13) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 14) == 0);
 
 	switch(selection) {
 	case 1:
@@ -499,6 +522,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = vutc_getTxTelemTest_revD();
 		break;
 	case 13:
+		offerMoreTests = Get_transmitter_Bitrate_Test();
+		break;
+	case 14:
 		offerMoreTests = FALSE;
 		break;
 
