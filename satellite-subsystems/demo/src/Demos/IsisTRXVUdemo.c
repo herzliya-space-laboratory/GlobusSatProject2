@@ -58,12 +58,23 @@ static Boolean softResetVUTest(void)
 
 static Boolean hardResetVUTest(void)
 {
-     printf("\r\n Hard Reset of both receiver and transmitter microcontrollers \r\n");
-     print_error(IsisTrxvu_componentHardReset(0, trxvu_rc));
-     vTaskDelay(1 / portTICK_RATE_MS);
-     print_error(IsisTrxvu_componentHardReset(0, trxvu_tc));
-     return TRUE;
-
+	int safetycheck = 0;
+	printf("\r\n Hard reseting may cause issues and damage the receiver and transmitter microcontrollers \r\n");
+	printf("\r\n Are you sure you want to continue press 1 if yes. press 0 if no /r/n");
+	UTIL_DbguGetIntegerMinMax(&safetycheck, 0, 1);
+	switch (safetycheck) {
+	case 0:
+		return TRUE;
+	case 1:
+	     printf("\r\n Hard Reset of both receiver and transmitter microcontrollers \r\n");
+	     print_error(IsisTrxvu_componentHardReset(0, trxvu_rc));
+	     vTaskDelay(1 / portTICK_RATE_MS);
+	     print_error(IsisTrxvu_componentHardReset(0, trxvu_tc));
+	     return TRUE;
+	default:
+		return TRUE;
+	}
+return TRUE;
 
 }
 
