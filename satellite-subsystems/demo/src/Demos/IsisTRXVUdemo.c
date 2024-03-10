@@ -288,6 +288,23 @@ static Boolean Get_Idle_State_Test() {
 	    }
 	return TRUE;
 }
+static Boolean Get_transmitter_beacon_Test(){
+	ISIStrxvuTransmitterState currentstate;
+	int error = IsisTrxvu_tcGetState(0, &currentstate);
+	if (!error) printf("there was an error getting the state of the transmitter: %d", error);
+	switch (currentstate.fields.transmitter_beacon) {
+		case trxvu_beacon_none:
+			printf("\r\n Transmitter beacon mode: None\r\n");
+			break;
+		case trxvu_beacon_active:
+			printf("\r\n Transmitter beacon mode: Active\r\n");
+			break;
+		default:
+			printf("\r\n Unknown transmitter beacon mode\r\n");
+			break;
+	}
+	return TRUE;
+}
 static Boolean vurc_getFrameCmdInterruptTest(void)
 {
     //Using a binary semaphore for syncronization between the interrupt and this task
@@ -498,9 +515,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 12) (revD) Get transmitter telemetry \n\r");
 	printf("\t 13) get the current bitrate");
 	printf("\t 14) get the current Idle state of the transmitter");
-	printf("\t 15) Return to main menu \n\r");
+	printf("\t 15) get the transmitter beacon ");
+	printf("\t 16) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 15) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 16) == 0);
 
 	switch(selection) {
 	case 1:
@@ -546,7 +564,11 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = Get_Idle_State_Test();
 		break;
 	case 15:
+		offerMoreTests = Get_transmitter_beacon_Test();
+		break;
+	case 16:
 		offerMoreTests = FALSE;
+
 		break;
 
 	default:
