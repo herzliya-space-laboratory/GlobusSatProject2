@@ -71,7 +71,7 @@ static Boolean SolarPanelv2_Temperature2()
 }*/
 
 
-static Boolean PrintBeaconGom(void)
+static Boolean PrintBeacon(void)
 {
 #ifdef USE_EPS_ISIS
 	printf("\n\r You are using the wrong EPS this id the function for EPS.Gom \n\r");
@@ -141,8 +141,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 
 	printf("\n\r Select a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
-	printf("\t 1) Print beacon eps.Gom \n\r");
-	printf("\t 2) Print beacon eps.ISIS \n\r");
+	printf("\t 1) Print beacon \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
 
@@ -151,7 +150,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		offerMoreTests = FALSE;
 		break;
 	case 1:
-		offerMoreTests = PrintBeaconGom();
+		offerMoreTests = PrintBeacon();
 		break;
 	default:
 		break;
