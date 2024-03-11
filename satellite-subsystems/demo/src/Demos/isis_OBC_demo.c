@@ -7,6 +7,7 @@
 #include "isis_OBC_demo.h"
 #include  "common.h"
 
+#include <satellite-subsystems/imepsv2_piu.h>
 
 #include "satellite-subsystems/GomEPS.h"
 #include "satellite-subsystems/IsisSolarPanelv2.h"
@@ -73,16 +74,33 @@ static Boolean SolarPanelv2_Temperature2()
 
 static Boolean PrintBeacon(void)
 {
-#ifdef USE_EPS_ISIS
-	printf("\n\r You are using the wrong EPS this id the function for EPS.Gom \n\r");
-#else
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
-	gom_eps_hk_t myEpsStatus_hk;
 	F_SPACE space;
 	int ret = f_getfreespace(f_getdrive(), &space);
+	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
+
+#ifdef USE_EPS_ISIS
+	imepsv2_piu__gethousekeepingeng__from_t response;
+
+	int error = imepsv2_piu__gethousekeepingeng(0,&response);
+	if( error )
+		TRACE_ERROR("imepsv2_piu__gethousekeepingeng(...) return error (%d)!\n\r",error);
+	else
+	{
+		printf("\n\r EPS: \n\r");
+		printf("\t Volt battery [mV]: %d\r\n", response.fields.batt_input.fields.volt);
+
+		printf("Consumed power: %d mW \n\r", response.fields.dist_input.fields.power * 10);
+//need finish
+		printf("\t MCU Temperature [°C]: %2f\r\n",((double)response.fields.temp) * 0.01);
+
+	}
+
+#else
+	gom_eps_hk_t myEpsStatus_hk;
+
 
 	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
-	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
 	printf("\n\r EPS: \n\r");
 	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
 	//printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V mA //not right
