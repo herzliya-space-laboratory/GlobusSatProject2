@@ -23,6 +23,8 @@
 #include "GomEPSdemo.h"
 #include "IsisSPv2demo.h"
 
+//#define USE_EPS_ISIS
+
 static Boolean SolarPanelv2_Temperature2()
 {
 	int error;
@@ -69,8 +71,11 @@ static Boolean SolarPanelv2_Temperature2()
 }*/
 
 
-static Boolean PrintBeacon(void)
+static Boolean PrintBeaconGom(void)
 {
+#ifdef USE_EPS_ISIS
+	printf("\n\r You are using the wrong EPS this id the function for EPS.Gom \n\r");
+#else
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
 	gom_eps_hk_t myEpsStatus_hk;
 	F_SPACE space;
@@ -91,7 +96,7 @@ static Boolean PrintBeacon(void)
 	printf("\t battery0 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[4]);
 	printf("\t battery1 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[5]);
 	printf("\t number of reboots to EPS: %d\r\n", (int)myEpsStatus_hk.fields.counter_boot);
-
+#endif
 	printf("\n\r Solar panel: \n\r");
 	SolarPanelv2_Temperature2();
 
@@ -136,7 +141,8 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 
 	printf("\n\r Select a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
-	printf("\t 1) Print beacon \n\r");
+	printf("\t 1) Print beacon eps.Gom \n\r");
+	printf("\t 2) Print beacon eps.ISIS \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
 
@@ -145,7 +151,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		offerMoreTests = FALSE;
 		break;
 	case 1:
-		offerMoreTests = PrintBeacon();
+		offerMoreTests = PrintBeaconGom();
 		break;
 	default:
 		break;
@@ -210,7 +216,7 @@ Boolean InitSDFat(void)
 }
 Boolean InitOBCtests(void)
 {
-	if(!GomEPSdemoInit() || !InitSDFat())
+	if((!GomEPSdemoInit() && !isis_eps__demo__init()) || !InitSDFat())
 	{
 		return FALSE;
 	}
