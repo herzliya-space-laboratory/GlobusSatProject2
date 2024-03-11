@@ -68,10 +68,7 @@ static Boolean SolarPanelv2_Temperature2()
 	}
 }*/
 
-static Boolean PrintName(void) {
-	printf("i am ben\r\n");
-	return TRUE;
-}
+
 static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
@@ -140,7 +137,6 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\n\r Select a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
-	printf("\t 2) Print my Name \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
 
@@ -150,9 +146,6 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 1:
 		offerMoreTests = PrintBeacon();
-		break;
-	case 2:
-		offerMoreTests = PrintName();
 		break;
 	default:
 		break;
