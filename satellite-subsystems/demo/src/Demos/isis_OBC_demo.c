@@ -16,6 +16,7 @@
 #include "hal/errors.h"
 #include "hal/Utility/util.h"
 #include "hal/Drivers/ADC.h"
+#include "hal/Storage/FRAM.h"
 
 #include <hcc/api_fat.h>
 #include <stdio.h>
@@ -89,10 +90,10 @@ static Boolean PrintBeacon(void)
 		printf("\n\r EPS: \n\r");
 		printf("\t Volt battery [mV]: %d\r\n", response.fields.batt_input.fields.volt);
 
-		printf("Consumed power: %d mW \n\r", response.fields.dist_input.fields.power * 10);
+		printf("Consumed power [mW]: %d\r\n", response.fields.dist_input.fields.power * 10);
 //need finish
 		printf("\t MCU Temperature [°C]: %2f\r\n",((double)response.fields.temp) * 0.01);
-
+		printf("\t Battery Temperature [°C]: %2f\r\n", ((double)response.fields.temp2) * 0.01))
 	}
 
 #else
@@ -150,6 +151,13 @@ static Boolean PrintBeacon(void)
 	return TRUE;
 }
 
+static Boolean WriteAndReadFromFRAM(void){
+	print_error(FRAM_start());
+	const unsigned char data[] = "hello";
+	unsigned int address = FRAM_getMaxAddress() - sizeof(data);
+	print_error(FRAM_writeAndVerify(data, address, sizeof(data)));
+	return TRUE;
+}
 
 static Boolean selectAndExecuteOBCDemoTest(void)
 {
@@ -159,7 +167,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\n\r Select a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
-
+	printf("\t 2) Write and read from FRAM \n\r");
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
 
 	switch(selection) {
@@ -168,6 +176,9 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 1:
 		offerMoreTests = PrintBeacon();
+		break;
+	case 2:
+		offerMoreTests = WriteAndReadFromFRAM();
 		break;
 	default:
 		break;
