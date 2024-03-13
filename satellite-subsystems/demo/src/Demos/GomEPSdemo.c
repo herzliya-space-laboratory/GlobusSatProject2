@@ -392,7 +392,7 @@ static Boolean EPS_PingTest(void)
 {
 	unsigned char ping_byte_out;
 	GomEpsPing(0, 'A',&ping_byte_out);
-    printf(ping_byte_out);
+    printf("%c",ping_byte_out);
     return TRUE;
 }
 
@@ -414,7 +414,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
 	printf("\t 11) EPS status \n\r");
-	printf("\t 12) EPS PING   \n\r");
+	printf("\t 12) EPS Ping   \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0);
 
