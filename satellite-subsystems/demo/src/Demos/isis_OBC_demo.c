@@ -158,7 +158,7 @@ static Boolean WriteAndReadFromFRAM(void){
 	unsigned int address = FRAM_getMaxAddress() - sizeof(data) - 10;
 	print_error(FRAM_writeAndVerify(data, address, sizeof(data)));
 	print_error(FRAM_read(writenData, address, sizeof(data)));
-	int i = 0;
+	unsigned int i = 0;
 	for(i = 0; i < sizeof(data); i++)
 	{
 		if(writenData[i] != data[i])
