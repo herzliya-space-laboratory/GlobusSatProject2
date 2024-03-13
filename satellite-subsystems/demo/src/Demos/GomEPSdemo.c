@@ -26,6 +26,7 @@
 #include <satellite-subsystems/GomEPS.h>
 
 #include <hal/errors.h>
+#include <hal/Timing/Time.h>
 
 static Boolean EPS_TelemetryHKbasic(void)
 {
@@ -390,9 +391,14 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
 
 static Boolean EPS_PingTest(void)
 {
+	// TODO check how ling the ping takes
+
 	unsigned char ping_byte_out;
 	GomEpsPing(0, 'A',&ping_byte_out);
-    printf("%c",ping_byte_out);
+	printf("%c",ping_byte_out);
+
+
+
     return TRUE;
 }
 
