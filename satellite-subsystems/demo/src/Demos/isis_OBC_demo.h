@@ -7,6 +7,7 @@
 
 #ifndef ISIS_OBC_DEMO_H_
 #define ISIS_OBC_DEMO_H_
+//#define USE_EPS_ISIS TRUE
 
 #include <hal/boolean.h>
 #include <hcc/api_hcc_mem.h>

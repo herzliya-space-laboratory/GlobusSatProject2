@@ -23,8 +23,9 @@
 
 #include "GomEPSdemo.h"
 #include "IsisSPv2demo.h"
+#include "isis_eps_demo.h"
 
-//#define USE_EPS_ISIS
+//#define USE_EPS_ISIS TRUE
 
 static Boolean SolarPanelv2_Temperature2()
 {
@@ -233,10 +234,17 @@ Boolean InitSDFat(void)
 }
 Boolean InitOBCtests(void)
 {
-	if((!GomEPSdemoInit() && !isis_eps__demo__init()) || !InitSDFat())
+#ifdef USE_EPS_ISIS
+	if(!isis_eps__demo__init() || !InitSDFat())
 	{
 		return FALSE;
 	}
+#else
+	if(!GomEPSdemoInit() || !InitSDFat())
+		{
+			return FALSE;
+		}
+#endif
 	/*if(!InitSolarPanels())
 	{
 		return FALSE;
