@@ -91,7 +91,7 @@ static Boolean PrintBeacon(void)
 		printf("\t Volt battery [mV]: %d\r\n", response.fields.batt_input.fields.volt);
 
 		printf("Consumed power [mW]: %d\r\n", response.fields.dist_input.fields.power * 10);
-//need finish
+//todo:need finish
 		printf("\t MCU Temperature [°C]: %2f\r\n",((double)response.fields.temp) * 0.01);
 		printf("\t Battery Temperature [°C]: %2f\r\n", ((double)response.fields.temp2) * 0.01))
 	}
@@ -152,7 +152,6 @@ static Boolean PrintBeacon(void)
 }
 
 static Boolean WriteAndReadFromFRAM(void){
-	print_error(FRAM_start());
 	const unsigned char data[] = "hello";
 	unsigned char writenData[sizeof(data)];
 	unsigned int address = FRAM_getMaxAddress() - sizeof(data) - 10;
@@ -173,15 +172,29 @@ static Boolean WriteAndReadFromFRAM(void){
 	return TRUE;
 }
 
+static Boolean supervisorResetTest(void)
+{
+	supervisor_generic_reply_t reply;
+
+	int err = Supervisor_reset(&reply, SUPERVISOR_SPI_INDEX);
+	if(!err)
+		printf("The supervisor has reset. \r\n");
+	else
+		print_error(err);
+
+	return TRUE;
+}
+
 static Boolean selectAndExecuteOBCDemoTest(void)
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
-	printf("\n\r Select a test to perform: \n\r");
+	printf("\n\rSelect a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
+	printf("\t 3) Reset the supervisor \n\r");
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
 
 	switch(selection) {
@@ -193,6 +206,9 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 2:
 		offerMoreTests = WriteAndReadFromFRAM();
+		break;
+	case 3:
+		offerMoreTests = supervisorResetTest();
 		break;
 	default:
 		break;
@@ -216,6 +232,27 @@ void IsisOBCdemoLoop(void)
 	}
 }
 
+Boolean InitFRAM(void)
+{
+	int error = FRAM_start();
+	if(error != E_NO_SS_ERR)
+	{
+		print_error(error);
+		return FALSE;
+	}
+	return TRUE;
+}
+
+Boolean InitSupervisor(void)
+{
+	int error = Supervisor_start(SUPERVISOR_SPI_INDEX, 0);
+	if(error != E_NO_SS_ERR)
+	{
+		print_error(error);
+		return FALSE;
+	}
+	return TRUE;
+}
 
 Boolean InitSDFat(void)
 {
@@ -258,15 +295,15 @@ Boolean InitSDFat(void)
 Boolean InitOBCtests(void)
 {
 #ifdef USE_EPS_ISIS
-	if(!isis_eps__demo__init() || !InitSDFat())
+	if(!isis_eps__demo__init() || !InitSDFat() || !InitSupervisor() || !InitFRAM())
 	{
 		return FALSE;
 	}
 #else
-	if(!GomEPSdemoInit() || !InitSDFat())
-		{
-			return FALSE;
-		}
+	if(!GomEPSdemoInit() || !InitSDFat() || !InitSupervisor() || !InitFRAM())
+	{
+		return FALSE;
+	}
 #endif
 	/*if(!InitSolarPanels())
 	{
