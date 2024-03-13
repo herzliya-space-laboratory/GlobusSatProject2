@@ -167,7 +167,7 @@ static Boolean WriteAndReadFromFRAM(void){
 			break;
 		}
 	}
-	if(i < sizeof(data) - 1)
+	if(i > sizeof(data) - 1)
 		printf("It write down what you wanted. \r\n");
 
 	return TRUE;
