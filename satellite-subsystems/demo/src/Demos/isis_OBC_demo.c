@@ -154,8 +154,14 @@ static Boolean PrintBeacon(void)
 static Boolean WriteAndReadFromFRAM(void){
 	print_error(FRAM_start());
 	const unsigned char data[] = "hello";
-	unsigned int address = FRAM_getMaxAddress() - sizeof(data);
+	unsigned char WritenData[];
+	unsigned int address = FRAM_getMaxAddress() - sizeof(data) - 10;
 	print_error(FRAM_writeAndVerify(data, address, sizeof(data)));
+	print_error(FRAM_read(WritenData, address, sizeof(data)));
+	if(WritenData == data)
+		printf("It write down what you wanted. \r\n");
+	else
+		printf("It doesn't write down what you wanted. \r\n");
 	return TRUE;
 }
 
