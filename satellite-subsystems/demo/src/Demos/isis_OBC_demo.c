@@ -25,8 +25,6 @@
 #include "IsisSPv2demo.h"
 #include "isis_eps_demo.h"
 
-//#define USE_EPS_ISIS TRUE
-
 static Boolean SolarPanelv2_Temperature2()
 {
 	int error;
