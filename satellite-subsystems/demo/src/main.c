@@ -73,12 +73,15 @@ Boolean selectAndExecuteTest()
 	printf( "\n\r Select the device to be tested to perform: \n\r");
 	printf("\t 1) TRXVU test \n\r");
 	printf("\t 2) Solar Panels V2 test \n\r");
+#ifdef USE_EPS_ISIS //this define is in the file of isis_OBC_demo.h
+	printf("\t 3) isis EPS Test \n\r");
+#else
 	printf("\t 3) Gom EPS Test \n\r");
+#endif
 	printf("\t 4) OBC Test \n\r");
 	printf("\t 5) Ants Test \n\t");
-	printf("\t 6) ISIS EPS Test \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 6) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 5) == 0);
 
 	switch(selection)
 	{
@@ -89,16 +92,17 @@ Boolean selectAndExecuteTest()
 			offerMoreTests = SolarPanelv2test();
 			break;
 		case 3:
+#ifdef USE_EPS_ISIS
+			offerMoreTests = isis_eps__test();
+#else
 			offerMoreTests = GomEPStest();
+#endif
 			break;
 		case 4:
 			offerMoreTests = OBCtest();
 			break;
 		case 5:
 			offerMoreTests = AntStest();
-			break;
-		case 6:
-			offerMoreTests = isis_eps__test();
 			break;
 		default:
 			break;
