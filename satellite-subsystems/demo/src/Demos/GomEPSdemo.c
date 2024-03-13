@@ -388,6 +388,13 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
     return TRUE;
 }
 
+static Boolean EPS_PingTest(void)
+{
+	unsigned char ping_byte_out;
+	GomEpsPing(0, 'A',&ping_byte_out);
+    printf(ping_byte_out);
+    return TRUE;
+}
 
 static Boolean selectAndExecuteGomEPSDemoTest(void)
 {
@@ -407,8 +414,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
 	printf("\t 11) EPS status \n\r");
+	printf("\t 12) EPS PING   \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0);
 
 	switch(selection) {
 	case 0:
@@ -447,8 +455,12 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 11:
     	offerMoreTests = EPS_Status();
     	break;
+    case 12:
+    	offerMoreTests = EPS_PingTest();
+    	break;
 	default:
 		break;
+
 	}
 
 	return offerMoreTests;
@@ -504,3 +516,4 @@ Boolean GomEPStest(void)
 	GomEPSdemoMain();
 	return TRUE;
 }
+
