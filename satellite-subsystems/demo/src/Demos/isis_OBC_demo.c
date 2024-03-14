@@ -80,20 +80,24 @@ static Boolean PrintBeacon(void)
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
 
 #ifdef USE_EPS_ISIS
-	imepsv2_piu__gethousekeepingeng__from_t response;
+	imepsv2_piu__gethousekeepingeng__from_t responseEPS;
 
-	int error = imepsv2_piu__gethousekeepingeng(0,&response);
+	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS);
 	if( error )
 		TRACE_ERROR("imepsv2_piu__gethousekeepingeng(...) return error (%d)!\n\r",error);
 	else
 	{
 		printf("\n\r EPS: \n\r");
-		printf("\t Volt battery [mV]: %d\r\n", response.fields.batt_input.fields.volt);
-
-		printf("Consumed power [mW]: %d\r\n", response.fields.dist_input.fields.power * 10);
-//todo:need finish
-		printf("\t MCU Temperature [°C]: %2f\r\n",((double)response.fields.temp) * 0.01);
-		printf("\t Battery Temperature [°C]: %2f\r\n", ((double)response.fields.temp2) * 0.01))
+		printf("\t Volt battery [mV]: %d\r\n", responseEPS.fields.batt_input.fields.volt);
+		//todo:Volt 5V [mV]
+		//todo:Volt 3.3V [mV]
+		//todo:Charging power [mW]
+		printf("\t Consumed power [mW]: %d\r\n", responseEPS.fields.dist_input.fields.power * 10);
+		printf("\t Electric current [mA]: %d\r\n", response.fields.batt_input.fields.current);
+		//todo: Current 3.3V [mA]
+		//todo:Current 5V [mA]
+		printf("\t MCU Temperature [°C]: %2f\r\n",((double)responseEPS.fields.temp) * 0.01);
+		printf("\t Battery Temperature [°C]: %2f\r\n", ((double)responseEPS.fields.temp2) * 0.01))
 	}
 
 #else
