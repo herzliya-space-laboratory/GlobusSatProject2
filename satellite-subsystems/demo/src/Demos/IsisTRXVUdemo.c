@@ -391,15 +391,15 @@ static Boolean Get_Tx_Telemetry_Value_Array(void) {
 	int choise;
 	printf("\r\n choose what you want to print\r\n");
 	printf("\r\n all: 0 \r\n");
-	printf("\r\n tx_reflpwr: 1 ");
-	printf("\r\n tx_fwrdpwr: 2");
-	printf("\r\n bus_volt: 3");
-	printf("\r\n vutotal_curr : 4");
-	printf("\r\n vutx_curr: 5");
-	printf("\r\n vurx_curr: 6");
-	printf("\r\n vupa_curr: 7");
-	printf("\r\n pa_temp: 8");
-	printf("\r\n board_temp: 9");
+	printf("\r\n tx_reflpwr: 1 \r\n");
+	printf("\r\n tx_fwrdpwr: 2 \r\n");
+	printf("\r\n bus_volt: 3 \r\n");
+	printf("\r\n vutotal_curr : 4 \r\n");
+	printf("\r\n vutx_curr: 5 \r\n");
+	printf("\r\n vurx_curr: 6 \r\n");
+	printf("\r\n vupa_curr: 7 \r\n");
+	printf("\r\n pa_temp: 8 \r\n");
+	printf("\r\n board_temp: 9 \r\n");
 	UTIL_DbguGetIntegerMinMax(&choise, 0,9);
 	switch(choise) {
 	    case 0:
@@ -445,6 +445,14 @@ static Boolean Get_Tx_Telemetry_Value_Array(void) {
 	        printf("\r\nInvalid choice.\r\n");
 	}
 
+	return TRUE;
+}
+static Boolean Get_Uptime(void) {
+	unsigned int uptime;
+
+	int error = IsisTrxvu_rcGetUptime(0, &uptime);
+	if(!error) printf("\r\n there is an error getting the uptime, %d \r\n", error);
+	printf("\r\n the uptime is: %d \r\n", uptime);
 	return TRUE;
 }
 static Boolean vurc_getRxTelemTest_revD(void)
@@ -575,13 +583,14 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 10) (revD) Get command frame by interrupt \n\r");
 	printf("\t 11) (revD) Get receiver telemetry \n\r");
 	printf("\t 12) (revD) Get transmitter telemetry \n\r");
-	printf("\t 13) get the current bitrate");
-	printf("\t 14) get the current Idle state of the transmitter");
-	printf("\t 15) get the transmitter beacon ");
-	printf("\t 16) Get Tx Telemetry last Value Array");
-	printf("\t 17) Return to main menu \n\r");
+	printf("\t 13) get the current bitrate \n\r");
+	printf("\t 14) get the current Idle state of the transmitter \n\r");
+	printf("\t 15) get the transmitter beacon \n\r");
+	printf("\t 16) Get Tx Telemetry last Value Array \n\r");
+	printf("\t 17) get Get_Uptime \n\r");
+	printf("\t 18) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 17) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 18) == 0);
 
 	switch(selection) {
 	case 1:
@@ -633,6 +642,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = Get_Tx_Telemetry_Value_Array();
 		break;
 	case 17:
+		offerMoreTests = Get_Uptime();
+		break;
+	case 18:
 		offerMoreTests = FALSE;
 		break;
 
