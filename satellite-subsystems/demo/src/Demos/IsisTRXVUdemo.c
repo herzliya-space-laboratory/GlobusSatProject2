@@ -384,7 +384,69 @@ static Boolean vurc_getFrameCmdInterruptTest(void)
 
     return TRUE;
 }
+static Boolean Get_Tx_Telemetry_Value_Array(void) {
+	ISIStrxvuTxTelemetry last_telemetry;
+	int error = IsisTrxvu_tcGetLastTxTelemetry(0, &last_telemetry);
+	if(!error) printf("\r\n there is an error getting the last_telemetry, %d \r\n", error);
+	int choise;
+	printf("\r\n choose what you want to print\r\n");
+	printf("\r\n all: 0 \r\n");
+	printf("\r\n tx_reflpwr: 1 ");
+	printf("\r\n tx_fwrdpwr: 2");
+	printf("\r\n bus_volt: 3");
+	printf("\r\n vutotal_curr : 4");
+	printf("\r\n vutx_curr: 5");
+	printf("\r\n vurx_curr: 6");
+	printf("\r\n vupa_curr: 7");
+	printf("\r\n pa_temp: 8");
+	printf("\r\n board_temp: 9");
+	UTIL_DbguGetIntegerMinMax(&choise, 0,9);
+	switch(choise) {
+	    case 0:
+	        printf("\r\nAll telemetry data:\r\n");
+	        printf("\r\nTx Reflected Power: %hu\r\n", last_telemetry.fields.tx_reflpwr);
+	        printf("\r\nTx Forward Power: %hu\r\n", last_telemetry.fields.tx_fwrdpwr);
+	        printf("\r\nBus Voltage: %hu\r\n", last_telemetry.fields.bus_volt);
+	        printf("\r\nTotal Current: %hu\r\n", last_telemetry.fields.vutotal_curr);
+	        printf("\r\nTransmitter Current: %hu\r\n", last_telemetry.fields.vutx_curr);
+	        printf("\r\nReceiver Current: %hu\r\n", last_telemetry.fields.vurx_curr);
+	        printf("\r\nPower Amplifier Current: %hu\r\n", last_telemetry.fields.vupa_curr);
+	        printf("\r\nPower Amplifier Temperature: %hu\r\n", last_telemetry.fields.pa_temp);
+	        printf("\r\nBoard Temperature: %hu\r\n", last_telemetry.fields.board_temp);
+	        break;
+	    case 1:
+	        printf("\r\nTx Reflected Power: %hu\r\n", last_telemetry.fields.tx_reflpwr);
+	        break;
+	    case 2:
+	        printf("\r\nTx Forward Power: %hu\r\n", last_telemetry.fields.tx_fwrdpwr);
+	        break;
+	    case 3:
+	        printf("\r\nBus Voltage: %hu\r\n", last_telemetry.fields.bus_volt);
+	        break;
+	    case 4:
+	        printf("\r\nTotal Current: %hu\r\n", last_telemetry.fields.vutotal_curr);
+	        break;
+	    case 5:
+	        printf("\r\nTransmitter Current: %hu\r\n", last_telemetry.fields.vutx_curr);
+	        break;
+	    case 6:
+	        printf("\r\nReceiver Current: %hu\r\n", last_telemetry.fields.vurx_curr);
+	        break;
+	    case 7:
+	        printf("\r\nPower Amplifier Current: %hu\r\n", last_telemetry.fields.vupa_curr);
+	        break;
+	    case 8:
+	        printf("\r\nPower Amplifier Temperature: %hu\r\n", last_telemetry.fields.pa_temp);
+	        break;
+	    case 9:
+	        printf("\r\nBoard Temperature: %hu\r\n", last_telemetry.fields.board_temp);
+	        break;
+	    default:
+	        printf("\r\nInvalid choice.\r\n");
+	}
 
+	return TRUE;
+}
 static Boolean vurc_getRxTelemTest_revD(void)
 {
 	unsigned short telemetryValue;
@@ -516,9 +578,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 13) get the current bitrate");
 	printf("\t 14) get the current Idle state of the transmitter");
 	printf("\t 15) get the transmitter beacon ");
-	printf("\t 16) Return to main menu \n\r");
+	printf("\t 16) Get Tx Telemetry last Value Array");
+	printf("\t 17) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 16) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 17) == 0);
 
 	switch(selection) {
 	case 1:
@@ -567,8 +630,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = Get_transmitter_beacon_Test();
 		break;
 	case 16:
+		offerMoreTests = Get_Tx_Telemetry_Value_Array();
+		break;
+	case 17:
 		offerMoreTests = FALSE;
-
 		break;
 
 	default:
