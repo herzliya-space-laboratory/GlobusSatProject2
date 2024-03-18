@@ -592,6 +592,10 @@ static Boolean printTransmitterState() {
 	       		}
 	 return TRUE;
 }
+static Boolean IsisTrxvu_tcEstimateTransmissionTimeTest(void){
+	printf("\r\n the current time it takes to send a package size of  8 with a 9600bitrate is %d \r\n", IsisTrxvu_tcEstimateTransmissionTime(8, trxvu_bitrate_9600));
+	return TRUE;
+}
 static Boolean selectAndExecuteTRXVUDemoTest(void)
 {
 	int selection = 0;
@@ -617,7 +621,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 16) prints Get Tx Telemetry Value Array");
 	printf("\t 17) print Transmitter State");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 17) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 18) == 0);
 
 	switch(selection) {
 	case 0:
@@ -673,6 +677,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 17:
 		offerMoreTests = printTransmitterState();
+		break;
+	case 18:
+		offerMoreTests = IsisTrxvu_tcEstimateTransmissionTimeTest();
 		break;
 	default:
 		break;
