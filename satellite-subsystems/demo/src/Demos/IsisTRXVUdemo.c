@@ -160,6 +160,14 @@ static Boolean vutc_toggleIdleStateTest(void)
 
 	return TRUE;
 }
+static Boolean Get_Uptime(void) {
+	unsigned int uptime;
+
+	int error = IsisTrxvu_rcGetUptime(0, &uptime);
+	if(!error) printf("\r\n there is an error getting the uptime, %d \r\n", error);
+	printf("\r\n the uptime is: %d \r\n", uptime);
+	return TRUE;
+}
 
 static Boolean vurc_getFrameCountTest(void)
 {
@@ -483,7 +491,107 @@ static Boolean TransponderOff()
 
 	return TRUE;
 }
+static Boolean Get_Tx_Telemetry_Value_Array(void) {
+	ISIStrxvuTxTelemetry last_telemetry;
+	int error = IsisTrxvu_tcGetLastTxTelemetry(0, &last_telemetry);
+	if(!error) printf("\r\n there is an error getting the last_telemetry, %d \r\n", error);
+	int choise;
+	printf("\r\n choose what you want to print\r\n");
+	printf("\r\n all: 0 \r\n");
+	printf("\r\n tx_reflpwr: 1 \r\n");
+	printf("\r\n tx_fwrdpwr: 2 \r\n");
+	printf("\r\n bus_volt: 3 \r\n");
+	printf("\r\n vutotal_curr : 4 \r\n");
+	printf("\r\n vutx_curr: 5 \r\n");
+	printf("\r\n vurx_curr: 6 \r\n");
+	printf("\r\n vupa_curr: 7 \r\n");
+	printf("\r\n pa_temp: 8 \r\n");
+	printf("\r\n board_temp: 9 \r\n");
+	UTIL_DbguGetIntegerMinMax(&choise, 0,9);
+	switch(choise) {
+	    case 0:
+	        printf("\r\nAll telemetry data:\r\n");
+	        printf("\r\nTx Reflected Power: %hu\r\n", last_telemetry.fields.tx_reflpwr);
+	        printf("\r\nTx Forward Power: %hu\r\n", last_telemetry.fields.tx_fwrdpwr);
+	        printf("\r\nBus Voltage: %hu\r\n", last_telemetry.fields.bus_volt);
+	        printf("\r\nTotal Current: %hu\r\n", last_telemetry.fields.vutotal_curr);
+	        printf("\r\nTransmitter Current: %hu\r\n", last_telemetry.fields.vutx_curr);
+	        printf("\r\nReceiver Current: %hu\r\n", last_telemetry.fields.vurx_curr);
+	        printf("\r\nPower Amplifier Current: %hu\r\n", last_telemetry.fields.vupa_curr);
+	        printf("\r\nPower Amplifier Temperature: %hu\r\n", last_telemetry.fields.pa_temp);
+	        printf("\r\nBoard Temperature: %hu\r\n", last_telemetry.fields.board_temp);
+	        break;
+	    case 1:
+	        printf("\r\nTx Reflected Power: %hu\r\n", last_telemetry.fields.tx_reflpwr);
+	        break;
+	    case 2:
+	        printf("\r\nTx Forward Power: %hu\r\n", last_telemetry.fields.tx_fwrdpwr);
+	        break;
+	    case 3:
+	        printf("\r\nBus Voltage: %hu\r\n", last_telemetry.fields.bus_volt);
+	        break;
+	    case 4:
+	        printf("\r\nTotal Current: %hu\r\n", last_telemetry.fields.vutotal_curr);
+	        break;
+	    case 5:
+	        printf("\r\nTransmitter Current: %hu\r\n", last_telemetry.fields.vutx_curr);
+	        break;
+	    case 6:
+	        printf("\r\nReceiver Current: %hu\r\n", last_telemetry.fields.vurx_curr);
+	        break;
+	    case 7:
+	        printf("\r\nPower Amplifier Current: %hu\r\n", last_telemetry.fields.vupa_curr);
+	        break;
+	    case 8:
+	        printf("\r\nPower Amplifier Temperature: %hu\r\n", last_telemetry.fields.pa_temp);
+	        break;
+	    case 9:
+	        printf("\r\nBoard Temperature: %hu\r\n", last_telemetry.fields.board_temp);
+	        break;
+	    default:
+	        printf("\r\nInvalid choice.\r\n");
+	}
 
+	return TRUE;
+}
+static Boolean printTransmitterState() {
+	ISIStrxvuTransmitterState currentstate;
+	print_error(IsisTrxvu_tcGetState(0, &currentstate));
+	switch (currentstate.fields.transmitter_idle_state) {
+	        case trxvu_idle_state_off:
+            printf("\r\n Transmitter is in idle state OFF\r\n");
+            break;
+        case trxvu_idle_state_on:
+            printf("\r\n Transmitter is in idle state ON\r\n");
+            break;
+        default:
+            printf("\r\n Unknown transmitter idle state\r\n");
+            break;
+	}
+        switch (currentstate.fields.transmitter_beacon) {
+        	case trxvu_beacon_none:
+        		printf("\r\n Transmitter beacon mode: None\r\n");
+       			break;
+      		case trxvu_beacon_active:
+      			printf("\r\n Transmitter beacon mode: Active\r\n");
+       			break;
+	       	default:
+	   			printf("\r\n Unknown transmitter beacon mode\r\n");
+    			break;
+	        }
+	       	switch (currentstate.fields.transmitter_idle_state) {
+	            case trxvu_idle_state_off:
+	       	       printf("\r\n Transmitter is in idle state OFF\r\n");
+	       	       break;
+     			case trxvu_idle_state_on:
+     			     printf("\r\n Transmitter is in idle state ON\r\n");
+	       			 break;
+  			    default:
+  			    	printf("\r\n Unknown transmitter idle state\r\n");
+  			    	break;
+	       		}
+	 return TRUE;
+}
 static Boolean selectAndExecuteTRXVUDemoTest(void)
 {
 	int selection = 0;
@@ -505,8 +613,11 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 12) Get the transponder off \n\r");
 	printf("\t 13) send beacon every 20 seconds \n\r");
 	printf("\t 14) Stop sending beacon \n\r");
+	printf("\t 15) get uptime");
+	printf("\t 16) prints Get Tx Telemetry Value Array");
+	printf("\t 17) print Transmitter State");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 17) == 0);
 
 	switch(selection) {
 	case 0:
@@ -553,6 +664,15 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 14:
 		offerMoreTests = vutc_stopSendingBeacon();
+		break;
+	case 15:
+		offerMoreTests = Get_Uptime();
+		break;
+	case 16:
+		offerMoreTests = Get_Tx_Telemetry_Value_Array();
+		break;
+	case 17:
+		offerMoreTests = printTransmitterState();
 		break;
 	default:
 		break;
