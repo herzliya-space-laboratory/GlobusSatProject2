@@ -620,6 +620,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 15) get uptime");
 	printf("\t 16) prints Get Tx Telemetry Value Array");
 	printf("\t 17) print Transmitter State");
+	printf("\t 18) checks for estimate time 8 bytes by 9600 bitrate ");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 18) == 0);
 
