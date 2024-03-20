@@ -496,7 +496,7 @@ static Boolean SetTransponderThreshold(void){
 	int input;
 	short threshold;
 	unsigned char data[] = {0x52, 0,0};
-		printf("set the Transponder Threshold range is between 0-4095 /r/n");
+		printf("set the Transponder Threshold range is between 0-4095 \r\n");
 		UTIL_DbguGetIntegerMinMax(&input, 0, 4095);
 		threshold = (short)input;
 		memcpy(data + 1,&threshold, sizeof(threshold));
