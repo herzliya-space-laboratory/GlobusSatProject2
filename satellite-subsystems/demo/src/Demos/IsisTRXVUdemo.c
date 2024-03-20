@@ -42,6 +42,7 @@
 #define SIZE_RXFRAME	30
 #define SIZE_TXFRAME	235
 
+#define MICROCHIP_SLAVE 0x61
 static xTaskHandle watchdogKickTaskHandle = NULL;
 static xSemaphoreHandle trxvuInterruptTrigger = NULL;
 
@@ -473,7 +474,7 @@ static Boolean vutc_getTxTelemTest_revD(void)
 static Boolean TransponderOn()
 {
 	unsigned char data[] = {0x38, 0x02};
-	if(I2C_write(0x61, data, 2))
+	if(I2C_write(MICROCHIP_SLAVE, data, 2))
 		printf("ohhh no. \r\n");
 	else
 		printf("It work \r\n");
@@ -484,11 +485,25 @@ static Boolean TransponderOn()
 static Boolean TransponderOff()
 {
 	unsigned char data[] = {0x38, 0x01};
-	if(I2C_write(0x61, data, 2))
+	if(I2C_write(MICROCHIP_SLAVE, data, 2))
 		printf("ohhh no. \r\n");
 	else
 		printf("It work \r\n");
 
+	return TRUE;
+}
+static Boolean SetTransponderThreshold(void){
+	int input;
+	short threshold;
+	unsigned char data[] = {0x52, 0,0};
+		printf("set the Transponder Threshold range is between 0-4095 /r/n");
+		UTIL_DbguGetIntegerMinMax(&input, 0, 4095);
+		threshold = (short)input;
+		memcpy(data + 1,&threshold, sizeof(threshold));
+		if(I2C_write(MICROCHIP_SLAVE, data, 3))
+			printf("ohhh no. \r\n");
+		else
+			printf("It work \r\n");
 	return TRUE;
 }
 static Boolean Get_Tx_Telemetry_Value_Array(void) {
@@ -611,12 +626,13 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 10) Send packet inserted by the user\n\r");
 	printf("\t 11) Get the transponder on \n\r");
 	printf("\t 12) Get the transponder off \n\r");
-	printf("\t 13) send beacon every 20 seconds \n\r");
-	printf("\t 14) Stop sending beacon \n\r");
-	printf("\t 15) get uptime \n\r");
-	printf("\t 16) prints Get Tx Telemetry Value Array \n\r");
-	printf("\t 17) print Transmitter State \n\r");
-	printf("\t 18) checks for estimate time 8 bytes by 9600 bitrate \n\r");
+	printf("\t 13) Set Transponder Threshold \n\r");
+	printf("\t 14) send beacon every 20 seconds \n\r");
+	printf("\t 15) Stop sending beacon \n\r");
+	printf("\t 16) get uptime \n\r");
+	printf("\t 17) prints Get Tx Telemetry Value Array \n\r");
+	printf("\t 18) print Transmitter State \n\r");
+	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 18) == 0);
 
@@ -661,21 +677,24 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = TransponderOff();
 		break;
 	case 13:
-		offerMoreTests = vutc_sendBeacon();
+		offerMoreTests = SetTransponderThreshold();
 		break;
 	case 14:
-		offerMoreTests = vutc_stopSendingBeacon();
+		offerMoreTests = vutc_sendBeacon();
 		break;
 	case 15:
-		offerMoreTests = Get_Uptime();
+		offerMoreTests = vutc_stopSendingBeacon();
 		break;
 	case 16:
-		offerMoreTests = Get_Tx_Telemetry_Value_Array();
+		offerMoreTests = Get_Uptime();
 		break;
 	case 17:
-		offerMoreTests = printTransmitterState();
+		offerMoreTests = Get_Tx_Telemetry_Value_Array();
 		break;
 	case 18:
+		offerMoreTests = printTransmitterState();
+		break;
+	case 19:
 		offerMoreTests = IsisTrxvu_tcEstimateTransmissionTimeTest();
 		break;
 	default:
@@ -708,7 +727,7 @@ Boolean IsisTRXVUdemoInit(void)
 
 	//I2C addresses defined
 	myTRXVUAddress[0].addressVu_rc = 0x60;
-	myTRXVUAddress[0].addressVu_tc = 0x61;
+	myTRXVUAddress[0].addressVu_tc = MICROCHIP_SLAVE;
 
 	//Buffer definition
 	myTRXVUBuffers[0].maxAX25frameLengthTX = SIZE_TXFRAME;
