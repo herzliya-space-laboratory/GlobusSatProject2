@@ -178,6 +178,7 @@ static Boolean WriteAndReadFromFRAM(void){
 
 static Boolean supervisorResetTest(void)
 {
+	//todo:need check and an explain.
 	supervisor_generic_reply_t reply;
 
 	int err = Supervisor_reset(&reply, SUPERVISOR_SPI_INDEX);
