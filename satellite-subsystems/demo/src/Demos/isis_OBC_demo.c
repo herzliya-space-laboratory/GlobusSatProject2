@@ -176,20 +176,6 @@ static Boolean WriteAndReadFromFRAM(void){
 	return TRUE;
 }
 
-static Boolean supervisorResetTest(void)
-{
-	//todo:need check and an explain.
-	supervisor_generic_reply_t reply;
-
-	int err = Supervisor_reset(&reply, SUPERVISOR_SPI_INDEX);
-	if(!err)
-		printf("The supervisor has reset. \r\n");
-	else
-		print_error(err);
-
-	return TRUE;
-}
-
 static Boolean selectAndExecuteOBCDemoTest(void)
 {
 	int selection = 0;
@@ -199,8 +185,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
-	printf("\t 3) Reset the supervisor \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0);
 
 	switch(selection) {
 	case 0:
@@ -211,9 +196,6 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 2:
 		offerMoreTests = WriteAndReadFromFRAM();
-		break;
-	case 3:
-		offerMoreTests = supervisorResetTest();
 		break;
 	default:
 		break;
