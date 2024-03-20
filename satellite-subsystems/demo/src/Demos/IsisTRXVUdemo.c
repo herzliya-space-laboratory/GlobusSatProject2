@@ -492,65 +492,55 @@ static Boolean TransponderOff()
 	return TRUE;
 }
 static Boolean Get_Tx_Telemetry_Value_Array(void) {
-	ISIStrxvuTxTelemetry last_telemetry;
-	int error = IsisTrxvu_tcGetLastTxTelemetry(0, &last_telemetry);
-	if(!error) printf("\r\n there is an error getting the last_telemetry, %d \r\n", error);
-	int choise;
-	printf("\r\n choose what you want to print\r\n");
-	printf("\r\n all: 0 \r\n");
-	printf("\r\n tx_reflpwr: 1 \r\n");
-	printf("\r\n tx_fwrdpwr: 2 \r\n");
-	printf("\r\n bus_volt: 3 \r\n");
-	printf("\r\n vutotal_curr : 4 \r\n");
-	printf("\r\n vutx_curr: 5 \r\n");
-	printf("\r\n vurx_curr: 6 \r\n");
-	printf("\r\n vupa_curr: 7 \r\n");
-	printf("\r\n pa_temp: 8 \r\n");
-	printf("\r\n board_temp: 9 \r\n");
-	UTIL_DbguGetIntegerMinMax(&choise, 0,9);
-	switch(choise) {
-	    case 0:
-	        printf("\r\nAll telemetry data:\r\n");
-	        printf("\r\nTx Reflected Power: %hu\r\n", last_telemetry.fields.tx_reflpwr);
-	        printf("\r\nTx Forward Power: %hu\r\n", last_telemetry.fields.tx_fwrdpwr);
-	        printf("\r\nBus Voltage: %hu\r\n", last_telemetry.fields.bus_volt);
-	        printf("\r\nTotal Current: %hu\r\n", last_telemetry.fields.vutotal_curr);
-	        printf("\r\nTransmitter Current: %hu\r\n", last_telemetry.fields.vutx_curr);
-	        printf("\r\nReceiver Current: %hu\r\n", last_telemetry.fields.vurx_curr);
-	        printf("\r\nPower Amplifier Current: %hu\r\n", last_telemetry.fields.vupa_curr);
-	        printf("\r\nPower Amplifier Temperature: %hu\r\n", last_telemetry.fields.pa_temp);
-	        printf("\r\nBoard Temperature: %hu\r\n", last_telemetry.fields.board_temp);
-	        break;
-	    case 1:
-	        printf("\r\nTx Reflected Power: %hu\r\n", last_telemetry.fields.tx_reflpwr);
-	        break;
-	    case 2:
-	        printf("\r\nTx Forward Power: %hu\r\n", last_telemetry.fields.tx_fwrdpwr);
-	        break;
-	    case 3:
-	        printf("\r\nBus Voltage: %hu\r\n", last_telemetry.fields.bus_volt);
-	        break;
-	    case 4:
-	        printf("\r\nTotal Current: %hu\r\n", last_telemetry.fields.vutotal_curr);
-	        break;
-	    case 5:
-	        printf("\r\nTransmitter Current: %hu\r\n", last_telemetry.fields.vutx_curr);
-	        break;
-	    case 6:
-	        printf("\r\nReceiver Current: %hu\r\n", last_telemetry.fields.vurx_curr);
-	        break;
-	    case 7:
-	        printf("\r\nPower Amplifier Current: %hu\r\n", last_telemetry.fields.vupa_curr);
-	        break;
-	    case 8:
-	        printf("\r\nPower Amplifier Temperature: %hu\r\n", last_telemetry.fields.pa_temp);
-	        break;
-	    case 9:
-	        printf("\r\nBoard Temperature: %hu\r\n", last_telemetry.fields.board_temp);
-	        break;
-	    default:
-	        printf("\r\nInvalid choice.\r\n");
+	unsigned short telemetryValue;
+	float eng_value = 0.0;
+	ISIStrxvuTxTelemetry telemetry;
+	int rv;
+
+	// Telemetry values are presented as raw values
+	printf("\r\nGet all Telemetry at once in raw values \r\n\r\n");
+	rv = IsisTrxvu_tcGetLastTxTelemetry(0, &telemetry);
+	if(rv)
+	{
+		printf("Subsystem call failed. rv = %d", rv);
+		return TRUE;
 	}
+
+	telemetryValue = telemetry.fields.tx_reflpwr;
+	eng_value = ((float)(telemetryValue * telemetryValue)) * 5.887E-5;
+	printf("RF reflected power = %f mW\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.tx_fwrdpwr;
+	eng_value = ((float)(telemetryValue * telemetryValue)) * 5.887E-5;
+	printf("RF forward power = %f mW\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.bus_volt;
+	eng_value = ((float)telemetryValue) * 0.00488;
+	printf("Bus voltage = %f V\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.vutotal_curr;
+	eng_value = ((float)telemetryValue) * 0.16643964;
+	printf("Total current = %f mA\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.vutx_curr;
+	eng_value = ((float)telemetryValue) * 0.16643964;
+	printf("Transmitter current = %f mA\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.vurx_curr;
+	eng_value = ((float)telemetryValue) * 0.16643964;
+	printf("Receiver current = %f mA\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.vupa_curr;
+	eng_value = ((float)telemetryValue) * 0.16643964;
+	printf("PA current = %f mA\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.pa_temp;
+	eng_value = ((float)telemetryValue) * -0.07669 + 195.6037;
+	printf("PA temperature = %f degC\r\n", eng_value);
+
+	telemetryValue = telemetry.fields.board_temp;
+	eng_value = ((float)telemetryValue) * -0.07669 + 195.6037;
+	printf("Local oscillator temperature = %f degC\r\n", eng_value);
 
 	return TRUE;
 }
@@ -617,10 +607,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 12) Get the transponder off \n\r");
 	printf("\t 13) send beacon every 20 seconds \n\r");
 	printf("\t 14) Stop sending beacon \n\r");
-	printf("\t 15) get uptime");
-	printf("\t 16) prints Get Tx Telemetry Value Array");
-	printf("\t 17) print Transmitter State");
-	printf("\t 18) checks for estimate time 8 bytes by 9600 bitrate ");
+	printf("\t 15) get uptime \n\r");
+	printf("\t 16) prints Get Tx Telemetry Value Array \n\r");
+	printf("\t 17) print Transmitter State \n\r");
+	printf("\t 18) checks for estimate time 8 bytes by 9600 bitrate \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 18) == 0);
 
