@@ -165,7 +165,7 @@ static Boolean Get_Uptime(void) {
 
 	int error = IsisTrxvu_rcGetUptime(0, &uptime);
 	if(!error) printf("\r\n there is an error getting the uptime, %d \r\n", error);
-	printf("\r\n the uptime is: %d secounds \r\n", uptime);
+	printf("\r\n the uptime is: %d seconds \r\n", uptime);
 	return TRUE;
 }
 
