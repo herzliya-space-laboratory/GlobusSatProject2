@@ -432,8 +432,10 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 10) EPS Reboot \n\r");
 	printf("\t 11) EPS status \n\r");
 	printf("\t 12) EPS Ping   \n\r");
+	printf("\t 13) EPS Get Heater Mode \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0);
+
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 13) == 0);
 
 	switch(selection) {
 	case 0:
@@ -474,6 +476,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     	break;
     case 12:
     	offerMoreTests = EPS_PingTest();
+    	break;
+    case 13:
+    	offerMoreTests = EPS_GetHeaterMode();
     	break;
 	default:
 		break;
