@@ -165,7 +165,7 @@ static Boolean Get_Uptime(void) {
 
 	int error = IsisTrxvu_rcGetUptime(0, &uptime);
 	if(!error) printf("\r\n there is an error getting the uptime, %d \r\n", error);
-	printf("\r\n the uptime is: %d \r\n", uptime);
+	printf("\r\n the uptime is: %d secounds \r\n", uptime);
 	return TRUE;
 }
 
@@ -569,16 +569,22 @@ static Boolean printTransmitterState() {
 	   			printf("\r\n Unknown transmitter beacon mode\r\n");
     			break;
 	        }
-	       	switch (currentstate.fields.transmitter_idle_state) {
-	            case trxvu_idle_state_off:
-	       	       printf("\r\n Transmitter is in idle state OFF\r\n");
-	       	       break;
-     			case trxvu_idle_state_on:
-     			     printf("\r\n Transmitter is in idle state ON\r\n");
-	       			 break;
-  			    default:
-  			    	printf("\r\n Unknown transmitter idle state\r\n");
-  			    	break;
+        switch(currentstate.fields.transmitter_bitrate) {
+            case trxvu_bitratestatus_1200:
+                printf("Transmission Bitrate: 1200 bps\r\n");
+                break;
+            case trxvu_bitratestatus_2400:
+                printf("Transmission Bitrate: 2400 bps\r\n");
+                break;
+            case trxvu_bitratestatus_4800:
+                printf("Transmission Bitrate: 4800 bps\r\n");
+                break;
+            case trxvu_bitratestatus_9600:
+                printf("Transmission Bitrate: 9600 bps\r\n");
+                break;
+            default:
+                printf("Invalid bitrate status\r\n");
+                break;
 	       		}
 	 return TRUE;
 }
