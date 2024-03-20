@@ -350,12 +350,33 @@ static Boolean _gethousekeepingeng__tm( void )
 	return TRUE;
 }
 
+static Boolean GetStatusEPS(void)
+{
+	imepsv2_piu__gethousekeepingeng__from_t responseEPS;
+
+	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS);
+
+	if( error )
+			TRACE_ERROR("imepsv2_piu__gethousekeepingeng(...) return error (%d)!\n\r",error);
+	else
+	{
+		if(responseEPS.fields.batt_input.fields.volt > 7400)
+			printf("EPS status is Operational \nThe volt battery equal to %d [mV]\r\n", responseEPS.fields.batt_input.fields.volt);
+		else if(responseEPS.fields.batt_input.fields.volt > 7000)
+			printf("EPS status is Cruise \nThe volt battery equal to %d [mV]\r\n", responseEPS.fields.batt_input.fields.volt);
+		else
+			printf("The satellite is in Power Safe mode \nThe volt battery equal to %d [mV]\r\n", responseEPS.fields.batt_input.fields.volt);
+	}
+	return TRUE;
+}
+
 static Boolean selectAndExecuteIsis_EpsDemoTest()
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
 	printf( "\n\r Select a test to perform: \n\r");
+	printf("\t 0 - Return to main menu \n\r");
 	printf("\t 1 - Software Reset \n\r");
 	printf("\t 2 - Cancel Operation \n\r");
 	printf("\t 3 - Watchdog Kick \n\r");
@@ -366,12 +387,15 @@ static Boolean selectAndExecuteIsis_EpsDemoTest()
 	printf("\t 8 - Get System Status \n\r");
 	printf("\t 9 - Get Housekeeping Data - Raw \n\r");
 	printf("\t 10 - Get Housekeeping Data - Engineering \n\r");
-	printf("\t 11 - Return to main menu \n\r");
+	printf("\t 11 - Get status \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 11) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
 
 	switch(selection)
 	{
+		case 0:
+			offerMoreTests = FALSE;
+			break;
 		case 1:
 			offerMoreTests = _reset__tmtc();
 			break;
@@ -403,7 +427,7 @@ static Boolean selectAndExecuteIsis_EpsDemoTest()
 			offerMoreTests = _gethousekeepingeng__tm();
 			break;
 		case 11:
-			offerMoreTests = FALSE;
+			offerMoreTests = GetStatusEPS();
 			break;
 		default:
 			break;
