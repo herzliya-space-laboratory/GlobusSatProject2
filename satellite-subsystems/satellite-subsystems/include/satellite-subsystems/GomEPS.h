@@ -35,6 +35,7 @@ typedef union __attribute__ ((__packed__)) _gom_eps_channelstates_t
 	} fields; //!< Struct with individual fields of GOM EPS channel status
 } gom_eps_channelstates_t;
 
+
 /**
  * List of EPS channel IDs
  */
