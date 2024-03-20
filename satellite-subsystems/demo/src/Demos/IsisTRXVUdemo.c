@@ -719,7 +719,7 @@ static void _WatchDogKickTask(void *parameters)
 
 Boolean IsisTRXVUdemoInit(void)
 {
-    // Definition of I2C and TRXUV
+    // Definition of I2C and TRXVU
 	ISIStrxvuI2CAddress myTRXVUAddress[1];
 	ISIStrxvuFrameLengths myTRXVUBuffers[1];
 	ISIStrxvuBitrate myTRXVUBitrates[1];
