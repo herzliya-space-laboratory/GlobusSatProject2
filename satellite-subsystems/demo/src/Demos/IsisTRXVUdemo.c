@@ -45,7 +45,32 @@
 #define MICROCHIP_SLAVE 0x61
 static xTaskHandle watchdogKickTaskHandle = NULL;
 static xSemaphoreHandle trxvuInterruptTrigger = NULL;
-
+//help function
+static void I2CWrite_Error(int error) {
+	switch(error) {
+	case 0:
+		//works fine
+		break;
+	case -3:
+		printf("error -3: creating a semaphore to wait for the transfer fails \r\n");
+		break;
+	case -2:
+		printf("input transfer parameters are wrong \r\n");
+		break;
+	case -1:
+		printf("queuing the transfer fails \r\n");
+		break;
+	case 5:
+		printf("read error \r\n");
+		break;
+	case 6:
+		printf("timeout error \r\n");
+		break;
+	case 7:
+		printf("general error \r\n");
+		break;
+	}
+}
 // Test Function
 static Boolean softResetVUTest(void)
 {
@@ -474,22 +499,14 @@ static Boolean vutc_getTxTelemTest_revD(void)
 static Boolean TransponderOn()
 {
 	unsigned char data[] = {0x38, 0x02};
-	if(I2C_write(MICROCHIP_SLAVE, data, 2))
-		printf("ohhh no. \r\n");
-	else
-		printf("It work \r\n");
-
+	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 2));
 	return TRUE;
 }
 
 static Boolean TransponderOff()
 {
 	unsigned char data[] = {0x38, 0x01};
-	if(I2C_write(MICROCHIP_SLAVE, data, 2))
-		printf("ohhh no. \r\n");
-	else
-		printf("It work \r\n");
-
+	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 2));
 	return TRUE;
 }
 static Boolean SetTransponderThreshold(void){
@@ -500,10 +517,7 @@ static Boolean SetTransponderThreshold(void){
 		UTIL_DbguGetIntegerMinMax(&input, 0, 4095);
 		threshold = (short)input;
 		memcpy(data + 1,&threshold, sizeof(threshold));
-		if(I2C_write(MICROCHIP_SLAVE, data, 3))
-			printf("ohhh no. \r\n");
-		else
-			printf("It work \r\n");
+		I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 3));
 	return TRUE;
 }
 static Boolean Get_Tx_Telemetry_Value_Array(void) {
