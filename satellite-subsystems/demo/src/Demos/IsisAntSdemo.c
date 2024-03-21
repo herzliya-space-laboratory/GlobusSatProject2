@@ -253,7 +253,7 @@ static Boolean getActivationCount(int index) {
         for (antennaSelection = isisants_antenna1; antennaSelection <= isisants_antenna4; antennaSelection++) {
             // Call the function with the given parameters
             print_error(IsisAntS_getActivationTime(index, side, antennaSelection, &deploymentTime));
-            printf("for the side: %d, and the antenna %d, the deployment time is %d \r\n", side, antennaSelection, deploymentTime);
+            printf("for the side: %d, and the antenna %d, the deployment time is %d \r\n", side + 1, antennaSelection + 1, deploymentTime);
         }
     }
     return TRUE;
