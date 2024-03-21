@@ -243,7 +243,23 @@ static Boolean autoDeploymentAntSTest(unsigned char index, ISISantsSide side)
 	return TRUE;
 }
 
+static Boolean getActivationCount(int index) {
+    ISISantsSide side;
+    ISISantsAntenna antennaSelection;
+    unsigned short deploymentTime;
+    // Outer loop cycles through side
+    for (side = isisants_sideA; side <= isisants_sideB; side++) {
+        // Inner loop cycles through antennaSelection
+        for (antennaSelection = isisants_antenna1; antennaSelection <= isisants_antenna4; antennaSelection++) {
+            // Call the function with the given parameters
+            print_error(IsisAntS_getActivationTime(index, side, antennaSelection, &deploymentTime));
+            printf("for the side: %d, and the antenna %d, the deployment time is %d \r\n", side, antennaSelection, deploymentTime);
+        }
+    }
+    return TRUE;
 
+
+}
 static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
 {
     int antennaSelection = 0;
@@ -302,9 +318,10 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
 	printf("\t 11) AntS autodeployment - side B\n\r");
     printf("\t 12) AntS manual deployment - side A\n\r");
     printf("\t 13) AntS manual deployment - side B\n\r");
-	printf("\t 14) Return to main menu \n\r");
+    printf("\t 14 get Activation Count \n\r");
+	printf("\t 15) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 14) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 15) == 0);
 
 	switch(selection) {
 	case 1:
@@ -349,7 +366,10 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
     case 13:
         offerMoreTests = manualDeploymentAntSTest(index, isisants_sideB);
         break;
-	case 14:
+    case 14:
+    	offerMoreTests = getActivationCount(index);
+    	break;
+	case 15:
 		offerMoreTests = FALSE;
 		break;
 
