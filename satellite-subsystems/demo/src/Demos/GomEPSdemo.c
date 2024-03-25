@@ -418,19 +418,27 @@ static Boolean Eps_ResetCounters(void)
 	gom_eps_hk_wdt_t data_out;
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
 	printf("%u",data_out.fields.counter_wdt_i2c);
+	printf(" -counter_wdt_i2c\r\n");
 	printf("%u",data_out.fields.counter_wdt_gnd);
+	printf(" -counter_wdt_gnd\r\n");
 	printf("%u",data_out.fields.counter_wdt_csp[0]);
+	printf(" -counter_wdt_csp[0]\r\n");
 	printf("%u",data_out.fields.counter_wdt_csp[1]);
+	printf(" -counter_wdt_csp[1]\r\n");
 
 
 	GomEpsResetCounters(0);
 	printf("\r\n it reset \r\n");
-	print_error(GomEpsGetHkData_wdt(0,&data_out));
 
-	printf("%u/r/n",data_out.fields.counter_wdt_i2c);
-	printf("%u/r/n",data_out.fields.counter_wdt_gnd);
-	printf("%u/r/n",data_out.fields.counter_wdt_csp[0]);
-	printf("%u/r/n",data_out.fields.counter_wdt_csp[1]);
+	print_error(GomEpsGetHkData_wdt(0,&data_out));
+	printf("%u",data_out.fields.counter_wdt_i2c);
+	printf(" -counter_wdt_i2c\r\n");
+	printf("%u",data_out.fields.counter_wdt_gnd);
+	printf(" -counter_wdt_gnd\r\n");
+	printf("%u",data_out.fields.counter_wdt_csp[0]);
+	printf(" -counter_wdt_csp[0]\r\n");
+	printf("%u",data_out.fields.counter_wdt_csp[1]);
+	printf(" -counter_wdt_csp[1]\r\n");
 
 
 	GomEpsResetCounters(0);
