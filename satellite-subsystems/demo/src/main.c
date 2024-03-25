@@ -75,7 +75,7 @@ Boolean selectAndExecuteTest()
 	printf("\t 2) Solar Panels V2 test \n\r");
 	printf("\t 3) Gom EPS Test \n\r");
 	printf("\t 4) OBC Test \n\r");
-	printf("\t 5) Ants Test \n\r");
+	printf("\t 5) Ants Test \n\t");
 	printf("\t 6) ISIS EPS Test \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 6) == 0);
