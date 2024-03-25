@@ -424,12 +424,13 @@ static Boolean Eps_ResetCounters(void)
 
 
 	GomEpsResetCounters(0);
-
+	printf("\r\n it reset \r\n");
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
-	printf("%u",data_out.fields.counter_wdt_i2c);
-	printf("%u",data_out.fields.counter_wdt_gnd);
-	printf("%u",data_out.fields.counter_wdt_csp[0]);
-	printf("%u",data_out.fields.counter_wdt_csp[1]);
+
+	printf("%u/r/n",data_out.fields.counter_wdt_i2c);
+	printf("%u/r/n",data_out.fields.counter_wdt_gnd);
+	printf("%u/r/n",data_out.fields.counter_wdt_csp[0]);
+	printf("%u/r/n",data_out.fields.counter_wdt_csp[1]);
 
 
 	GomEpsResetCounters(0);
