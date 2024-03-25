@@ -79,7 +79,7 @@ Boolean selectAndExecuteTest()
 	printf("\t 3) Gom EPS Test \n\r");
 #endif
 	printf("\t 4) OBC Test \n\r");
-	printf("\t 5) Ants Test \n\t");
+	printf("\t 5) Ants Test \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 5) == 0);
 
