@@ -7,7 +7,9 @@
 
 #include "isis_eps_demo.h"
 #include "input.h"
+#include "common.h"
 
+#include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -370,26 +372,50 @@ static Boolean GetStatusEPS(void)
 	return TRUE;
 }
 
+static void GetConfigurationParmeter(uint16_t config_parmeter_id, char name[])
+{
+	imepsv2_piu__getconfigurationparameter__from_t response;
+	print_error(imepsv2_piu__getconfigurationparameter(0, config_parmeter_id, &response));
+
+	printf("%s: ", name);
+	short response_short;
+	memcpy(&response_short, response.fields.par_val, 2);
+	printf(response_short + "\r\n");
+}
+
+static Boolean GetConfigurationParameters(void)
+{
+	GetConfigurationParmeter(0x4002, "OBUS_FORCE_ENA_BF");
+
+	GetConfigurationParmeter(0x4004, "OBUS_STARTUP_ENA_BF");
+
+	GetConfigurationParmeter(0x480D, "SAFETY_VOLT_LOTHR"); //in mV
+
+	GetConfigurationParmeter(0x480E, "SAFETY_VOLT_HITHR"); //in mV
+
+	return TRUE;
+}
+
 static Boolean selectAndExecuteIsis_EpsDemoTest()
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
 	printf( "\n\r Select a test to perform: \n\r");
-	printf("\t 0 - Return to main menu \n\r");
-	printf("\t 1 - Software Reset \n\r");
-	printf("\t 2 - Cancel Operation \n\r");
-	printf("\t 3 - Watchdog Kick \n\r");
-	printf("\t 4 - Output Bus Channel On \n\r");
-	printf("\t 5 - Output Bus Channel Off \n\r");
-	printf("\t 6 - Switch To Nominal \n\r");
-	printf("\t 7 - Switch To Safety \n\r");
-	printf("\t 8 - Get System Status \n\r");
-	printf("\t 9 - Get Housekeeping Data - Raw \n\r");
-	printf("\t 10 - Get Housekeeping Data - Engineering \n\r");
-	printf("\t 11 - Get status \n\r");
-
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
+	printf("\t 0) Return to main menu \n\r");
+	printf("\t 1) Software Reset \n\r");
+	printf("\t 2) Cancel Operation \n\r");
+	printf("\t 3) Watchdog Kick \n\r");
+	printf("\t 4) Output Bus Channel On \n\r");
+	printf("\t 5) Output Bus Channel Off \n\r");
+	printf("\t 6) Switch To Nominal \n\r");
+	printf("\t 7) Switch To Safety \n\r");
+	printf("\t 8) Get System Status \n\r");
+	printf("\t 9) Get Housekeeping Data - Raw \n\r");
+	printf("\t 10) Get Housekeeping Data - Engineering \n\r");
+	printf("\t 11) Get status \n\r");
+	printf("\t 12) Get configuration parameters \n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0);
 
 	switch(selection)
 	{
@@ -428,6 +454,9 @@ static Boolean selectAndExecuteIsis_EpsDemoTest()
 			break;
 		case 11:
 			offerMoreTests = GetStatusEPS();
+			break;
+		case 12:
+			offerMoreTests = GetConfigurationParameters();
 			break;
 		default:
 			break;
