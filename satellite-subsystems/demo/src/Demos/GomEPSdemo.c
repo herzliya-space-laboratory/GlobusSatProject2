@@ -441,10 +441,27 @@ static Boolean Eps_ResetCounters(void)
 	printf(" -counter_wdt_csp[1]\r\n");
 
 
-	GomEpsResetCounters(0);
+	return TRUE;
+}
+
+
+static Boolean Eps_ResetWDT(void)
+{
+	gom_eps_hk_wdt_t data_out;
+	print_error(GomEpsGetHkData_wdt(0,&data_out));
+	printf("%u",data_out.fields.wdt_i2c_time_left);
+	printf(" -wdt_i2c_time_left\r\n");
+	printf("%u",data_out.fields.wdt_gnd_time_left);
+	printf(" -wdt_gnd_time_left\r\n");
+	printf("%u",data_out.fields.wdt_csp_pings_left[0]);
+	printf(" -wdt_csp_pings_left[0]\r\n");
+	printf("%u",data_out.fields.wdt_csp_pings_left[1]);
+	printf(" -wdt_csp_pings_left[1]\r\n");
 
 	return TRUE;
 }
+
+
 
 static Boolean selectAndExecuteGomEPSDemoTest(void)
 {
@@ -467,8 +484,10 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 12) EPS Ping   \n\r");
 	printf("\t 13) EPS Get Heater Mode \n\r");
 	printf("\t 14) Reset the GOMSpace EPS counters \n\r");
+	printf("\t 15) print \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0);
+
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 15) == 0);
 
 	switch(selection) {
 	case 0:
@@ -516,6 +535,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 14:
       	offerMoreTests = Eps_ResetCounters();
       	break;
+    case 15:
+          	offerMoreTests = Eps_ResetWDT();
+          	break;
 	default:
 		break;
 
