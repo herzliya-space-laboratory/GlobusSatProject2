@@ -413,56 +413,57 @@ static Boolean EPS_GetHeaterMode(void)
     return TRUE;
 }
 
-static Boolean Eps_ConfigGet(void)
+static Boolean EPS_ConfigGet(void)
 {
 	eps_config_t config_data;
 	print_error(GomEpsConfigGet(0, &config_data));
 
-	printf("-config_commandReplay:\r\n");
 	printf("%u", config_data.fields.commandReply);
+	printf("-config_commandReplay\r\n");
 
-	printf("-config_ppt_mode:\r\n");
 	printf("%u",config_data.fields.ppt_mode);
+	printf("-config_ppt_mode\r\n");
 
-	printf("-config_battheater_mode:\r\n");
 	printf("%u",config_data.fields.battheater_mode);
+	printf("-config_battheater_mode\r\n");
 
-	printf("-config_battheater_low:\r\n");
 	printf("%u",config_data.fields.battheater_low);
+	printf("-config_battheater_low\r\n");
 
-	printf("-config_battheater_high:\r\n");
 	printf("%u",config_data.fields.battheater_high);
+	printf("-config_battheater_high\r\n");
+
 
 	int i;
 
 	for(i = 0; i<=7; i++)
 	{
-		printf("-config_output_normal_value[%d]:\r\n", i);
 		printf("%u",config_data.fields.output_normal_value[i]);
+		printf("-config_output_normal_value[%d]\r\n", i);
 	}
 
 	for(i = 0; i<=7; i++)
 	{
-		printf("-config_output_safe_value[%d]:\r\n", i);
 		printf("%u",config_data.fields.output_safe_value[i]);
+		printf("-config_output_safe_value[%d]\r\n", i);
 	}
 
 	for(i = 0; i<=7; i++)
 	{
-		printf("-output_initial_on_delay[%d]:\r\n", i);
 		printf("%u",config_data.fields.output_initial_on_delay[i]);
+		printf("-output_initial_on_delay[%d]\r\n", i);
 	}
 
 	for(i = 0; i<=7; i++)
 	{
-		printf("-output_initial_off_delay[%d]:\r\n", i);
 		printf("%u",config_data.fields.output_initial_off_delay[i]);
+		printf("-output_initial_off_delay[%d]\r\n", i);
 	}
 
 	for(i = 0; i<=2; i++)
 	{
-		printf("-vboost[%d]:\r\n", i);
 		printf("%u",config_data.fields.vboost[i]);
+		printf("-vboost[%d]\r\n", i);
 	}
 
 	return TRUE;
@@ -606,7 +607,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
          offerMoreTests = Eps_ResetWDT();
          break;
     case 16:
-    	offerMoreTests = Eps_ConfigGet();
+    	offerMoreTests = EPS_ConfigGet();
     	break;
 	default:
 		break;
