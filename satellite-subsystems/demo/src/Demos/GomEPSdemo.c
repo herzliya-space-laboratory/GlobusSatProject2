@@ -413,6 +413,61 @@ static Boolean EPS_GetHeaterMode(void)
     return TRUE;
 }
 
+static Boolean Eps_ConfigGet(void)
+{
+	eps_config_t config_data;
+	print_error(GomEpsConfigGet(0, &config_data));
+
+	printf("-config_commandReplay:\r\n");
+	printf("%u", config_data.fields.commandReply);
+
+	printf("-config_ppt_mode:\r\n");
+	printf("%u",config_data.fields.ppt_mode);
+
+	printf("-config_battheater_mode:\r\n");
+	printf("%u",config_data.fields.battheater_mode);
+
+	printf("-config_battheater_low:\r\n");
+	printf("%u",config_data.fields.battheater_low);
+
+	printf("-config_battheater_high:\r\n");
+	printf("%u",config_data.fields.battheater_high);
+
+	int i;
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("-config_output_normal_value[%d]:\r\n", i);
+		printf("%u",config_data.fields.output_normal_value[i]);
+	}
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("-config_output_safe_value[%d]:\r\n", i);
+		printf("%u",config_data.fields.output_safe_value[i]);
+	}
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("-output_initial_on_delay[%d]:\r\n", i);
+		printf("%u",config_data.fields.output_initial_on_delay[i]);
+	}
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("-output_initial_off_delay[%d]:\r\n", i);
+		printf("%u",config_data.fields.output_initial_off_delay[i]);
+	}
+
+	for(i = 0; i<=2; i++)
+	{
+		printf("-vboost[%d]:\r\n", i);
+		printf("%u",config_data.fields.vboost[i]);
+	}
+
+	return TRUE;
+}
+
 static Boolean Eps_ResetCounters(void)
 {
 	gom_eps_hk_wdt_t data_out;
@@ -459,7 +514,7 @@ static Boolean Eps_ResetWDT(void)
 	printf(" -wdt_csp_pings_left[1]\r\n");
 
 	GomEpsResetWDT(0);
-	printf("\r\n it reset \r\n");
+	printf("\r\n it resets \r\n");
 
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
 	printf("%u",data_out.fields.wdt_i2c_time_left);
@@ -497,9 +552,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 13) EPS Get Heater Mode \n\r");
 	printf("\t 14) Reset the GOMSpace EPS counters \n\r");
 	printf("\t 15) print \n\r");
+	printf("\t 16) Get Config Parameters\n\r");
 
-
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 15) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 16) == 0);
 
 	switch(selection) {
 	case 0:
@@ -548,8 +603,11 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
       	offerMoreTests = Eps_ResetCounters();
       	break;
     case 15:
-          	offerMoreTests = Eps_ResetWDT();
-          	break;
+         offerMoreTests = Eps_ResetWDT();
+         break;
+    case 16:
+    	offerMoreTests = Eps_ConfigGet();
+    	break;
 	default:
 		break;
 
