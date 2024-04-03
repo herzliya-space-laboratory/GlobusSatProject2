@@ -352,37 +352,50 @@ static Boolean _gethousekeepingeng__tm( void )
 	return TRUE;
 }
 
+/**
+ * Get the status of the voltage on the EPS according to the voltage thresholds that we set in the PDR of Tavel2
+ * */
 static Boolean GetStatusEPS(void)
 {
 	imepsv2_piu__gethousekeepingeng__from_t responseEPS;
 
-	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS);
-
+	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS); //gets the data structure of the responseEPS
+	// if you get an error you print what error do you have. else it prints the status.
 	if( error )
 			TRACE_ERROR("imepsv2_piu__gethousekeepingeng(...) return error (%d)!\n\r",error);
 	else
 	{
-		if(responseEPS.fields.batt_input.fields.volt > 7400)
+		//get voltage in mV
+		if(responseEPS.fields.batt_input.fields.volt > 7400) //print for Operational mode
 			printf("EPS status is Operational \nThe volt battery equal to %d [mV]\r\n", responseEPS.fields.batt_input.fields.volt);
-		else if(responseEPS.fields.batt_input.fields.volt > 7000)
+		else if(responseEPS.fields.batt_input.fields.volt > 7000) //print for Cruise mode
 			printf("EPS status is Cruise \nThe volt battery equal to %d [mV]\r\n", responseEPS.fields.batt_input.fields.volt);
-		else
+		else //print for Power Safe mode
 			printf("The satellite is in Power Safe mode \nThe volt battery equal to %d [mV]\r\n", responseEPS.fields.batt_input.fields.volt);
 	}
 	return TRUE;
 }
 
+/**
+ * get configuration parameter that his value get is from type uint16_t, and prints the name of the parameter and the value of the parameter.
+ *
+ * @param[in] name= config_parmeter_id; type= uint16_t; put the id of the parameter according to ISIS.EPSv2.ICD.SW. Software ICD v1.0 from page 89 to page 92
+ * @param[in] name= name; type= char[]; put the name of the parameter you put the id of.
+ * */
 static void GetConfigurationParmeter(uint16_t config_parmeter_id, char name[])
 {
 	imepsv2_piu__getconfigurationparameter__from_t response;
-	print_error(imepsv2_piu__getconfigurationparameter(0, config_parmeter_id, &response));
+	print_error(imepsv2_piu__getconfigurationparameter(0, config_parmeter_id, &response)); ///gets the data structure of the parameter to response according to the id of the parameter
 
-	printf("%s: ", name);
+	printf("%s: ", name); //prints the name
 	short response_short;
-	memcpy(&response_short, response.fields.par_val, 2);
-	printf(response_short + "\r\n");
+	memcpy(&response_short, response.fields.par_val, 2); //instead of printing an array we do memcpy and get the array in the right places to create a new value and put it in response_short
+	printf(response_short + "\r\n"); //prints the value.
 }
 
+/**
+ * prints the value in these 4 config parameters.
+ * */
 static Boolean GetConfigurationParameters(void)
 {
 	GetConfigurationParmeter(0x4002, "OBUS_FORCE_ENA_BF");
@@ -395,7 +408,11 @@ static Boolean GetConfigurationParameters(void)
 
 	return TRUE;
 }
-
+/*
+ * Asks the user which test he wants or if he wants to exit the test loop.
+ * all the functions returns TRUE while the exit is FALSE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+ * */
 static Boolean selectAndExecuteIsis_EpsDemoTest()
 {
 	int selection = 0;
@@ -415,7 +432,7 @@ static Boolean selectAndExecuteIsis_EpsDemoTest()
 	printf("\t 10) Get Housekeeping Data - Engineering \n\r");
 	printf("\t 11) Get status \n\r");
 	printf("\t 12) Get configuration parameters \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 12) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
