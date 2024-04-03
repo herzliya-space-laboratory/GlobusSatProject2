@@ -72,7 +72,7 @@ static Boolean PrintBeacon(void)
 	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0)); //same and also check error.
 	//we need to decide before we run the program if we use Isis EPS or Gom EPS
-#ifdef USE_EPS_ISIS //if isis
+#ifdef USE_EPS_ISIS //if isis, this define is in the file of isis_OBC_demo.h
 	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //create a variable that is the struct we need from EPS_isis
 
 	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS); //get struct and get kind of error
