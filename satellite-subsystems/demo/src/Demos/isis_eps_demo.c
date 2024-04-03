@@ -215,7 +215,9 @@ static Boolean _getsystemstatus__tm( void )
 
 	return TRUE;
 }
-
+/*
+ * prints all the parameters in the structure of imepsv2_piu__gethousekeepingraw__from_t.
+ * */
 static Boolean _gethousekeepingraw__tm( void )
 {
 	imepsv2_piu__gethousekeepingraw__from_t response;
@@ -290,7 +292,9 @@ static Boolean _gethousekeepingraw__tm( void )
 	
 	return TRUE;
 }
-
+/*
+ * prints all the parameters in the structure of imepsv2_piu__gethousekeepingeng__from_t.
+ * */
 static Boolean _gethousekeepingeng__tm( void )
 {
 	imepsv2_piu__gethousekeepingeng__from_t response;
