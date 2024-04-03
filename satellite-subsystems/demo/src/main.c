@@ -58,6 +58,11 @@
 	#define MAIN_TRACE_FATAL		TRACE_FATAL
 #endif
 
+/*
+ * Asks the user which test he wants.
+ * all the functions returns TRUE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+ * */
 Boolean selectAndExecuteTest()
 {
 	int selection = 0;
@@ -81,7 +86,7 @@ Boolean selectAndExecuteTest()
 	printf("\t 4) OBC Test \n\r");
 	printf("\t 5) Ants Test \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 5) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 5) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
@@ -92,7 +97,7 @@ Boolean selectAndExecuteTest()
 			offerMoreTests = SolarPanelv2test();
 			break;
 		case 3:
-#ifdef USE_EPS_ISIS
+#ifdef USE_EPS_ISIS //this define is in the file of isis_OBC_demo.h
 			offerMoreTests = isis_eps__test();
 #else
 			offerMoreTests = GomEPStest();
