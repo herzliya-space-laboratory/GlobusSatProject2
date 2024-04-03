@@ -134,6 +134,9 @@ static Boolean EPS_TelemetryHKout(void)
 	return TRUE;
 }
 
+/**
+ * Prints out all the parameters of the struct gom_eps_hk_vi_t.
+ */
 static Boolean EPS_TelemetryHKvi(void)
 {
 	gom_eps_hk_vi_t myEpsTelemetry_hk_vi;
@@ -379,7 +382,9 @@ static Boolean EPS_ConfigGet(void)
 	return TRUE;
 }
 
-
+/**
+ * Turns on a selected channel.
+ */
 static Boolean EPS_SetOutputOn(void)
 {
     int selection;
@@ -395,6 +400,9 @@ static Boolean EPS_SetOutputOn(void)
     return TRUE;
 }
 
+/**
+ * Turns off a selected channel.
+ */
 static Boolean EPS_SetOutputOff(void)
 {
     int selection;
@@ -410,6 +418,9 @@ static Boolean EPS_SetOutputOff(void)
     return TRUE;
 }
 
+/**
+ * Reboots the EPS through a chosen mode, can either soft reboot or hard reboot.
+ */
 static Boolean EPS_Reboot(void)
 {
     int selection;
@@ -430,6 +441,9 @@ static Boolean EPS_Reboot(void)
     return TRUE;
 }
 
+/**
+ * Function turns on a stoppable loop that shows battery related telemetry.
+ */
 static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
 {
 	int i = 0;
@@ -472,7 +486,7 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
 
 static Boolean EPS_PingTest(void)
 {
-	// TODO check how ling the ping takes
+	// TODO check how long the ping takes
 
 	unsigned char ping_byte_out;
 	GomEpsPing(0, 'A',&ping_byte_out);
