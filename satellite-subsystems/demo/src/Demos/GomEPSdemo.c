@@ -28,6 +28,9 @@
 #include <hal/errors.h>
 #include <hal/Timing/Time.h>
 
+/*
+ * prints all the parameters in the structure of gom_eps_hk_basic_t.
+ * */
 static Boolean EPS_TelemetryHKbasic(void)
 {
 	gom_eps_hk_basic_t myEpsTelemetry_hk_basic;
@@ -52,6 +55,9 @@ static Boolean EPS_TelemetryHKbasic(void)
 	return TRUE;
 }
 
+/*
+ * prints all the parameters in the structure of gom_eps_hk_wdt_t.
+ * */
 static Boolean EPS_TelemetryHKwdt(void)
 {
 	gom_eps_hk_wdt_t myEpsTelemetry_hk_wdt;
@@ -73,6 +79,9 @@ static Boolean EPS_TelemetryHKwdt(void)
 	return TRUE;
 }
 
+/*
+ * prints all the parameters in the structure of gom_eps_hk_out_t.
+ * */
 static Boolean EPS_TelemetryHKout(void)
 {
 	gom_eps_hk_out_t myEpsTelemetry_hk_out;
@@ -148,7 +157,9 @@ static Boolean EPS_TelemetryHKvi(void)
 
 	return TRUE;
 }
-
+/*
+ * prints all the parameters in the structure of gom_eps_hk_t.
+ * */
 static Boolean EPS_TelemetryHKGeneral(void)
 {
 	gom_eps_hk_t myEpsTelemetry_hk;
@@ -236,23 +247,29 @@ static Boolean EPS_TelemetryHKGeneral(void)
 	return TRUE;
 }
 
+/**
+ * Get the status of the voltage on the EPS according to the voltage thresholds that we set in the PDR of Tavel2
+ * */
 static Boolean EPS_Status(void)
 {
 	gom_eps_hk_t myEpsStatus_hk;
 
 	printf("\r\nEPS Status HK General \r\n\n");
-	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
-	if(myEpsStatus_hk.fields.vbatt > 7400)
+	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk)); //gets the data structure of the myEpsStatus_hk
+	//get voltage in mV and prints in V
+	if(myEpsStatus_hk.fields.vbatt > 7400) // print for Operational mode
 		printf("EPS status is Operational \nThe vbatt equal to %lf\r\n", (myEpsStatus_hk.fields.vbatt / 1000.0));
-	else if(myEpsStatus_hk.fields.vbatt > 7000)
+	else if(myEpsStatus_hk.fields.vbatt > 7000) // print for Cruise mode
 		printf("EPS status is Cruise \nThe vbatt equal to %lf\r\n", (myEpsStatus_hk.fields.vbatt / 1000.0));
-	else
+	else //print for Power Safe mode
 		printf("The satellite is in Power Safe mode \nThe vbatt equal to %lf\r\n", (myEpsStatus_hk.fields.vbatt / 1000.0));
 
 	return TRUE;
 }
 
-
+/*
+ * prints all the parameters in the structure of gom_eps_hkparam_t.
+ * */
 static Boolean EPS_TelemetryHKParam(void)
 {
 	gom_eps_hkparam_t myEpsTelemetry_param;
