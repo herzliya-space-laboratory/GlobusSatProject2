@@ -303,6 +303,9 @@ static Boolean EPS_TelemetryHKParam(void)
 	return TRUE;
 }
 
+/** Prints the config of the GomEPS
+ * The config is in short of configuration and represents the gomEPS configuration, and is set by the struct eps_config_t which you can find at GomEPS.h
+ */
 static Boolean EPS_ConfigGet(void)
 {
 	eps_config_t config_data;
@@ -446,6 +449,10 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
     return TRUE;
 }
 
+/**
+ * The function sends a ping and prints it if the ping is valid
+ */
+
 static Boolean EPS_PingTest(void)
 {
 	// TODO check how ling the ping takes
@@ -456,9 +463,15 @@ static Boolean EPS_PingTest(void)
 
 
 
+
     return TRUE;
 }
 
+/**
+ * prints Heater Mode,bp4 Heater Mode,Onboard Heater Mode.
+ * The bp4 heater is the heater built on the batteries
+ * The Onboard Heater is te heater built on the Arduino Motherboard.
+ */
 static Boolean EPS_GetHeaterMode(void)
 {
 
@@ -470,6 +483,9 @@ static Boolean EPS_GetHeaterMode(void)
     return TRUE;
 }
 
+/**
+ * print the counters then reset it and print it again, to check if it really resets the counters.
+ */
 static Boolean Eps_ResetCounters(void)
 {
 	gom_eps_hk_wdt_t data_out;
@@ -501,7 +517,9 @@ static Boolean Eps_ResetCounters(void)
 	return TRUE;
 }
 
-
+/**
+ * Print just the gnd then resets it and prints it again, to check if it actually resets the gnd.
+ * */
 static Boolean Eps_ResetWDT(void)
 {
 	gom_eps_hk_wdt_t data_out;
@@ -517,9 +535,11 @@ static Boolean Eps_ResetWDT(void)
 	printf(" -wdt_gnd_time_left\r\n");
 	return TRUE;
 }
-
-
-
+/**
+Asks the user which test he wants or if he wants to exit the test loop.
+ * all the functions returns TRUE while the exit is FALSE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+*/
 static Boolean selectAndExecuteGomEPSDemoTest(void)
 {
 	int selection = 0;
@@ -545,7 +565,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 16) Get Config Parameters\n\r");
 
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 16) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 16) == 0);//you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
