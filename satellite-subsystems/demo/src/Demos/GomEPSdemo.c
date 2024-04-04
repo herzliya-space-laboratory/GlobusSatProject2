@@ -383,6 +383,35 @@ static Boolean EPS_ConfigGet(void)
 }
 
 /**
+ *
+ */
+static Boolean EPS_Config2Get(void)
+{
+	eps_config2_t config_data;
+	print_error(GomEpsConfigGet(0, &config_data));
+
+	printf("%u", config_data.fields.commandReply);
+	printf("-config_commandReply\r\n");
+
+	printf("%u", config_data.fields.batt_maxvoltage);
+	printf("-config_batt_max_voltage\r\n");
+
+	printf("%u", config_data.fields.batt_safevoltage);
+	printf("-config_batt_safe_voltage\r\n");
+
+	printf("%u", config_data.fields.batt_criticalvoltage);
+	printf("-config_batt_critical_voltage\r\n");
+
+	printf("%u", config_data.fields.batt_normalvoltage);
+	printf("-config_batt_normal_voltage\r\n");
+
+	printf("%u", config_data.fields.commandReply);
+	printf("-config_commandReply\r\n");
+
+	return TRUE;
+}
+
+/**
  * Turns on a selected channel.
  */
 static Boolean EPS_SetOutputOn(void)
@@ -594,6 +623,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 14) Reset the GOMSpace EPS counters \n\r");
 	printf("\t 15) print \n\r");
 	printf("\t 16) Get Config Parameters\n\r");
+	printf("\t 17) Get Config2 Parameters\n\r");
 
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 16) == 0);//you have to write a number between the two numbers include or else it ask you to enter a number between the two.
@@ -650,6 +680,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 16:
     	offerMoreTests = EPS_ConfigGet();
        	break;
+    case 17:
+    	offerMoreTests = EPS_Config2Get();
+    	break;
 
 	default:
 		break;
