@@ -502,6 +502,9 @@ static Boolean TransponderOff()
 
 	return TRUE;
 }
+/*
+ * brief sets the RSSI of the transmitter
+ * */
 static Boolean SetTransponderThreshold(void){
 	int input;
 	short threshold;
@@ -516,6 +519,10 @@ static Boolean SetTransponderThreshold(void){
 			printf("It work \r\n");
 	return TRUE;
 }
+/*
+ * brief prints the last reccorded Telementry
+ * */
+
 static Boolean Get_Tx_Telemetry_Value_Array(void) {
 	unsigned short telemetryValue;
 	float eng_value = 0.0;
@@ -569,6 +576,9 @@ static Boolean Get_Tx_Telemetry_Value_Array(void) {
 
 	return TRUE;
 }
+/*
+ * brief prints the State according to the current transmitter state from ISIStrxvuTransmitterState
+ * */
 static Boolean printTransmitterState() {
 	ISIStrxvuTransmitterState currentstate;
 	print_error(IsisTrxvu_tcGetState(0, &currentstate));
@@ -613,6 +623,9 @@ static Boolean printTransmitterState() {
 	       		}
 	 return TRUE;
 }
+/*
+ * brief, checks how much time it takes to send an 8 byte package at a 9600 bitrate
+ * */
 static Boolean IsisTrxvu_tcEstimateTransmissionTimeTest(void){
 	printf("\r\n the current time it takes to send a package size of  8 with a 9600bitrate is %d \r\n", IsisTrxvu_tcEstimateTransmissionTime(8, trxvu_bitrate_9600));
 	return TRUE;
@@ -644,7 +657,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 18) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 19) == 0);
 
 	switch(selection) {
 	case 0:
