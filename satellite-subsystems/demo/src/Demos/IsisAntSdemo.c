@@ -35,7 +35,9 @@
 #define	AUTO_DEPLOYMENT_TIME	10
 #define MANUAL_DEPLOYMENT_TIME  10
 
-// Function calls to reset both sides of the AntS
+/**
+ * Function resets both sides of the Ants
+ * */
 static Boolean resetAntSTest(unsigned char index)
 {
 	ISISantsSide activeSide = isisants_sideA;
@@ -66,7 +68,9 @@ static void printDeploymentStatus(unsigned char antenna_id, unsigned char status
 	}
 }
 
-// Function calls to get the current status of both sides of the AntS
+/**
+ * Function calls to get the current status of both sides of the Ants
+ */
 static void getStatusAntSTest(unsigned char index, ISISantsSide side)
 {
 	ISISantsStatus currentStatus;
@@ -92,7 +96,9 @@ static void getStatusAntSTest(unsigned char index, ISISantsSide side)
 	printf("Override: %s \r\n", currentStatus.fields.ignoreFlag==0?"inactive":"active");
 }
 
-// Function calls to get the current temperature on both sides of the AntS
+/**
+ * Function calls to get the current temperature on both sides of the Ants
+ * */
 static Boolean tempAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -110,7 +116,9 @@ static Boolean tempAntSTest(unsigned char index)
 	return TRUE;
 }
 
-// Function calls to get the current uptime on both sides of the AntS
+/**
+ * Function calls to get the current uptime on both sides of the Ants
+ * */
 static Boolean uptimeAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -126,7 +134,9 @@ static Boolean uptimeAntSTest(unsigned char index)
 	return TRUE;
 }
 
-// Function calls to get a block of telemetry on both sides of the AntS
+/**
+ * Function calls to get a block of telemetry on both sides of the Ants
+ * */
 static Boolean telemAntSTest(unsigned char index, ISISantsSide side)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -158,13 +168,17 @@ static Boolean telemAntSTest(unsigned char index, ISISantsSide side)
 	return TRUE;
 }
 
+/**
+ * Functions defines the "arm" status of 1 side of the antennas. It has 2 possible modes, arm and disarm.
+ * The arm mechanism is just a safety meassure to secure the deployment of the antennas without any problems, and to allow us to reuse them in the future.
+ */
 static Boolean setARMStatus(unsigned char index, ISISantsSide side, Boolean arm)
 {
     printf( "DISARMING antenna system side %c \n\r", side + 'A');
 
 	print_error(IsisAntS_setArmStatus(index, side, isisants_disarm));
 
-	vTaskDelay(5 / portTICK_RATE_MS);
+	vTaskDelay(5 / portTICK_RATE_MS); //delays the task by 5 ms
 
 	if(arm)
 	{
@@ -191,7 +205,7 @@ static Boolean setARMStatus(unsigned char index, ISISantsSide side, Boolean arm)
 		    	printf( "antenna system side %c arming failed \n\r", side + 'A');
 		    }
 
-			vTaskDelay(5 / portTICK_RATE_MS);
+			vTaskDelay(5 / portTICK_RATE_MS); //delays the task by 5 ms
 	    }
 	    else
 	    {
@@ -202,6 +216,9 @@ static Boolean setARMStatus(unsigned char index, ISISantsSide side, Boolean arm)
 	return TRUE;
 }
 
+/**
+ *  Automatically deploying all antennas of a certain given side.
+ * */
 static Boolean autoDeploymentAntSTest(unsigned char index, ISISantsSide side)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -260,6 +277,10 @@ static Boolean getActivationCount(int index) {
 
 
 }
+
+/**
+ * Manual deployment of 1 antenna of a certain given side
+ * */
 static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
 {
     int antennaSelection = 0;
