@@ -81,7 +81,9 @@ static Boolean softResetVUTest(void)
 
 	return TRUE;
 }
-
+/**
+ * checks that we can send beacon every 20 seconds. set sending beacon on
+ * */
 static Boolean vutc_sendBeacon(void)
 {
 	unsigned char data[10]  = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -90,7 +92,9 @@ static Boolean vutc_sendBeacon(void)
 
 	return TRUE;
 }
-
+/**
+ * set sending beacon off
+ * */
 static Boolean vutc_stopSendingBeacon(void)
 {
 	IsisTrxvu_tcClearBeacon(0);
@@ -126,7 +130,9 @@ static Boolean vutc_sendEmptyPacketTest(void)
 }
 
 
-
+/**
+ * get from user packet the size of 10 in Hexa32 and send the packet the times the user wants between 1 to 1000
+ * */
 static Boolean vutc_sendPacketInsertedByTheUser(void)
 {
 	//Buffers and variables definition
@@ -140,17 +146,17 @@ static Boolean vutc_sendPacketInsertedByTheUser(void)
 	printf("\r\nEnter buffer: \r\n");
 	for(i = 0; i < 10 ; i++)
 	{
-		if (UTIL_DbguGetHexa32(&temp) == 1)
+		if (UTIL_DbguGetHexa32(&temp) == 1) //get from user hexa32 and check if it was fine else i = i - 1
 			testBuffer2[i] = (unsigned char)temp;
 		else
 			i--;
 	}
 	printf("\r\nEnter amount of repetitions: \r\n");
-	while(UTIL_DbguGetIntegerMinMax(&amountOfRepetitions, 1, 1000) == 0);
-	while(txCounter < amountOfRepetitions && timeoutCounter < amountOfRepetitions)
+	while(UTIL_DbguGetIntegerMinMax(&amountOfRepetitions, 1, 1000) == 0); // get amount of repetition from user and check that is indeed get a number between 1 - 1000
+	while(txCounter < amountOfRepetitions && timeoutCounter < amountOfRepetitions) // send packets the amount of times the user insert.
 	{
 		printf("\r\n Transmission of single buffers with default callsign. AX25 Format. \r\n");
-		print_error(IsisTrxvu_tcSendAX25DefClSign(0, testBuffer2, 10, &avalFrames));
+		print_error(IsisTrxvu_tcSendAX25DefClSign(0, testBuffer2, 10, &avalFrames)); // send one packet that its the packet the user enter
 
 		if ((avalFrames != 0)&&(avalFrames != 255))
 		{
@@ -495,20 +501,27 @@ static Boolean vutc_getTxTelemTest_revD(void)
 
 	return TRUE;
 }
-
+/**
+ * set transponder on
+ * */
 static Boolean TransponderOn()
 {
 	unsigned char data[] = {0x38, 0x02};
 	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 2));
 	return TRUE;
 }
-
+/**
+ * set transponder off
+ * */
 static Boolean TransponderOff()
 {
 	unsigned char data[] = {0x38, 0x01};
 	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 2));
 	return TRUE;
 }
+/*
+ * brief sets the RSSI of the transmitter
+ * */
 static Boolean SetTransponderThreshold(void){
 	int input;
 	short threshold;
@@ -520,6 +533,10 @@ static Boolean SetTransponderThreshold(void){
 		I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 3));
 	return TRUE;
 }
+/*
+ * brief prints the last reccorded Telementry
+ * */
+
 static Boolean Get_Tx_Telemetry_Value_Array(void) {
 	unsigned short telemetryValue;
 	float eng_value = 0.0;
@@ -573,6 +590,9 @@ static Boolean Get_Tx_Telemetry_Value_Array(void) {
 
 	return TRUE;
 }
+/*
+ * brief prints the State according to the current transmitter state from ISIStrxvuTransmitterState
+ * */
 static Boolean printTransmitterState() {
 	ISIStrxvuTransmitterState currentstate;
 	print_error(IsisTrxvu_tcGetState(0, &currentstate));
@@ -617,6 +637,9 @@ static Boolean printTransmitterState() {
 	       		}
 	 return TRUE;
 }
+/*
+ * brief, checks how much time it takes to send an 8 byte package at a 9600 bitrate
+ * */
 static Boolean IsisTrxvu_tcEstimateTransmissionTimeTest(void){
 	printf("\r\n the current time it takes to send a package size of  8 with a 9600bitrate is %d \r\n", IsisTrxvu_tcEstimateTransmissionTime(8, trxvu_bitrate_9600));
 	return TRUE;
