@@ -405,8 +405,6 @@ static Boolean EPS_Config2Get(void)
 	printf("%u", config_data.fields.batt_normalvoltage);
 	printf("-config_batt_normal_voltage\r\n");
 
-	printf("%u", config_data.fields.commandReply);
-	printf("-config_commandReply\r\n");
 
 	return TRUE;
 }
@@ -626,7 +624,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 17) Get Config2 Parameters\n\r");
 
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 16) == 0);//you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 17) == 0);//you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
