@@ -7,6 +7,7 @@
 #include "isis_OBC_demo.h"
 #include  "common.h"
 
+#include <satellite-subsystems/imepsv2_piu.h>
 
 #include "satellite-subsystems/GomEPS.h"
 #include "satellite-subsystems/IsisSolarPanelv2.h"
@@ -15,6 +16,7 @@
 #include "hal/errors.h"
 #include "hal/Utility/util.h"
 #include "hal/Drivers/ADC.h"
+#include "hal/Storage/FRAM.h"
 
 #include <hcc/api_fat.h>
 #include <stdio.h>
@@ -22,7 +24,11 @@
 
 #include "GomEPSdemo.h"
 #include "IsisSPv2demo.h"
+#include "isis_eps_demo.h"
 
+/*
+ * gets and prints the solar panels temperature.
+ * */
 static Boolean SolarPanelv2_Temperature2()
 {
 	int error;
@@ -31,56 +37,68 @@ static Boolean SolarPanelv2_Temperature2()
 	int32_t paneltemp = 0;
 	float conv_temp;
 
-	IsisSolarPanelv2_wakeup();
+	IsisSolarPanelv2_wakeup(); //Wakes the internal temperature sensor from sleep mode.
 
 	printf("\t Temperature values \r\n");
 
-	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ )
+	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ ) //go for the count of solar panels we have.
 	{
-		error = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status);
-		if( error )
+		error = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //gets the temperature of each panel and the error message.
+		if( error ) //if there is error
 		{
-			printf("\t\t Panel %d : Error (%d), Status (0x%X) \r\n", panel, error, status);
+			printf("\t\t Panel %d : Error (%d), Status (0x%X) \r\n", panel, error, status); //print what panel, which error and status
 			continue;
 		}
 
 		conv_temp = (float)(paneltemp) * ISIS_SOLAR_PANEL_CONV;
 
-		printf("\t\t Panel %d : %f [°C]\n", panel, conv_temp);
+		printf("\t\t Panel %d : %f [°C]\n", panel, conv_temp); //else prints
 	}
 
-	IsisSolarPanelv2_sleep();
+	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
 
-	vTaskDelay( 1 / portTICK_RATE_MS );
+	vTaskDelay( 1 / portTICK_RATE_MS ); //Delay the program
 
 	return TRUE;
 }
-/*Boolean IsisOBCdemoMain(void)
-{
-	if(IsisOBCdemoInit())									// initialize of I2C and IsisOBC subsystem drivers succeeded?
-	{
-		IsisOBCdemoLoop();								// show the main IsisOBC demo interface and wait for user input
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
-}*/
 
-static Boolean PrintName(void) {
-	printf("i am ben\r\n");
-	return TRUE;
-}
+/*
+ * prints the beacon we supposed to send every 20 seconds.
+ * */
 static Boolean PrintBeacon(void)
 {
-	supervisor_housekeeping_t mySupervisor_housekeeping_hk;
-	gom_eps_hk_t myEpsStatus_hk;
-	F_SPACE space;
-	int ret = f_getfreespace(f_getdrive(), &space);
+	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
+	F_SPACE space; //same just to SD
+	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
+	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0)); //same and also check error.
+	//we need to decide before we run the program if we use Isis EPS or Gom EPS
+#ifdef USE_EPS_ISIS //if isis, this define is in the file of isis_OBC_demo.h
+	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //create a variable that is the struct we need from EPS_isis
 
-	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
-	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0));
+	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS); //get struct and get kind of error
+	if( error ) //if something different then 0
+		TRACE_ERROR("imepsv2_piu__gethousekeepingeng(...) return error (%d)!\n\r",error);
+	else //prints the categories for the EPS isis
+	{
+		printf("\n\r EPS: \n\r");
+		printf("\t Volt battery [mV]: %d\r\n", responseEPS.fields.batt_input.fields.volt);
+		//todo:Volt 5V [mV]
+		//todo:Volt 3.3V [mV]
+		//todo:Charging power [mW]
+		printf("\t Consumed power [mW]: %d\r\n", responseEPS.fields.dist_input.fields.power * 10);
+		printf("\t Electric current [mA]: %d\r\n", response.fields.batt_input.fields.current);
+		//todo: Current 3.3V [mA]
+		//todo:Current 5V [mA]
+		printf("\t MCU Temperature [°C]: %2f\r\n",((double)responseEPS.fields.temp) * 0.01);
+		printf("\t Battery Temperature [°C]: %2f\r\n", ((double)responseEPS.fields.temp2) * 0.01))
+	}
+
+#else
+	gom_eps_hk_t myEpsStatus_hk; //create a variable that is the struct we need from EPS_gom
+
+
+	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk)); //get struct and prints error if there is.
+	//prints the categories for the EPS Gom
 	printf("\n\r EPS: \n\r");
 	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
 	//printf("\t Volt 5V [mV]: %d\r\n", (int)myEpsStatus_hk.fields.curout[2]); //curout[2] - 5V mA //not right
@@ -94,55 +112,81 @@ static Boolean PrintBeacon(void)
 	printf("\t battery0 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[4]);
 	printf("\t battery1 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[5]);
 	printf("\t number of reboots to EPS: %d\r\n", (int)myEpsStatus_hk.fields.counter_boot);
-
+#endif
+	//for both of the EPS.
 	printf("\n\r Solar panel: \n\r");
-	SolarPanelv2_Temperature2();
+	SolarPanelv2_Temperature2(); // gets the temperature of the solar panels and print it.
 
-	printf("\n\r OBC: \n\r");
+	printf("\n\r OBC: \n\r"); //prints the categories of the OBC
 	printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
 	printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
 
 	printf("\n\r SD: \n\r");
-	if(!ret)
+	if(!ret) //if ret = 0 we prints the categories
 	{
 		/*printf("\t free memory [byte]: %lu \r\n", space.free);
 		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);*/
 		printf("\t There are:\n\t %lu bytes total\n\t %lu bytes free\n\t %lu bytes used\n\t %lu bytes bad.\r\n",space.total, space.free, space.used, space.bad);
 	}
-	else
+	else //else we print the kind of error.
 		printf("\t ERROR %d reading drive \r\n", ret);
 
-	printf("\n\r ADC: \n\r");
+	printf("\n\r ADC: \n\r"); //get and prints the ADC channels
 	unsigned short adcSamples[8];
 	int i;
-	int work = ADC_SingleShot(adcSamples);
-	if(!work)
+	int work = ADC_SingleShot(adcSamples); //Initialize the ADC driver
+	if(!work) //if the Initialize worked
 	{
 		for(i = 0; i < 8; i++)
-			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]);
+			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]); //gets the channels
 		for(i = 0; i < 8; i++)
-			printf("\t ADC channel %d: %d \r\n", i, adcSamples[i]);
+			printf("\t ADC channel %d: %d \r\n", i, adcSamples[i]); //prints the channels
 	}
 	else
-		printf("\t ERROR %d reading drive \r\n", work);
-	/*int i;
-	for(i = 0; i < 10; i++)
-		printf("\t ADC channel %d [mV]: %u\r\n", i, (unsigned int)mySupervisor_housekeeping_hk.fields.adcData[i]);*/
+		printf("\t ERROR %d reading drive \r\n", work); //if the Initialize didn't worked it's print error
+
 	return TRUE;
 }
 
+/*
+ * write to the FRAM memory, read from it and check we have put it in the right place and put the right thing
+ * */
+static Boolean WriteAndReadFromFRAM(void){
+	const unsigned char data[] = "hello"; //the data we write to the FRAM
+	unsigned char writtenData[sizeof(data)]; //make a same size array for the check after.
+	unsigned int address = FRAM_getMaxAddress() - sizeof(data) - 10; //get max address in the FRAM and subtracting from it 10 and the size of the data.
+	print_error(FRAM_writeAndVerify(data, address, sizeof(data))); //write data to the address and from there to the length of the data.
+	print_error(FRAM_read(writtenData, address, sizeof(data))); //read data from the address and from there to the length of the data and put it in writtenData.
+	unsigned int i = 0;
+	for(i = 0; i < sizeof(data); i++) //check if all the chars equal to each other
+	{
+		if(writtenData[i] != data[i]) //if they not
+		{
+			printf("It doesn't write down what you wanted. \r\n");
+			break;
+		}
+	}
+	if(i > sizeof(data) - 1) //if they are
+		printf("It write down what you wanted. \r\n");
 
+	return TRUE;
+}
+
+/*
+ * Asks the user which test he wants or if he wants to exit the test loop.
+ * all the functions returns TRUE while the exit is FALSE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+ * */
 static Boolean selectAndExecuteOBCDemoTest(void)
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
-	printf("\n\r Select a test to perform: \n\r");
+	printf("\n\rSelect a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
-	printf("\t 2) Print my Name \n\r");
-
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0);
+	printf("\t 2) Write and read from FRAM \n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -152,7 +196,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		offerMoreTests = PrintBeacon();
 		break;
 	case 2:
-		offerMoreTests = PrintName();
+		offerMoreTests = WriteAndReadFromFRAM();
 		break;
 	default:
 		break;
@@ -175,7 +219,32 @@ void IsisOBCdemoLoop(void)
 		}
 	}
 }
-
+/*
+ * initialize the supervisor by the function from the FRAM.h
+ * */
+Boolean InitFRAM(void)
+{
+	int error = FRAM_start();
+	if(error != E_NO_SS_ERR)
+	{
+		print_error(error);
+		return FALSE;
+	}
+	return TRUE;
+}
+/*
+ * initialize the supervisor by the function from the supervisor.h
+ * */
+Boolean InitSupervisor(void)
+{
+	int error = Supervisor_start(SUPERVISOR_SPI_INDEX, 0);
+	if(error != E_NO_SS_ERR)
+	{
+		print_error(error);
+		return FALSE;
+	}
+	return TRUE;
+}
 
 Boolean InitSDFat(void)
 {
@@ -217,10 +286,17 @@ Boolean InitSDFat(void)
 }
 Boolean InitOBCtests(void)
 {
-	if(!GomEPSdemoInit() || !InitSDFat())
+#ifdef USE_EPS_ISIS
+	if(!isis_eps__demo__init() || !InitSDFat() || !InitSupervisor() || !InitFRAM())
 	{
 		return FALSE;
 	}
+#else
+	if(!GomEPSdemoInit() || !InitSDFat() || !InitSupervisor() || !InitFRAM())
+	{
+		return FALSE;
+	}
+#endif
 	/*if(!InitSolarPanels())
 	{
 		return FALSE;
