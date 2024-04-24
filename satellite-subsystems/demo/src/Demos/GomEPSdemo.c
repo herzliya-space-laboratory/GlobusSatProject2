@@ -388,7 +388,7 @@ static Boolean EPS_ConfigGet(void)
 static Boolean EPS_Config2Get(void)
 {
 	eps_config2_t config_data;
-	print_error(GomEpsConfigGet(0, &config_data));
+	print_error(GomEpsConfig2Get(0, &config_data));
 
 	printf("%u", config_data.fields.commandReply);
 	printf("-config_commandReply\r\n");
@@ -621,7 +621,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 12) EPS Ping   \n\r");
 	printf("\t 13) EPS Get Heater Mode \n\r");
 	printf("\t 14) Reset the GOMSpace EPS counters \n\r");
-	printf("\t 15) print \n\r");
+	printf("\t 15) print to check if it actually resets the gnd \n\r");
 	printf("\t 16) Get Config Parameters\n\r");
 	printf("\t 17) Get Config2 Parameters\n\r");
 
