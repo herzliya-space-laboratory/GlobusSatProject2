@@ -299,12 +299,18 @@ static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
     return TRUE;
 }
 
+/*
+ * Asks the user which test he wants or if he wants to exit the test loop.
+ * all the functions returns TRUE while the exit is FALSE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+ * */
 Boolean selectAndExecuteAntSDemoTest(unsigned char index)
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
 	printf("\n\r Select a test to perform: \n\r");
+	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) AntS reset - both sides \n\r");
 	printf("\t 2) Ants status - both sides \n\r");
 	printf("\t 3) AntS uptime - both sides \n\r");
@@ -319,10 +325,8 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
     printf("\t 12) AntS manual deployment - side A\n\r");
     printf("\t 13) AntS manual deployment - side B\n\r");
     printf("\t 14) get Activation Count \n\r");
-	printf("\t 15) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 15) == 0);
-
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 	switch(selection) {
 	case 1:
 		offerMoreTests = resetAntSTest(index);
@@ -369,7 +373,7 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
     case 14:
     	offerMoreTests = getActivationCount(index);
     	break;
-	case 15:
+	case 0:
 		offerMoreTests = FALSE;
 		break;
 
