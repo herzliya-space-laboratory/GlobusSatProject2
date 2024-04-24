@@ -37,7 +37,9 @@
 // #define AUTO_DPLOYMENT
 // #define MANUAL_DPLOYMENT
 
-// Function calls to reset both sides of the AntS
+/**
+ * Function resets both sides of the Ants
+ * */
 static Boolean resetAntSTest(unsigned char index)
 {
 	ISISantsSide activeSide = isisants_sideA;
@@ -68,7 +70,9 @@ static void printDeploymentStatus(unsigned char antenna_id, unsigned char status
 	}
 }
 
-// Function calls to get the current status of both sides of the AntS
+/**
+ * Function calls to get the current status of both sides of the Ants
+ */
 static void getStatusAntSTest(unsigned char index, ISISantsSide side)
 {
 	ISISantsStatus currentStatus;
@@ -94,7 +98,9 @@ static void getStatusAntSTest(unsigned char index, ISISantsSide side)
 	printf("Override: %s \r\n", currentStatus.fields.ignoreFlag==0?"inactive":"active");
 }
 
-// Function calls to get the current temperature on both sides of the AntS
+/**
+ * Function calls to get the current temperature on both sides of the Ants
+ * */
 static Boolean tempAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -112,7 +118,9 @@ static Boolean tempAntSTest(unsigned char index)
 	return TRUE;
 }
 
-// Function calls to get the current uptime on both sides of the AntS
+/**
+ * Function calls to get the current uptime on both sides of the Ants
+ * */
 static Boolean uptimeAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -128,7 +136,9 @@ static Boolean uptimeAntSTest(unsigned char index)
 	return TRUE;
 }
 
-// Function calls to get a block of telemetry on both sides of the AntS
+/**
+ * Function calls to get a block of telemetry on both sides of the Ants
+ * */
 static Boolean telemAntSTest(unsigned char index, ISISantsSide side)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -160,13 +170,17 @@ static Boolean telemAntSTest(unsigned char index, ISISantsSide side)
 	return TRUE;
 }
 
+/**
+ * Functions defines the "arm" status of 1 side of the antennas. It has 2 possible modes, arm and disarm.
+ * The arm mechanism is just a safety meassure to secure the deployment of the antennas without any problems, and to allow us to reuse them in the future.
+ */
 static Boolean setARMStatus(unsigned char index, ISISantsSide side, Boolean arm)
 {
     printf( "DISARMING antenna system side %c \n\r", side + 'A');
 
 	print_error(IsisAntS_setArmStatus(index, side, isisants_disarm));
 
-	vTaskDelay(5 / portTICK_RATE_MS);
+	vTaskDelay(5 / portTICK_RATE_MS); //delays the task by 5 ms
 
 	if(arm)
 	{
@@ -193,7 +207,7 @@ static Boolean setARMStatus(unsigned char index, ISISantsSide side, Boolean arm)
 		    	printf( "antenna system side %c arming failed \n\r", side + 'A');
 		    }
 
-			vTaskDelay(5 / portTICK_RATE_MS);
+			vTaskDelay(5 / portTICK_RATE_MS); //delays the task by 5 ms
 	    }
 	    else
 	    {
@@ -204,6 +218,9 @@ static Boolean setARMStatus(unsigned char index, ISISantsSide side, Boolean arm)
 	return TRUE;
 }
 
+/**
+ *  Automatically deploying all antennas of a certain given side.
+ * */
 static Boolean autoDeploymentAntSTest(unsigned char index, ISISantsSide side)
 {
 	unsigned char antennaSystemsIndex = index;
@@ -246,7 +263,27 @@ static Boolean autoDeploymentAntSTest(unsigned char index, ISISantsSide side)
 	return TRUE;
 }
 
+static Boolean getActivationCount(int index) {
+    ISISantsSide side;
+    ISISantsAntenna antennaSelection;
+    unsigned short deploymentTime;
+    // Outer loop cycles through side
+    for (side = isisants_sideA; side <= isisants_sideB; side++) {
+        // Inner loop cycles through antennaSelection
+        for (antennaSelection = isisants_antenna1; antennaSelection <= isisants_antenna4; antennaSelection++) {
+            // Call the function with the given parameters
+            print_error(IsisAntS_getActivationTime(index, side, antennaSelection, &deploymentTime));
+            printf("for the side: %d, and the antenna %d, the deployment time is %d \r\n", side + 1, antennaSelection + 1, deploymentTime);
+        }
+    }
+    return TRUE;
 
+
+}
+
+/**
+ * Manual deployment of 1 antenna of a certain given side
+ * */
 static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
 {
     int antennaSelection = 0;
@@ -286,12 +323,18 @@ static Boolean manualDeploymentAntSTest(unsigned char index, ISISantsSide side)
     return TRUE;
 }
 
+/*
+ * Asks the user which test he wants or if he wants to exit the test loop.
+ * all the functions returns TRUE while the exit is FALSE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+ * */
 Boolean selectAndExecuteAntSDemoTest(unsigned char index)
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
 	printf("\n\r Select a test to perform: \n\r");
+	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) AntS reset - both sides \n\r");
 	printf("\t 2) Ants status - both sides \n\r");
 	printf("\t 3) AntS uptime - both sides \n\r");
@@ -305,10 +348,9 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
 	printf("\t 11) AntS autodeployment - side B\n\r");
     printf("\t 12) AntS manual deployment - side A\n\r");
     printf("\t 13) AntS manual deployment - side B\n\r");
-	printf("\t 14) Return to main menu \n\r");
+    printf("\t 14) get Activation Count \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 14) == 0);
-
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 	switch(selection) {
 	case 1:
 		offerMoreTests = resetAntSTest(index);
@@ -352,7 +394,10 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
     case 13:
         offerMoreTests = manualDeploymentAntSTest(index, isisants_sideB);
         break;
-	case 14:
+    case 14:
+    	offerMoreTests = getActivationCount(index);
+    	break;
+	case 0:
 		offerMoreTests = FALSE;
 		break;
 
