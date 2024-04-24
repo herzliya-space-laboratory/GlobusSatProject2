@@ -318,7 +318,7 @@ Boolean selectAndExecuteAntSDemoTest(unsigned char index)
 	printf("\t 11) AntS autodeployment - side B\n\r");
     printf("\t 12) AntS manual deployment - side A\n\r");
     printf("\t 13) AntS manual deployment - side B\n\r");
-    printf("\t 14 get Activation Count \n\r");
+    printf("\t 14) get Activation Count \n\r");
 	printf("\t 15) Return to main menu \n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 15) == 0);
