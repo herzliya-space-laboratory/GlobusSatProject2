@@ -26,7 +26,11 @@
 #include <satellite-subsystems/GomEPS.h>
 
 #include <hal/errors.h>
+#include <hal/Timing/Time.h>
 
+/*
+ * prints all the parameters in the structure of gom_eps_hk_basic_t.
+ * */
 static Boolean EPS_TelemetryHKbasic(void)
 {
 	gom_eps_hk_basic_t myEpsTelemetry_hk_basic;
@@ -51,6 +55,9 @@ static Boolean EPS_TelemetryHKbasic(void)
 	return TRUE;
 }
 
+/*
+ * prints all the parameters in the structure of gom_eps_hk_wdt_t.
+ * */
 static Boolean EPS_TelemetryHKwdt(void)
 {
 	gom_eps_hk_wdt_t myEpsTelemetry_hk_wdt;
@@ -72,6 +79,9 @@ static Boolean EPS_TelemetryHKwdt(void)
 	return TRUE;
 }
 
+/*
+ * prints all the parameters in the structure of gom_eps_hk_out_t.
+ * */
 static Boolean EPS_TelemetryHKout(void)
 {
 	gom_eps_hk_out_t myEpsTelemetry_hk_out;
@@ -124,6 +134,9 @@ static Boolean EPS_TelemetryHKout(void)
 	return TRUE;
 }
 
+/**
+ * Prints out all the parameters of the struct gom_eps_hk_vi_t.
+ */
 static Boolean EPS_TelemetryHKvi(void)
 {
 	gom_eps_hk_vi_t myEpsTelemetry_hk_vi;
@@ -147,7 +160,9 @@ static Boolean EPS_TelemetryHKvi(void)
 
 	return TRUE;
 }
-
+/*
+ * prints all the parameters in the structure of gom_eps_hk_t.
+ * */
 static Boolean EPS_TelemetryHKGeneral(void)
 {
 	gom_eps_hk_t myEpsTelemetry_hk;
@@ -235,23 +250,29 @@ static Boolean EPS_TelemetryHKGeneral(void)
 	return TRUE;
 }
 
+/**
+ * Get the status of the voltage on the EPS according to the voltage thresholds that we set in the PDR of Tavel2
+ * */
 static Boolean EPS_Status(void)
 {
 	gom_eps_hk_t myEpsStatus_hk;
 
 	printf("\r\nEPS Status HK General \r\n\n");
-	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk));
-	if(myEpsStatus_hk.fields.vbatt > 7400)
+	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk)); //gets the data structure of the myEpsStatus_hk
+	//get voltage in mV and prints in V
+	if(myEpsStatus_hk.fields.vbatt > 7400) // print for Operational mode
 		printf("EPS status is Operational \nThe vbatt equal to %lf\r\n", (myEpsStatus_hk.fields.vbatt / 1000.0));
-	else if(myEpsStatus_hk.fields.vbatt > 7000)
+	else if(myEpsStatus_hk.fields.vbatt > 7000) // print for Cruise mode
 		printf("EPS status is Cruise \nThe vbatt equal to %lf\r\n", (myEpsStatus_hk.fields.vbatt / 1000.0));
-	else
+	else //print for Power Safe mode
 		printf("The satellite is in Power Safe mode \nThe vbatt equal to %lf\r\n", (myEpsStatus_hk.fields.vbatt / 1000.0));
 
 	return TRUE;
 }
 
-
+/*
+ * prints all the parameters in the structure of gom_eps_hkparam_t.
+ * */
 static Boolean EPS_TelemetryHKParam(void)
 {
 	gom_eps_hkparam_t myEpsTelemetry_param;
@@ -302,6 +323,95 @@ static Boolean EPS_TelemetryHKParam(void)
 	return TRUE;
 }
 
+/** Prints the config of the GomEPS
+ * The config is in short of configuration and represents the gomEPS configuration, and is set by the struct eps_config_t which you can find at GomEPS.h
+ */
+static Boolean EPS_ConfigGet(void)
+{
+	eps_config_t config_data;
+	print_error(GomEpsConfigGet(0, &config_data));
+
+	printf("%u", config_data.fields.commandReply);
+	printf("-config_commandReplay\r\n");
+
+	printf("%u",config_data.fields.ppt_mode);
+	printf("-config_ppt_mode\r\n");
+
+	printf("%u",config_data.fields.battheater_mode);
+	printf("-config_battheater_mode\r\n");
+
+	printf("%u",config_data.fields.battheater_low);
+	printf("-config_battheater_low\r\n");
+
+	printf("%u",config_data.fields.battheater_high);
+	printf("-config_battheater_high\r\n");
+
+
+	int i;
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("%u",config_data.fields.output_normal_value[i]);
+		printf("-config_output_normal_value[%d]\r\n", i);
+	}
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("%u",config_data.fields.output_safe_value[i]);
+		printf("-config_output_safe_value[%d]\r\n", i);
+	}
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("%u",config_data.fields.output_initial_on_delay[i]);
+		printf("-output_initial_on_delay[%d]\r\n", i);
+	}
+
+	for(i = 0; i<=7; i++)
+	{
+		printf("%u",config_data.fields.output_initial_off_delay[i]);
+		printf("-output_initial_off_delay[%d]\r\n", i);
+	}
+
+	for(i = 0; i<=2; i++)
+	{
+		printf("%u",config_data.fields.vboost[i]);
+		printf("-vboost[%d]\r\n", i);
+	}
+
+	return TRUE;
+}
+
+/**
+ *
+ */
+static Boolean EPS_Config2Get(void)
+{
+	eps_config2_t config_data;
+	print_error(GomEpsConfig2Get(0, &config_data));
+
+	printf("%u", config_data.fields.commandReply);
+	printf("-config_commandReply\r\n");
+
+	printf("%u", config_data.fields.batt_maxvoltage);
+	printf("-config_batt_max_voltage\r\n");
+
+	printf("%u", config_data.fields.batt_safevoltage);
+	printf("-config_batt_safe_voltage\r\n");
+
+	printf("%u", config_data.fields.batt_criticalvoltage);
+	printf("-config_batt_critical_voltage\r\n");
+
+	printf("%u", config_data.fields.batt_normalvoltage);
+	printf("-config_batt_normal_voltage\r\n");
+
+
+	return TRUE;
+}
+
+/**
+ * Turns on a selected channel.
+ */
 static Boolean EPS_SetOutputOn(void)
 {
     int selection;
@@ -317,6 +427,9 @@ static Boolean EPS_SetOutputOn(void)
     return TRUE;
 }
 
+/**
+ * Turns off a selected channel.
+ */
 static Boolean EPS_SetOutputOff(void)
 {
     int selection;
@@ -332,6 +445,9 @@ static Boolean EPS_SetOutputOff(void)
     return TRUE;
 }
 
+/**
+ * Reboots the EPS through a chosen mode, can either soft reboot or hard reboot.
+ */
 static Boolean EPS_Reboot(void)
 {
     int selection;
@@ -352,6 +468,9 @@ static Boolean EPS_Reboot(void)
     return TRUE;
 }
 
+/**
+ * Function turns on a stoppable loop that shows battery related telemetry.
+ */
 static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
 {
 	int i = 0;
@@ -388,7 +507,97 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
     return TRUE;
 }
 
+/**
+ * The function sends a ping and prints it if the ping is valid
+ */
 
+static Boolean EPS_PingTest(void)
+{
+	// TODO check how long the ping takes
+
+	unsigned char ping_byte_out;
+	GomEpsPing(0, 'A',&ping_byte_out);
+	printf("%c",ping_byte_out);
+
+
+
+
+    return TRUE;
+}
+
+/**
+ * prints Heater Mode,bp4 Heater Mode,Onboard Heater Mode.
+ * The bp4 heater is the heater built on the batteries
+ * The Onboard Heater is te heater built on the Arduino Motherboard.
+ */
+static Boolean EPS_GetHeaterMode(void)
+{
+
+	gom_eps_heater_status_t my_heater_status_eps;
+	print_error(GomEpsGetHeaterMode(0,&my_heater_status_eps));
+	printf("%c",my_heater_status_eps.fields.bp4_heatermode);
+	printf("%c",my_heater_status_eps.fields.onboard_heatermode);
+
+    return TRUE;
+}
+
+/**
+ * print the counters then reset it and print it again, to check if it really resets the counters.
+ */
+static Boolean Eps_ResetCounters(void)
+{
+	gom_eps_hk_wdt_t data_out;
+	print_error(GomEpsGetHkData_wdt(0,&data_out));
+	printf("%u",data_out.fields.counter_wdt_i2c);
+	printf(" -counter_wdt_i2c\r\n");
+	printf("%u",data_out.fields.counter_wdt_gnd);
+	printf(" -counter_wdt_gnd\r\n");
+	printf("%u",data_out.fields.counter_wdt_csp[0]);
+	printf(" -counter_wdt_csp[0]\r\n");
+	printf("%u",data_out.fields.counter_wdt_csp[1]);
+	printf(" -counter_wdt_csp[1]\r\n");
+
+
+	GomEpsResetCounters(0);
+	printf("\r\n it reset \r\n");
+
+	print_error(GomEpsGetHkData_wdt(0,&data_out));
+	printf("%u",data_out.fields.counter_wdt_i2c);
+	printf(" -counter_wdt_i2c\r\n");
+	printf("%u",data_out.fields.counter_wdt_gnd);
+	printf(" -counter_wdt_gnd\r\n");
+	printf("%u",data_out.fields.counter_wdt_csp[0]);
+	printf(" -counter_wdt_csp[0]\r\n");
+	printf("%u",data_out.fields.counter_wdt_csp[1]);
+	printf(" -counter_wdt_csp[1]\r\n");
+
+
+	return TRUE;
+}
+
+/**
+ * Print just the gnd then resets it and prints it again, to check if it actually resets the gnd.
+ * */
+static Boolean Eps_ResetWDT(void)
+{
+	gom_eps_hk_wdt_t data_out;
+	print_error(GomEpsGetHkData_wdt(0,&data_out));
+	printf("%u",data_out.fields.wdt_gnd_time_left);
+	printf(" -wdt_gnd_time_left\r\n");
+
+	 GomEpsResetWDT(0);
+			printf("\r\n it resets \r\n");
+
+	 print_error(GomEpsGetHkData_wdt(0,&data_out));
+	printf("%u",data_out.fields.wdt_gnd_time_left);
+	printf(" -wdt_gnd_time_left\r\n");
+	return TRUE;
+}
+/**
+Asks the user which test he wants or if he wants to exit the test loop.
+ * all the functions returns TRUE while the exit is FALSE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+*/
 static Boolean selectAndExecuteGomEPSDemoTest(void)
 {
 	int selection = 0;
@@ -407,8 +616,15 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
 	printf("\t 11) EPS status \n\r");
+	printf("\t 12) EPS Ping   \n\r");
+	printf("\t 13) EPS Get Heater Mode \n\r");
+	printf("\t 14) Reset the GOMSpace EPS counters \n\r");
+	printf("\t 15) print to check if it actually resets the gnd \n\r");
+	printf("\t 16) Get Config Parameters\n\r");
+	printf("\t 17) Get Config2 Parameters\n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
+
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 17) == 0);//you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -447,8 +663,28 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 11:
     	offerMoreTests = EPS_Status();
     	break;
+    case 12:
+    	offerMoreTests = EPS_PingTest();
+    	break;
+    case 13:
+    	offerMoreTests = EPS_GetHeaterMode();
+    	break;
+    case 14:
+      	offerMoreTests = Eps_ResetCounters();
+      	break;
+    case 15:
+    	offerMoreTests = Eps_ResetWDT();
+    	break;
+    case 16:
+    	offerMoreTests = EPS_ConfigGet();
+       	break;
+    case 17:
+    	offerMoreTests = EPS_Config2Get();
+    	break;
+
 	default:
 		break;
+
 	}
 
 	return offerMoreTests;
@@ -504,3 +740,4 @@ Boolean GomEPStest(void)
 	GomEPSdemoMain();
 	return TRUE;
 }
+
