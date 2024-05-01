@@ -535,8 +535,8 @@ static Boolean EPS_GetHeaterMode(void)
 
 	gom_eps_heater_status_t my_heater_status_eps;
 	print_error(GomEpsGetHeaterMode(0,&my_heater_status_eps));
-	printf("%s\r\n",my_heater_status_eps.fields.bp4_heatermode);
-	printf("%s\r\n",my_heater_status_eps.fields.onboard_heatermode);
+	printf("%d\r\n",my_heater_status_eps.fields.bp4_heatermode);
+	printf("%d\r\n",my_heater_status_eps.fields.onboard_heatermode);
 
     return TRUE;
 }
