@@ -616,7 +616,7 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
 	printf("\t 11) EPS status \n\r");
-	printf("\t 12) EPS Ping   \n\r");
+	printf("\t 12) EPS Ping \n\r");
 	printf("\t 13) EPS Get Heater Mode \n\r");
 	printf("\t 14) Reset the GOMSpace EPS counters \n\r");
 	printf("\t 15) print to check if it actually resets the gnd \n\r");
