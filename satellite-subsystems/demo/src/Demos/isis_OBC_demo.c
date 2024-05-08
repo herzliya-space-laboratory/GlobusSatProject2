@@ -68,9 +68,9 @@ static Boolean SolarPanelv2_Temperature2()
 static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
+	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0)); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
 	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
-	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0)); //same and also check error.
 	//we need to decide before we run the program if we use Isis EPS or Gom EPS
 #ifdef USE_EPS_ISIS //if isis, this define is in the file of isis_OBC_demo.h
 	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //create a variable that is the struct we need from EPS_isis
@@ -124,8 +124,6 @@ static Boolean PrintBeacon(void)
 	printf("\n\r SD: \n\r");
 	if(!ret) //if ret = 0 we prints the categories
 	{
-		/*printf("\t free memory [byte]: %lu \r\n", space.free);
-		printf("\t corrupt bytes [byte]: %lu \r\n", space.bad);*/
 		printf("\t There are:\n\t %lu bytes total\n\t %lu bytes free\n\t %lu bytes used\n\t %lu bytes bad.\r\n",space.total, space.free, space.used, space.bad);
 	}
 	else //else we print the kind of error.

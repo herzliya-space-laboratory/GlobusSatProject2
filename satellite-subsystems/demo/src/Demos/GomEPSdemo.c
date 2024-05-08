@@ -528,15 +528,15 @@ static Boolean EPS_PingTest(void)
 /**
  * prints Heater Mode,bp4 Heater Mode,Onboard Heater Mode.
  * The bp4 heater is the heater built on the batteries
- * The Onboard Heater is te heater built on the Arduino Motherboard.
+ * The Onboard Heater is the heater built on the Arduino Motherboard.
  */
 static Boolean EPS_GetHeaterMode(void)
 {
 
 	gom_eps_heater_status_t my_heater_status_eps;
 	print_error(GomEpsGetHeaterMode(0,&my_heater_status_eps));
-	printf("%d\r\n",my_heater_status_eps.fields.bp4_heatermode);
-	printf("%d\r\n",my_heater_status_eps.fields.onboard_heatermode);
+	printf("bp4 - %d\r\n",my_heater_status_eps.fields.bp4_heatermode);
+	printf("onboard - %d\r\n",my_heater_status_eps.fields.onboard_heatermode);
 
     return TRUE;
 }
@@ -585,10 +585,10 @@ static Boolean Eps_ResetWDT(void)
 	printf("%u",data_out.fields.wdt_gnd_time_left);
 	printf(" -wdt_gnd_time_left\r\n");
 
-	 GomEpsResetWDT(0);
-			printf("\r\n it resets \r\n");
+	GomEpsResetWDT(0);
+	printf("\r\n it resets \r\n");
 
-	 print_error(GomEpsGetHkData_wdt(0,&data_out));
+	print_error(GomEpsGetHkData_wdt(0,&data_out));
 	printf("%u",data_out.fields.wdt_gnd_time_left);
 	printf(" -wdt_gnd_time_left\r\n");
 	return TRUE;
