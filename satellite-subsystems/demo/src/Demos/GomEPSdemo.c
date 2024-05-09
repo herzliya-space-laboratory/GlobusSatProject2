@@ -383,7 +383,8 @@ static Boolean EPS_ConfigGet(void)
 }
 
 /**
- *
+ * Prints the config of the GomEPS. most of the configs are about the batts and voltage thresholds.
+ * The config is in short of configuration and represents the gomEPS configuration, and is set by the struct eps_config2_t which you can find at GomEPS.h
  */
 static Boolean EPS_Config2Get(void)
 {
@@ -417,7 +418,7 @@ static Boolean EPS_SetOutputOn(void)
     int selection;
 
     printf( "Select channel to enable: 0, 1, 2, 3, 4, 5. Type 6 to cancel \n\r");
-    while(UTIL_DbguGetIntegerMinMax(&selection, 0, 6) == 0);
+    while(UTIL_DbguGetIntegerMinMax(&selection, 0, 6) == 0); //get selected channel to turn on.
 
     if(selection != 6)
     {
@@ -435,7 +436,7 @@ static Boolean EPS_SetOutputOff(void)
     int selection;
 
     printf( "Select channel to disable: 0, 1, 2, 3, 4, 5. Type 6 to cancel \n\r");
-    while(UTIL_DbguGetIntegerMinMax(&selection, 0, 6) == 0);
+    while(UTIL_DbguGetIntegerMinMax(&selection, 0, 6) == 0); //get selected channel to turn off.
 
     if(selection != 6)
     {
@@ -452,7 +453,7 @@ static Boolean EPS_Reboot(void)
 {
     int selection;
 
-    printf( "Select eps reboot mode: 0=soft, 1=hard. Type 2 to cancel \n\r");
+    printf( "Select eps reboot mode: 0 = soft, 1 = hard. Type 2 to cancel \n\r");
     while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0);
 
     switch(selection)
@@ -546,6 +547,7 @@ static Boolean EPS_GetHeaterMode(void)
  */
 static Boolean Eps_ResetCounters(void)
 {
+	//you can write printf("%u -counter_wdt_i2c\r\n", data_out.fields.counter_wdt_i2c) instead.
 	gom_eps_hk_wdt_t data_out;
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
 	printf("%u",data_out.fields.counter_wdt_i2c);
