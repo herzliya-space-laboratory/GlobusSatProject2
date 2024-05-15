@@ -27,7 +27,7 @@ static Boolean GetRadfatTemp()
 	stactTemp.writeData = writeData;
 	stactTemp.readData = readData;
 	stactTemp.readSize = 4;
-	stactTemp.writeReadDelay = 845;
+	stactTemp.writeReadDelay = 845 / portTICK_RATE_MS;
 	int error = I2C_writeRead(&stactTemp);
 	if(error)
 	{
