@@ -12,8 +12,6 @@
 #include <hcc/api_hcc_mem.h>
 #include <hcc/api_mdriver_atmel_mcipdc.h>
 
-Boolean PayloadDemoMain(void);
-
 void PayloadDemoLoop(void);
 
 Boolean PayloadTest(void);
