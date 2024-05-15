@@ -13,6 +13,10 @@ typedef struct __attribute__ ((__packed__))
 {
     unsigned int temp;
 } temp_telemetry;
+typedef struct __attribute__ ((__packed__))
+{
+    unsigned int counter;
+} count_seu_upset;
 
 static Boolean GetRadfatTemp()
 {
@@ -40,6 +44,32 @@ static Boolean GetRadfatTemp()
 	return TRUE;
 }
 
+static Boolean GetSEUCountChangeBits()
+{
+	I2Ctransfer structCounter;
+	unsigned char readData[4] = {0};
+	unsigned char writeData[1] = {0x47};
+
+	count_seu_upset* telemetry = (count_seu_upset*)(&readData[0]);
+
+	structCounter.slaveAddress = 0x55;
+	structCounter.writeSize = 1;
+	structCounter.writeData = writeData;
+	structCounter.readData = readData;
+	structCounter.readSize = 4;
+	structCounter.writeReadDelay = 100 / portTICK_RATE_MS;
+	int error = I2C_writeRead(&structCounter);
+	if(error)
+	{
+		printf("ERROR - %d \r\n", error);
+	}
+	else
+	{
+		printf("SEU counter upset - %d \r\n", telemetry->counter);
+	}
+	return TRUE;
+}
+
 static Boolean selectAndExecutePayloadDemoTest(void)
 {
 	int selection = 0;
@@ -48,7 +78,8 @@ static Boolean selectAndExecutePayloadDemoTest(void)
 	printf("\n\rSelect a test to perform: \n\r");
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print RADFET temperature \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 1) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	printf("\t 2) Print count changes bits (SEU) \n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -56,6 +87,9 @@ static Boolean selectAndExecutePayloadDemoTest(void)
 		break;
 	case 1:
 		offerMoreTests = GetRadfatTemp();
+		break;
+	case 2:
+		offerMoreTests = GetSEUCountChangeBits();
 		break;
 	default:
 		break;
