@@ -331,20 +331,15 @@ static Boolean EPS_ConfigGet(void)
 	eps_config_t config_data;
 	print_error(GomEpsConfigGet(0, &config_data));
 
-	printf("%u", config_data.fields.commandReply);
-	printf("-config_commandReplay\r\n");
+	printf("%u -config_commandReplay\r\n", config_data.fields.commandReply);
 
-	printf("%u",config_data.fields.ppt_mode);
-	printf("-config_ppt_mode\r\n");
+	printf("%u -config_ppt_mode\r\n",config_data.fields.ppt_mode);
 
-	printf("%u",config_data.fields.battheater_mode);
-	printf("-config_battheater_mode\r\n");
+	printf("%u -config_battheater_mode\r\n",config_data.fields.battheater_mode);
 
-	printf("%u",config_data.fields.battheater_low);
-	printf("-config_battheater_low\r\n");
+	printf("%u -config_battheater_low\r\n",config_data.fields.battheater_low);
 
-	printf("%u",config_data.fields.battheater_high);
-	printf("-config_battheater_high\r\n");
+	printf("%u -config_battheater_high\r\n",config_data.fields.battheater_high);
 
 
 	int i;
@@ -391,20 +386,15 @@ static Boolean EPS_Config2Get(void)
 	eps_config2_t config_data;
 	print_error(GomEpsConfig2Get(0, &config_data));
 
-	printf("%u", config_data.fields.commandReply);
-	printf("-config_commandReply\r\n");
+	printf("%u -config_commandReply\r\n", config_data.fields.commandReply);
 
-	printf("%u", config_data.fields.batt_maxvoltage);
-	printf("-config_batt_max_voltage\r\n");
+	printf("%u -config_batt_max_voltage\r\n", config_data.fields.batt_maxvoltage);
 
-	printf("%u", config_data.fields.batt_safevoltage);
-	printf("-config_batt_safe_voltage\r\n");
+	printf("%u -config_batt_safe_voltage\r\n", config_data.fields.batt_safevoltage);
 
-	printf("%u", config_data.fields.batt_criticalvoltage);
-	printf("-config_batt_critical_voltage\r\n");
+	printf("%u -config_batt_critical_voltage\r\n", config_data.fields.batt_criticalvoltage);
 
-	printf("%u", config_data.fields.batt_normalvoltage);
-	printf("-config_batt_normal_voltage\r\n");
+	printf("%u -config_batt_normal_voltage\r\n", config_data.fields.batt_normalvoltage);
 
 
 	return TRUE;
@@ -547,31 +537,23 @@ static Boolean EPS_GetHeaterMode(void)
  */
 static Boolean Eps_ResetCounters(void)
 {
-	//you can write printf("%u -counter_wdt_i2c\r\n", data_out.fields.counter_wdt_i2c) instead.
 	gom_eps_hk_wdt_t data_out;
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
-	printf("%u",data_out.fields.counter_wdt_i2c);
-	printf(" -counter_wdt_i2c\r\n");
-	printf("%u",data_out.fields.counter_wdt_gnd);
-	printf(" -counter_wdt_gnd\r\n");
-	printf("%u",data_out.fields.counter_wdt_csp[0]);
-	printf(" -counter_wdt_csp[0]\r\n");
-	printf("%u",data_out.fields.counter_wdt_csp[1]);
-	printf(" -counter_wdt_csp[1]\r\n");
+	printf("%u -counter_wdt_i2c\r\n",data_out.fields.counter_wdt_i2c);
+	printf("%u -counter_wdt_gnd\r\n",data_out.fields.counter_wdt_gnd);
+	printf("%u -counter_wdt_csp[0]\r\n",data_out.fields.counter_wdt_csp[0]);
+	printf("%u-counter_wdt_csp[1]\r\n",data_out.fields.counter_wdt_csp[1]);
 
 
 	GomEpsResetCounters(0);
 	printf("\r\n it reset \r\n");
 
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
-	printf("%u",data_out.fields.counter_wdt_i2c);
-	printf(" -counter_wdt_i2c\r\n");
-	printf("%u",data_out.fields.counter_wdt_gnd);
-	printf(" -counter_wdt_gnd\r\n");
-	printf("%u",data_out.fields.counter_wdt_csp[0]);
-	printf(" -counter_wdt_csp[0]\r\n");
-	printf("%u",data_out.fields.counter_wdt_csp[1]);
-	printf(" -counter_wdt_csp[1]\r\n");
+	printf("%u -counter_wdt_i2c\r\n",data_out.fields.counter_wdt_i2c);
+	printf("%u -counter_wdt_gnd\r\n",data_out.fields.counter_wdt_gnd);
+	printf("%u -counter_wdt_csp[0]\r\n",data_out.fields.counter_wdt_csp[0]);
+	printf("%u-counter_wdt_csp[1]\r\n",data_out.fields.counter_wdt_csp[1]);
+
 
 
 	return TRUE;
@@ -584,15 +566,14 @@ static Boolean Eps_ResetWDT(void)
 {
 	gom_eps_hk_wdt_t data_out;
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
-	printf("%u",data_out.fields.wdt_gnd_time_left);
-	printf(" -wdt_gnd_time_left\r\n");
+	printf("%u -wdt_gnd_time_left\r\n",data_out.fields.wdt_gnd_time_left);
 
 	GomEpsResetWDT(0);
 	printf("\r\n it resets \r\n");
 
 	print_error(GomEpsGetHkData_wdt(0,&data_out));
-	printf("%u",data_out.fields.wdt_gnd_time_left);
-	printf(" -wdt_gnd_time_left\r\n");
+	printf("%u -wdt_gnd_time_left\r\n",data_out.fields.wdt_gnd_time_left);
+
 	return TRUE;
 }
 /**
