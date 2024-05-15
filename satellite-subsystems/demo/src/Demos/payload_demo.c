@@ -29,7 +29,7 @@ static Boolean GetRadfatTemp()
 	stactTemp.readSize = 4;
 	stactTemp.writeReadDelay = 845;
 	int error = I2C_writeRead(&stactTemp);
-	if(!error)
+	if(error)
 	{
 		printf("ERROR - %d", error);
 	}
