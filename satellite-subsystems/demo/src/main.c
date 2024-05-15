@@ -18,6 +18,7 @@
 #include "Demos/isis_eps_demo.h"
 #include "Demos/tausat2_pdhudemo.h"
 #include "Demos/isis_OBC_demo.h"
+#include "Demos/payload_demo.h"
 #include <satellite-subsystems/version/version.h>
 
 #include <at91/utility/exithandler.h>
@@ -85,8 +86,8 @@ Boolean selectAndExecuteTest()
 #endif
 	printf("\t 4) OBC Test \n\r");
 	printf("\t 5) Ants Test \n\r");
-
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 5) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	printf("\t 6) Payload Test \n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 6) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
@@ -108,6 +109,9 @@ Boolean selectAndExecuteTest()
 			break;
 		case 5:
 			offerMoreTests = AntStest();
+			break;
+		case 6:
+			offerMoreTests = PayloadTest();
 			break;
 		default:
 			break;
