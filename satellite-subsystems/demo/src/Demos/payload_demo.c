@@ -31,11 +31,11 @@ static Boolean GetRadfatTemp()
 	int error = I2C_writeRead(&stactTemp);
 	if(error)
 	{
-		printf("ERROR - %d", error);
+		printf("ERROR - %d \r\n", error);
 	}
 	else
 	{
-		printf("RADFAT temperature - %d", telemetry->temp);
+		printf("RADFAT temperature - %d \r\n", telemetry->temp);
 	}
 	return TRUE;
 }
