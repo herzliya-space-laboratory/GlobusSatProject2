@@ -27,7 +27,7 @@
 #include "isis_eps_demo.h"
 
 /*
- * gets and prints the solar panels temperature.
+ * Gets and prints the solar panels temperature.
  * */
 static Boolean SolarPanelv2_Temperature2()
 {
@@ -41,9 +41,9 @@ static Boolean SolarPanelv2_Temperature2()
 
 	printf("\t Temperature values \r\n");
 
-	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ ) //go for the count of solar panels we have.
+	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ ) //Go for the count of solar panels we have.
 	{
-		error = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //gets the temperature of each panel and the error message.
+		error = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //Gets the temperature of each panel and the error message.
 		if( error ) //if there is error
 		{
 			printf("\t\t Panel %d : Error (%d), Status (0x%X) \r\n", panel, error, status); //print what panel, which error and status
@@ -63,7 +63,7 @@ static Boolean SolarPanelv2_Temperature2()
 }
 
 /*
- * prints the beacon we supposed to send every 20 seconds.
+ * Prints the beacon we supposed to send every 20 seconds.
  * */
 static Boolean PrintBeacon(void)
 {
@@ -71,11 +71,11 @@ static Boolean PrintBeacon(void)
 	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0)); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
 	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
-	//we need to decide before we run the program if we use Isis EPS or Gom EPS
+	//We need to decide before we run the program if we use Isis EPS or Gom EPS
 #ifdef USE_EPS_ISIS //if isis, this define is in the file of isis_OBC_demo.h
-	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //create a variable that is the struct we need from EPS_isis
+	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
 
-	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS); //get struct and get kind of error
+	int error = imepsv2_piu__gethousekeepingeng(0,&responseEPS); //Get struct and get kind of error
 	if( error ) //if something different then 0
 		TRACE_ERROR("imepsv2_piu__gethousekeepingeng(...) return error (%d)!\n\r",error);
 	else //prints the categories for the EPS isis
@@ -94,10 +94,10 @@ static Boolean PrintBeacon(void)
 	}
 
 #else
-	gom_eps_hk_t myEpsStatus_hk; //create a variable that is the struct we need from EPS_gom
+	gom_eps_hk_t myEpsStatus_hk; //Create a variable that is the struct we need from EPS_gom
 
 
-	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk)); //get struct and prints error if there is.
+	print_error(GomEpsGetHkData_general(0, &myEpsStatus_hk)); //Get struct and prints error if there is.
 	//prints the categories for the EPS Gom
 	printf("\n\r EPS: \n\r");
 	printf("\t Volt battery [mV]: %d\r\n", myEpsStatus_hk.fields.vbatt);
@@ -113,50 +113,50 @@ static Boolean PrintBeacon(void)
 	printf("\t battery1 Temperature [°C]: %d\r\n", (int)myEpsStatus_hk.fields.temp[5]);
 	printf("\t number of reboots to EPS: %d\r\n", (int)myEpsStatus_hk.fields.counter_boot);
 #endif
-	//for both of the EPS.
+	//For both of the EPS.
 	printf("\n\r Solar panel: \n\r");
-	SolarPanelv2_Temperature2(); // gets the temperature of the solar panels and print it.
+	SolarPanelv2_Temperature2(); // Gets the temperature of the solar panels and print it.
 
-	printf("\n\r OBC: \n\r"); //prints the categories of the OBC
+	printf("\n\r OBC: \n\r"); //Prints the categories of the OBC
 	printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
 	printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
 
 	printf("\n\r SD: \n\r");
-	if(!ret) //if ret = 0 we prints the categories
+	if(!ret) //If ret = 0 we prints the categories
 	{
 		printf("\t There are:\n\t %lu bytes total\n\t %lu bytes free\n\t %lu bytes used\n\t %lu bytes bad.\r\n",space.total, space.free, space.used, space.bad);
 	}
 	else //else we print the kind of error.
 		printf("\t ERROR %d reading drive \r\n", ret);
 
-	printf("\n\r ADC: \n\r"); //get and prints the ADC channels
+	printf("\n\r ADC: \n\r"); //Get and prints the ADC channels
 	unsigned short adcSamples[8];
 	int i;
 	int work = ADC_SingleShot(adcSamples); //Initialize the ADC driver
-	if(!work) //if the Initialize worked
+	if(!work) //If the Initialize worked
 	{
 		for(i = 0; i < 8; i++)
-			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]); //gets the channels
+			ADC_ConvertRaw10bitToMillivolt(adcSamples[i]); //Gets the channels
 		for(i = 0; i < 8; i++)
-			printf("\t ADC channel %d: %d \r\n", i, adcSamples[i]); //prints the channels
+			printf("\t ADC channel %d: %d \r\n", i, adcSamples[i]); //Prints the channels
 	}
 	else
-		printf("\t ERROR %d reading drive \r\n", work); //if the Initialize didn't worked it's print error
+		printf("\t ERROR %d reading drive \r\n", work); //If the Initialize didn't worked it's print error
 
 	return TRUE;
 }
 
 /*
- * write to the FRAM memory, read from it and check we have put it in the right place and put the right thing
+ * Write to the FRAM memory, read from it and check we have put it in the right place and put the right thing
  * */
 static Boolean WriteAndReadFromFRAM(void){
-	const unsigned char data[] = "hello"; //the data we write to the FRAM
-	unsigned char writtenData[sizeof(data)]; //make a same size array for the check after.
-	unsigned int address = FRAM_getMaxAddress() - sizeof(data) - 10; //get max address in the FRAM and subtracting from it 10 and the size of the data.
-	print_error(FRAM_writeAndVerify(data, address, sizeof(data))); //write data to the address and from there to the length of the data.
-	print_error(FRAM_read(writtenData, address, sizeof(data))); //read data from the address and from there to the length of the data and put it in writtenData.
+	const unsigned char data[] = "hello"; //The data we write to the FRAM
+	unsigned char writtenData[sizeof(data)]; //Make a same size array for the check after.
+	unsigned int address = FRAM_getMaxAddress() - sizeof(data) - 10; //Get max address in the FRAM and subtracting from it 10 and the size of the data.
+	print_error(FRAM_writeAndVerify(data, address, sizeof(data))); //Write data to the address and from there to the length of the data.
+	print_error(FRAM_read(writtenData, address, sizeof(data))); //Read data from the address and from there to the length of the data and put it in writtenData.
 	unsigned int i = 0;
-	for(i = 0; i < sizeof(data); i++) //check if all the chars equal to each other
+	for(i = 0; i < sizeof(data); i++) //Check if all the chars equal to each other
 	{
 		if(writtenData[i] != data[i]) //if they not
 		{
@@ -172,7 +172,7 @@ static Boolean WriteAndReadFromFRAM(void){
 
 /*
  * Asks the user which test he wants or if he wants to exit the test loop.
- * all the functions returns TRUE while the exit is FALSE.
+ * All the functions returns TRUE while the exit is FALSE.
  * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
  * */
 static Boolean selectAndExecuteOBCDemoTest(void)
@@ -184,7 +184,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -218,7 +218,7 @@ void IsisOBCdemoLoop(void)
 	}
 }
 /*
- * initialize the supervisor by the function from the FRAM.h
+ * Initialize the supervisor by the function from the FRAM.h
  * */
 Boolean InitFRAM(void)
 {
@@ -231,11 +231,12 @@ Boolean InitFRAM(void)
 	return TRUE;
 }
 /*
- * initialize the supervisor by the function from the supervisor.h
+ * Initialize the supervisor by the function from the supervisor.h
  * */
 Boolean InitSupervisor(void)
 {
-	int error = Supervisor_start(SUPERVISOR_SPI_INDEX, 0);
+	uint8_t po = SUPERVISOR_SPI_INDEX;
+	int error = Supervisor_start(&po, 0);
 	if(error != E_NO_SS_ERR)
 	{
 		print_error(error);

@@ -517,7 +517,7 @@ static Boolean EPS_PingTest(void)
 }
 
 /**
- * prints Heater Mode,bp4 Heater Mode,Onboard Heater Mode.
+ * Prints Heater Mode,bp4 Heater Mode,Onboard Heater Mode.
  * The bp4 heater is the heater built on the batteries
  * The Onboard Heater is the heater built on the Arduino Motherboard.
  */
@@ -533,7 +533,7 @@ static Boolean EPS_GetHeaterMode(void)
 }
 
 /**
- * print the counters then reset it and print it again, to check if it really resets the counters.
+ * Print the counters then reset it and print it again, to check if it really resets the counters.
  */
 static Boolean Eps_ResetCounters(void)
 {
@@ -542,7 +542,7 @@ static Boolean Eps_ResetCounters(void)
 	printf("%u -counter_wdt_i2c\r\n",data_out.fields.counter_wdt_i2c);
 	printf("%u -counter_wdt_gnd\r\n",data_out.fields.counter_wdt_gnd);
 	printf("%u -counter_wdt_csp[0]\r\n",data_out.fields.counter_wdt_csp[0]);
-	printf("%u-counter_wdt_csp[1]\r\n",data_out.fields.counter_wdt_csp[1]);
+	printf("%u -counter_wdt_csp[1]\r\n",data_out.fields.counter_wdt_csp[1]);
 
 
 	GomEpsResetCounters(0);
@@ -552,7 +552,7 @@ static Boolean Eps_ResetCounters(void)
 	printf("%u -counter_wdt_i2c\r\n",data_out.fields.counter_wdt_i2c);
 	printf("%u -counter_wdt_gnd\r\n",data_out.fields.counter_wdt_gnd);
 	printf("%u -counter_wdt_csp[0]\r\n",data_out.fields.counter_wdt_csp[0]);
-	printf("%u-counter_wdt_csp[1]\r\n",data_out.fields.counter_wdt_csp[1]);
+	printf("%u -counter_wdt_csp[1]\r\n",data_out.fields.counter_wdt_csp[1]);
 
 
 

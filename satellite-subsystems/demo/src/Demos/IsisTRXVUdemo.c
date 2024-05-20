@@ -502,7 +502,7 @@ static Boolean vutc_getTxTelemTest_revD(void)
 	return TRUE;
 }
 /**
- * set transponder on
+ * Set transponder on.
  * */
 static Boolean TransponderOn()
 {
@@ -511,7 +511,7 @@ static Boolean TransponderOn()
 	return TRUE;
 }
 /**
- * set transponder off
+ * Set transponder off.
  * */
 static Boolean TransponderOff()
 {
@@ -520,13 +520,13 @@ static Boolean TransponderOff()
 	return TRUE;
 }
 /*
- * brief sets the RSSI of the transmitter
+ * Brief sets the RSSI of the transmitter.
  * */
 static Boolean SetTransponderThreshold(void){
 	int input;
 	short threshold;
 	unsigned char data[] = {0x52, 0,0};
-	printf("set the Transponder Threshold range is between 0-4095 \r\n");
+	printf("Set the transponder Threshold range to be between 0-4095 \r\n");
 	UTIL_DbguGetIntegerMinMax(&input, 0, 4095);
 	threshold = (short)input;
 	memcpy(data + 1,&threshold, sizeof(threshold));
@@ -534,7 +534,7 @@ static Boolean SetTransponderThreshold(void){
 	return TRUE;
 }
 /*
- * brief prints the last reccorded Telementry
+ * Brief prints the last reccorded telementry.
  * */
 
 static Boolean Get_Tx_Telemetry_Value_Array(void) {
@@ -591,7 +591,7 @@ static Boolean Get_Tx_Telemetry_Value_Array(void) {
 	return TRUE;
 }
 /*
- * brief prints the State according to the current transmitter state from ISIStrxvuTransmitterState
+ * Brief prints the State according to the current transmitter state from ISIStrxvuTransmitterState
  * */
 static Boolean printTransmitterState() {
 	ISIStrxvuTransmitterState currentstate;
