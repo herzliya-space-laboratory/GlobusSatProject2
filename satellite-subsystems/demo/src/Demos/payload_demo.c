@@ -1,7 +1,7 @@
 /*
  * payload_demo.c
  *
- *  Created on: 15 áîàé 2024
+ *  Created on: 15 MAY 2024
  *      Author: maayan
  */
 #include "payload_demo.h"
@@ -17,7 +17,11 @@ typedef struct __attribute__ ((__packed__))
 {
     unsigned int counter;
 } count_seu_upset;
-
+typedef struct __attribute__ ((__packed__))
+{
+    unsigned int RED1;
+    unsigned int RED2;
+} red_telementry;
 static Boolean GetRadfatTemp()
 {
 	I2Ctransfer stactTemp;
@@ -69,7 +73,37 @@ static Boolean GetSEUCountChangeBits()
 	}
 	return TRUE;
 }
+/*
+ * GetREDFromREDFET
+ * @short reads the radiation from the payload (I2C opcode 0x47)
+ * @param None
+ * @return TRUE
+ */
+static Boolean GetREDromRADFET()
+{
+	I2Ctransfer structRED;
+	unsigned char readData[8] = {0};
+	unsigned char writeData[1] = {0x33};
 
+	red_telementry* telemetry = (red_telementry*)(&readData[0]);
+
+	structRED.slaveAddress = 0x55;
+	structRED.writeSize = 1;
+	structRED.writeData = writeData;
+	structRED.readData = readData;
+	structRED.readSize = 8;
+	structRED.writeReadDelay = 1250 / portTICK_RATE_MS;
+	int error = I2C_writeRead(&structRED);
+	if(error)
+	{
+		printf("ERROR - %d \r\n", error);
+	}
+	else
+	{
+		printf("RED from payload1 - %d \r\n RED from payload2  %d \r\n", telemetry->RED1, telemetry->RED2);
+	}
+	return TRUE;
+}
 static Boolean selectAndExecutePayloadDemoTest(void)
 {
 	int selection = 0;
@@ -79,7 +113,8 @@ static Boolean selectAndExecutePayloadDemoTest(void)
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print RADFET temperature \n\r");
 	printf("\t 2) Print count changes bits (SEU) \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	printf("\t 3) Print RED amount from both payload (total RED check) \n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -90,6 +125,9 @@ static Boolean selectAndExecutePayloadDemoTest(void)
 		break;
 	case 2:
 		offerMoreTests = GetSEUCountChangeBits();
+		break;
+	case 3:
+		offerMoreTests = GetREDromRADFET();
 		break;
 	default:
 		break;
