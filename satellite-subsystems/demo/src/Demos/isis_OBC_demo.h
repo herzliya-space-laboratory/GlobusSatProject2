@@ -1,8 +1,8 @@
 /*
  * isis_OBC_demo.h
  *
- *  Created on: 20 בדצמ 2023
- *      Author: maaya
+ *  Created on: 20 12 2023
+ *      Author: maayan
  */
 
 #ifndef ISIS_OBC_DEMO_H_

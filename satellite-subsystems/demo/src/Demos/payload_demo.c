@@ -1,7 +1,7 @@
 /*
  * payload_demo.c
  *
- *  Created on: 15 áîàé 2024
+ *  Created on: 15 MAY 2024
  *      Author: maayan
  */
 #include "payload_demo.h"
@@ -79,7 +79,7 @@ static Boolean GetSEUCountChangeBits()
  * @param None
  * @return TRUE
  */
-static Boolean GetRETFromREDFET()
+static Boolean GetREDromRADFET()
 {
 	I2Ctransfer structRED;
 	unsigned char readData[8] = {0};
@@ -114,7 +114,7 @@ static Boolean selectAndExecutePayloadDemoTest(void)
 	printf("\t 1) Print RADFET temperature \n\r");
 	printf("\t 2) Print count changes bits (SEU) \n\r");
 	printf("\t 3) Print RED amount from both payload (total RED check) \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number betweenï¿½theï¿½two.
 
 	switch(selection) {
 	case 0:
@@ -127,7 +127,7 @@ static Boolean selectAndExecutePayloadDemoTest(void)
 		offerMoreTests = GetSEUCountChangeBits();
 		break;
 	case 3:
-		offerMoreTests = GetRETFromREDFET();
+		offerMoreTests = GetREDromRADFET();
 		break;
 	default:
 		break;
