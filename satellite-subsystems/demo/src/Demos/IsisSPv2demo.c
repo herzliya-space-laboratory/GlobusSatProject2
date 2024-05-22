@@ -73,7 +73,6 @@ Boolean SolarPanelv2_State() {
 	case ISIS_SOLAR_PANEL_STATE_AWAKE:
 		printf("the current state is: AWAKE \r\n");
 		break;
-
 	default:
 		break;
 	}
