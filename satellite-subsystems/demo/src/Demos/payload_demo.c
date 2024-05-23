@@ -100,7 +100,7 @@ static Boolean GetREDromRADFET()
 	}
 	else
 	{
-		printf("RED from payload1 - %d \r\n RED from payload2  %d \r\n", telemetry->RED1, telemetry->RED2);
+		printf("RED from payload1: %d \r\n RED from payload2:  %d \r\n", telemetry->RED1, telemetry->RED2);
 	}
 	return TRUE;
 }

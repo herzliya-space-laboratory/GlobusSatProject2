@@ -68,7 +68,7 @@ static Boolean SolarPanelv2_Temperature2()
 static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
-	print_error(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0)); //gets the variables to the struct and also check error.
+	int error = Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
 	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
 	//We need to decide before we run the program if we use Isis EPS or Gom EPS
@@ -118,9 +118,13 @@ static Boolean PrintBeacon(void)
 	SolarPanelv2_Temperature2(); // Gets the temperature of the solar panels and print it.
 
 	printf("\n\r OBC: \n\r"); //Prints the categories of the OBC
-	printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
-	printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
-
+	if(error)
+		printf("ERROR - %d \n\r", error);
+	else
+	{
+		printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
+		printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
+	}
 	printf("\n\r SD: \n\r");
 	if(!ret) //If ret = 0 we prints the categories
 	{
