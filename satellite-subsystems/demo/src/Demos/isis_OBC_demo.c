@@ -119,7 +119,7 @@ static Boolean PrintBeacon(void)
 
 	printf("\n\r OBC: \n\r"); //Prints the categories of the OBC
 	if(error)
-		printf("ERROR - %d \n\r", error);
+		printf("ERROR: %d \n\r", error);
 	else
 	{
 		printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
