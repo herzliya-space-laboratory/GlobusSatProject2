@@ -68,7 +68,7 @@ static Boolean SolarPanelv2_Temperature2()
 static Boolean PrintBeacon(void)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
-	int error = Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, 0); //gets the variables to the struct and also check error.
+	int error = Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
 	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
 	//We need to decide before we run the program if we use Isis EPS or Gom EPS
