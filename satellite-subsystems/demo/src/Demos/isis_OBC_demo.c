@@ -123,7 +123,7 @@ static Boolean PrintBeacon(void)
 	else
 	{
 		printf("\t number of resets: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcResetCount);
-		printf("\t satellite uptime: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime);
+		printf("\t satellite uptime [sec]: %lu \r\n", mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS);
 	}
 	printf("\n\r SD: \n\r");
 	if(!ret) //If ret = 0 we prints the categories
