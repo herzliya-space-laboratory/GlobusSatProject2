@@ -13,30 +13,26 @@
 #include <stdint.h>
 
 /*
- 	 	 	 	  ______
-			  ___|		|___
- 	 	 	 |				|
- 	 	 	 |	FULL MODE	|
- 	 	 	 |- - - - - - -	|	-> FULL UP = 7400
- 	 	 	 |- - - - - - - |	-> FULL DOWN = 7300
- 	 	 	 |				|
- 	 	 	 |	CRUISE MODE	|
- 	 	 	 |- - - - - - -	|	-> CRUISE UP = 7200
- 	 	 	 |- - - - - - - |	-> CRUISE DOWN = 7100
- 	 	 	 |				|
- 	 	 	 |	SAFE MODE	|
- 	 	 	 |- - - - - - -	| 	-> SAFE UP = 6600
- 	 	 	 |- - - - - - - |	-> SAFE DOWN = 6500
- 	 	 	 |				|
- 	 	 	 |	CRITICAL	|
- 	 	 	 |______________|
+ 	 	 	 	    ____
+			  _____|	|_____
+ 	 	 	 |				  |
+ 	 	 	 |OPERATIONAL MODE|
+ 	 	 	 |- - - - - - -	- |	-> OPERATIONAL UP = 7500
+ 	 	 	 |- - - - - - - - |	-> OPERATIONAL DOWN = 7400
+ 	 	 	 |				  |
+ 	 	 	 |	 CRUISE MODE  |
+ 	 	 	 |- - - - - - -	- |	-> CRUISE UP = 7100
+ 	 	 	 |- - - - - - - - |	-> CRUISE DOWN = 7000
+ 	 	 	 |				  |
+ 	 	 	 |POWER SAFE MODE |
+ 	 	 	 |________________|
  */
 #define DEFAULT_ALPHA_VALUE 0.3
 
 #define NUMBER_OF_SOLAR_PANELS			6
-#define NUMBER_OF_THRESHOLD_VOLTAGES 	6 		///< first 3 are charging voltages, last 3 are discharging voltages
-#define DEFAULT_EPS_THRESHOLD_VOLTAGES 	{(voltage_t)6500, (voltage_t)7100, (voltage_t)7300,	 \
-										  (voltage_t)6600, (voltage_t)7200, (voltage_t)7400}
+#define NUMBER_OF_THRESHOLD_VOLTAGES 	4 		///< first 3 are charging voltages, last 3 are discharging voltages
+#define DEFAULT_EPS_THRESHOLD_VOLTAGES 	{(voltage_t)7000, (voltage_t)7400,	 \
+										  (voltage_t)7100, (voltage_t)7500}
 
 typedef enum __attribute__ ((__packed__)){
 	INDEX_DOWN_SAFE,
