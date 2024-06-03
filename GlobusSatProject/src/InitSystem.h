@@ -18,7 +18,7 @@
 int StartFRAM();
 
 /*!
- * @brief	writes the default filght parameters to the corresponding FRAM addresses
+ * @brief	writes the default flight parameters to the corresponding FRAM addresses
  * @see FRAM_FlightParameters.h
  */
 void WriteDefaultValuesToFRAM();

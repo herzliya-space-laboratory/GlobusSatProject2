@@ -39,7 +39,6 @@ typedef struct __attribute__ ((__packed__)) sat_packet_t
 /*!
  * @brief parses given frame from TRXVU into 'sat_command_t' structure.
  * @param[in] data raw data from which to parse the SPL packet
- * @param[in] data_length length of data packet in bytes
  * @param[out] cmd pointer to parsed command buffer
  * @return	errors according to CMD_ERR
  */
