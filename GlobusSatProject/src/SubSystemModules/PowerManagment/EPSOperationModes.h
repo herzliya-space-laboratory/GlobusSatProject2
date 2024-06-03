@@ -17,9 +17,9 @@
 #define SYSTEM7 	 0x80	//!< channel state when 'SYSTEM7' is on
 
 typedef enum{
-	FullMode,
+	OperationalMode,
 	CruiseMode,
-	SafeMode
+	PowerSafeMode
 }EpsState_t;
 
 /*!
