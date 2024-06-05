@@ -37,8 +37,8 @@ int InitTrxvu(){
 	}
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
-	myAntennaAddress[0].addressSideA = 0x31;
-	myAntennaAddress[0].addressSideB = 0x32;
+	myAntennaAddress[0].addressSideA = ANTS_I2C_SIDE_A_ADDR;
+	myAntennaAddress[0].addressSideB = ANTS_I2C_SIDE_B_ADDR;
 	//Initialize the AntS system
 	return logError(IsisAntS_initialize(myAntennaAddress, 1), "Ants");
 #else
