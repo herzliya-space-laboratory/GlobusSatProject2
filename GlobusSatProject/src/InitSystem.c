@@ -49,6 +49,6 @@ int InitSubsystems(){
 		return -1;
 /*	else if(StartTime())
 		return -1;*/
-	printf("Succeeded");
+	printf("Succeeded\r\n");
 	return 0;
 }
