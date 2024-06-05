@@ -9,6 +9,7 @@
 #include <hal/Drivers/I2C.h>
 #include <hal/Drivers/SPI.h>
 #include <hal/Timing/Time.h>
+#include <hal/Utility/util.h>
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
@@ -35,10 +36,10 @@ int StartSPI(){
 }
 
 //TODO: need to be filled right.
-int StartTIME(){
+/*int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
 	return logError(Time_start(time, I2CTransferTimeout), "Time");
-}
+}*/
 
 int InitSubsystems(){
 	if(StartFRAM())
@@ -49,5 +50,8 @@ int InitSubsystems(){
 		return -1;
 /*	else if(StartTime())
 		return -1;*/
+	printf("Succeeded\r\n");
+	int selection;
+	UTIL_DbguGetIntegerMinMax(&selection, 1, 10101);
 	return 0;
 }
