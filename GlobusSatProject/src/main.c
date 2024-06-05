@@ -69,15 +69,15 @@ Boolean selectAndExecuteTest()
 	switch(selection)
 	{
 		case 1:
-			FRAM_start();
+			StartFRAM();
 			offerMoreTests = TRUE;
 			break;
 		case 2:
-			I2C_start();
+			StartI2C();
 			offerMoreTests = TRUE;
 			break;
 		case 3:
-			SPI_start();
+			StartSPI();
 			offerMoreTests = TRUE;
 			break;
 		case 4:

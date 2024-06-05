@@ -35,10 +35,10 @@ int StartSPI(){
 }
 
 //TODO: need to be filled right.
-int StartTIME(){
+/*int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
 	return logError(Time_start(time, I2CTransferTimeout), "Time");
-}
+}*/
 
 int InitSubsystems(){
 	if(StartFRAM())
