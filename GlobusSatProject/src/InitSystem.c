@@ -8,6 +8,7 @@
 #include <hal/Storage/FRAM.h>
 #include <hal/Drivers/I2C.h>
 #include <hal/Drivers/SPI.h>
+#include <hal/Timing/Time.h>
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
@@ -30,5 +31,10 @@ int StartI2C(){
 
 //TODO: need to be filled right.
 int StartSPI(){
-	return logError(SPI_start(1, 1), "SPI");
+	return logError(SPI_start(bus1_spi, slave1_spi), "SPI");
+}
+
+//TODO: need to be filled right.
+int StartTIME(){
+	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "Time");
 }
