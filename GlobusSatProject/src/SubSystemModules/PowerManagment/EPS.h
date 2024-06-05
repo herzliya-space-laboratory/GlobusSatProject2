@@ -35,25 +35,22 @@
 										  (voltage_t)7100, (voltage_t)7500}
 
 typedef enum __attribute__ ((__packed__)){
-	INDEX_DOWN_SAFE,
 	INDEX_DOWN_CRUISE,
-	INDEX_DOWN_FULL,
-	INDEX_UP_SAFE,
+	INDEX_DOWN_OPERATIONAL,
 	INDEX_UP_CRUISE,
-	INDEX_UP_FULL
+	INDEX_UP_OPERATIONAL
 }EpsThresholdsIndex;
 
 typedef union __attribute__ ((__packed__)){
 	voltage_t raw[NUMBER_OF_THRESHOLD_VOLTAGES];
 	struct {
-		voltage_t Vdown_safe;
 		voltage_t Vdown_cruise;
-		voltage_t Vdown_full;
-		voltage_t Vup_safe;
+		voltage_t Vdown_operational;
 		voltage_t Vup_cruise;
-		voltage_t Vup_full;
+		voltage_t Vup_operational;
 	}fields;
 }EpsThreshVolt_t;
+
 typedef union __attribute__ ((__packed__)){
 struct {
 	int16_t H1_MIN;
