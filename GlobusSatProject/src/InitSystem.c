@@ -20,6 +20,7 @@
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
+#define TIME_SYNCINTERVAL  60
 
 int StartFRAM(){
 	return logError(FRAM_start(), "FRAM");
@@ -35,11 +36,10 @@ int StartSPI(){
 	return logError(SPI_start(bus1_spi, slave1_spi), "SPI");
 }
 
-//TODO: need to be filled right.
-/*int StartTIME(){
+int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
-	return logError(Time_start(time, I2CTransferTimeout), "Time");
-}*/
+	return logError(Time_start(&time, TIME_SYNCINTERVAL), "Time");
+}
 
 int InitSubsystems(){
 	if(StartFRAM())
@@ -48,8 +48,8 @@ int InitSubsystems(){
 		return -1;
 	else if(StartSPI())
 		return -1;
-/*	else if(StartTime())
-		return -1;*/
+	else if(StartTime())
+		return -1;
 	printf("Succeeded\r\n");
 	return 0;
 }
