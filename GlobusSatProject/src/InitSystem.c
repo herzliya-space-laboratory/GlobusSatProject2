@@ -9,6 +9,7 @@
 #include <hal/Drivers/I2C.h>
 #include <hal/Drivers/SPI.h>
 #include <hal/Timing/Time.h>
+#include <hal/Utility/util.h>
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
@@ -49,5 +50,6 @@ int InitSubsystems(){
 		return -1;
 /*	else if(StartTime())
 		return -1;*/
+	printf("Succeeded\r\n");
 	return 0;
 }
