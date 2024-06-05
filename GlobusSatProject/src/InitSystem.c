@@ -49,7 +49,9 @@ int InitSubsystems(){
 		return -1;
 	else if(StartSPI())
 		return -1;
-	else if(StartTime())
+	else if(StartTIME())
+		return -1;
+	else if(InitTrxvu())
 		return -1;
 #ifdef WE_HAVE_EPS
 	if(EPS_Init())
