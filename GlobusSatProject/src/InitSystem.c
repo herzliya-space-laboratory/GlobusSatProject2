@@ -47,7 +47,7 @@ int InitSubsystems(){
 		return -1;
 	else if(StartSPI())
 		return -1;
-	else if(StartTime())
-		return -1;
+/*	else if(StartTime())
+		return -1;*/
 	return 0;
 }
