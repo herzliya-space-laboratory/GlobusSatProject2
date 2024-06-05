@@ -14,6 +14,7 @@
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
 
+
 #include "GlobalStandards.h"
 #include "InitSystem.h"
 #include "utils.h"
@@ -50,6 +51,10 @@ int InitSubsystems(){
 		return -1;
 	else if(StartTime())
 		return -1;
+#ifdef WE_HAVE_EPS
+	if(EPS_Init())
+		return -1;
+#endif
 	printf("Succeeded\r\n");
 	return 0;
 }
