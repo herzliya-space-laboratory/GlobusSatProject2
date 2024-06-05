@@ -18,11 +18,9 @@ int CMD_GetSmoothingFactor(sat_packet_t *cmd);
 
 int CMD_EnterCruiseMode(sat_packet_t *cmd);
 
-int CMD_EnterFullMode(sat_packet_t *cmd);
+int CMD_EnterOperationalMode(sat_packet_t *cmd);
 
-int CMD_EnterCriticalMode(sat_packet_t *cmd);
-
-int CMD_EnterSafeMode(sat_packet_t *cmd);
+int CMD_EnterPowerSafeMode(sat_packet_t *cmd);
 
 int CMD_GetCurrentMode(sat_packet_t *cmd);
 
