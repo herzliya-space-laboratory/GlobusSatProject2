@@ -51,7 +51,5 @@ int InitSubsystems(){
 /*	else if(StartTime())
 		return -1;*/
 	printf("Succeeded\r\n");
-	int selection;
-	UTIL_DbguGetIntegerMinMax(&selection, 1, 10101);
 	return 0;
 }
