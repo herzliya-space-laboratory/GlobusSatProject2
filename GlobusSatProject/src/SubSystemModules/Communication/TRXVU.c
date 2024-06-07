@@ -31,16 +31,20 @@ int InitTrxvu(){
 	//Initialize the trxvu subsystem
 	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
 #ifdef WE_HAVE_ANTS
-	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)
-	{
-		return logError(rv, "TRXVU");
-	}
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
 	myAntennaAddress[0].addressSideA = ANTS_I2C_SIDE_A_ADDR;
 	myAntennaAddress[0].addressSideB = ANTS_I2C_SIDE_B_ADDR;
+	int errorAnts = IsisAntS_initialize(myAntennaAddress, 1);
+
+	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)
+	{
+		logError(errorAnts, "Ants")
+		return logError(rv, "TRXVU");
+	}
+
 	//Initialize the AntS system
-	return logError(IsisAntS_initialize(myAntennaAddress, 1), "Ants");
+	return logError(errorAnts, "Ants");
 #else
 	return logError(rv, "TRXVU");
 #endif
