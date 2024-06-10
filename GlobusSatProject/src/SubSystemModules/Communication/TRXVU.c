@@ -13,7 +13,7 @@
 
 /*#define WE_HAVE_ANTS 0*/
 
-int InitTrxvu(){
+int InitTrxvuAndAnts(){
 	// Definition of I2C and TRXVU
 	ISIStrxvuI2CAddress myTRXVUAddress[1];
 	ISIStrxvuFrameLengths myTRXVUBuffers[1];

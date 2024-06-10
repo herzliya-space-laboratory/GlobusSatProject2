@@ -68,7 +68,7 @@ void InitTxModule();
  * @return	0 on successful init
  * 			errors according to <hal/errors.h>
  */
-int InitTrxvu();
+int InitTrxvuAndAnts();
 
 void checkTransponderFinish();
 

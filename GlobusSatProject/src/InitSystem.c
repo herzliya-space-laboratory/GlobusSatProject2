@@ -51,12 +51,12 @@ int InitSubsystems(){
 
 	StartTIME();
 
-	InitTrxvu();
+	InitTrxvuAndAnts();
 
 	InitializeFS();
 
 #ifdef WE_HAVE_EPS
-	EPS_Init();
+	EPS_And_SP_Init();
 #endif
 	printf("Did init\r\n");
 	return 0;
