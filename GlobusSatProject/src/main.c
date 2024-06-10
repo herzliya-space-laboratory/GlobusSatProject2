@@ -45,12 +45,13 @@ void taskMain()
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 
 	InitSubsystems();
-
-/*	while (TRUE) {
+#ifdef WE_HAVE_EPS
+	while (TRUE) {
 		EPS_Conditioning();
 		vTaskDelay(10);
-	}*/
+	}
 }
+#endif
 #endif
 
 // main operation function. will be called upon software boot.
