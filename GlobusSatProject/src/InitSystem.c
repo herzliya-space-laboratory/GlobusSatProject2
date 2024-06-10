@@ -43,22 +43,21 @@ int StartTIME(){
 }
 
 int InitSubsystems(){
-	if(StartFRAM())
-		return -1;
-	else if(StartI2C())
-		return -1;
-	else if(StartSPI())
-		return -1;
-	else if(StartTIME())
-		return -1;
-	else if(InitTrxvu())
-		return -1;
-	else if(InitializeFS() != FS_SUCCSESS)
-		return -1;
+	StartFRAM();
+
+	StartI2C();
+
+	StartSPI();
+
+	StartTIME();
+
+	InitTrxvu();
+
+	InitializeFS();
+
 #ifdef WE_HAVE_EPS
-	if(EPS_Init())
-		return -1;
+	EPS_Init();
 #endif
-	printf("Succeeded\r\n");
+	printf("Did init\r\n");
 	return 0;
 }

@@ -46,8 +46,7 @@ int StartTIME();
 
 /*!
  * @brief	executes all required initializations of systems, including sub-systems, and checks for errors
- * @return	0 successful init
- * 			-1 failed at init
+ * @return	0
  */
 int InitSubsystems();
 
