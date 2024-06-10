@@ -22,7 +22,7 @@
 
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 
-int UpdateState(voltage_t);
+int UpdateState(voltage_t); //TODO del
 
 voltage_t currentVolatage;
 voltage_t prevVolatage;
