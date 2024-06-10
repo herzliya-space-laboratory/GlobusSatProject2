@@ -15,7 +15,7 @@
 
 #define EPS_I2C_BUS_INDEX 0			//!< index of the EPS I2C
 #define EPS_I2C_ADDR 0x20			//!< I2C address of the EPS
-
+#define GOM_I2C_ADRESS 0x02
 #define ANTS_I2C_SIDE_A_ADDR 0x31
 #define ANTS_I2C_SIDE_B_ADDR 0x32
 

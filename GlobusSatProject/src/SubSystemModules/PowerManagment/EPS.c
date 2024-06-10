@@ -22,11 +22,8 @@
 
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 
-int GetBatteryVoltage(voltage_t *vbat);
 int UpdateState(voltage_t);
-int UpdateStateFirst(); //do this before the loop
-int GetAlpha(float *alpha);
-int RestoreDefaultAlpha();
+int UpdateStateFirst();
 
 voltage_t currentVolatage;
 voltage_t prevVolatage;
@@ -39,21 +36,17 @@ int EPS_Init(void)
 
 #ifdef GOMEPS_H_
 
-    unsigned char i2c_address = 0x02;
+    unsigned char i2c_address = GOM_I2C_ADRESS;
     int rv;
 
 	rv = GomEpsInitialize(&i2c_address, 1);
-	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)
-	{
 		// we have a problem. Indicate the error. But we'll gracefully exit to the higher menu instead of
 		// hanging the code
-		TRACE_ERROR("\n\r GomEpsInitialize() failed; err=%d! Exiting ... \n\r", rv);
-		return FALSE;
-	}
+		logError(rv,"\n\r GomEpsInitialize() failed \n\r");
+		return 0;
+
 #endif
-	GetBatteryVoltage(&currentVolatage);
 	GetBatteryVoltage(&prevVolatage);
-	UpdateStateFirst();
 	return 0;
 }
 int EPS_Conditioning() {
