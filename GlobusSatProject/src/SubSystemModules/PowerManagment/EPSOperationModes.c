@@ -14,11 +14,6 @@ EpsState_t GetSystemState() {
 	return currentState;
 }
 
-int SetSystemState(EpsState_t state) {
-	currentState = state;
-	return 0;
-}
-
 
 int EnterOperationalMode() {
 	currentState = OperationalMode;

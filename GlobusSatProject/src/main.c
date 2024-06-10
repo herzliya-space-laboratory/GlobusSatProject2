@@ -46,10 +46,10 @@ void taskMain()
 
 	InitSubsystems();
 
-/*	while (TRUE) {
+	while (TRUE) {
 		EPS_Conditioning();
 		vTaskDelay(10);
-	}*/
+	}
 }
 #endif
 

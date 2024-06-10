@@ -16,43 +16,64 @@
 #include "EPSOperationModes.h"
 #include "GlobalStandards.h"
 #include "utils.h"
+#include "satellite-subsystems/GomEPS.h"
 
 #define EPS_INDEX 100 //place holder
-int EPS_Init();
-int EPS_Loop();
+
+#define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
+
 int GetBatteryVoltage(voltage_t *vbat);
-int EPS_Conditioning();
-int EPS_First_Conditioning(); //do this before the loop
+int UpdateState(voltage_t);
+int UpdateStateFirst(); //do this before the loop
 int GetAlpha(float *alpha);
 int RestoreDefaultAlpha();
-int smoothen(voltage_t volt, float alpha, voltage_t *output);
 
 voltage_t currentVolatage;
+voltage_t prevVolatage;
+float Alpha = DEFAULT_ALPHA_VALUE;
 
-float ALPHA = DEFAULT_ALPHA_VALUE;
+
+int EPS_Init(void)
+{
 
 
-int EPS_Init() {
+#ifdef GOMEPS_H_
+
+    unsigned char i2c_address = 0x02;
+    int rv;
+
+	rv = GomEpsInitialize(&i2c_address, 1);
+	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)
+	{
+		// we have a problem. Indicate the error. But we'll gracefully exit to the higher menu instead of
+		// hanging the code
+		TRACE_ERROR("\n\r GomEpsInitialize() failed; err=%d! Exiting ... \n\r", rv);
+		return FALSE;
+	}
+#endif
 	GetBatteryVoltage(&currentVolatage);
-	EPS_First_Conditioning();
+	GetBatteryVoltage(&prevVolatage);
+	UpdateStateFirst();
 	return 0;
 }
-
-int EPS_Loop() {
+int EPS_Conditioning() {
 	voltage_t temp;
 	GetBatteryVoltage(&temp);
-	smoothen(temp, ALPHA, &currentVolatage);
-	EPS_Conditioning();
+	currentVolatage = SMOOTHEN(temp, Alpha);
+	UpdateState(currentVolatage);
+	prevVolatage = currentVolatage;
 	return 0;
 }
-
-int EPS_Conditioning() {
-	if (currentVolatage > 7500)
-		EnterOperationalMode();
-	else if (currentVolatage < 7400 && currentVolatage > 7100)
-		EnterCruiseMode();
-	else if (currentVolatage < 7000)
-		EnterPowerSafeMode();
+//EPS_Conditioning
+int UpdateState(voltage_t prev) {
+	if (prev > currentVolatage) {
+		if(prev > 7500) EnterOperationalMode();
+		if(prev > 7100) EnterCruiseMode();
+	}
+	if(prev < currentVolatage) {
+		if(prev > 7400) EnterCruiseMode();
+		if(prev > 7000) EnterPowerSafeMode();
+	}
 
 	return 0;
 }
@@ -61,7 +82,7 @@ int EPS_Conditioning() {
  * @brief, like EPS_Conditioning, but with a symmetric thresholds
  * return 0;
  */
-int EPS_First_Conditioning() {
+int UpdateStateFirst() {
 	if (currentVolatage > 7500)
 			EnterOperationalMode();
 		else if (currentVolatage < 7500 && currentVolatage > 7000)
@@ -71,22 +92,29 @@ int EPS_First_Conditioning() {
 	return 0;
 }
 int GetAlpha(float *alpha) {
-	*alpha = ALPHA;
+	*alpha = Alpha;
 	return 0;
 }
 int RestoreDefaultAlpha() {
-	ALPHA = DEFAULT_ALPHA_VALUE;
-	return 0;
-}
-int smoothen(voltage_t volt, float alpha, voltage_t *output) {
-	*output = currentVolatage - (alpha * (volt - currentVolatage));
+	Alpha = DEFAULT_ALPHA_VALUE;
 	return 0;
 }
 
+
 int GetBatteryVoltage(voltage_t *vbat) {
+	//gom_eps_hk_vi_t
+	vbat = vbat + 1;
+#ifdef GOMEPS_H_
+	gom_eps_hk_vi_t output;
+	GomEpsGetHkData_vi(0x02, &output);
+	*vbat = (voltage_t)output.fields.vbatt;
+#else
 	imepsv2_piu__gethousekeepingeng__from_t houseKeeping;
 	imepsv2_piu__gethousekeepingeng(EPS_INDEX, &houseKeeping);
 	*vbat = (voltage_t)houseKeeping.fields.volt_brdsup;
+#endif
+
 	return 0;
 }
+
 
