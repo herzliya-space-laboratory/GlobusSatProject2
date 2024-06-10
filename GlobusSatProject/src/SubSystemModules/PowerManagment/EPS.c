@@ -59,13 +59,13 @@ int EPS_Conditioning() {
 }
 //EPS_Conditioning
 int UpdateState(voltage_t prev) {
-	if (prev > currentVolatage) {
-		if(prev > 7500) EnterOperationalMode();
-		if(prev > 7100) EnterCruiseMode();
+	if (prev >= currentVolatage) {
+		if(prev > 7500) EnterOperationalMode(); //
+		else if(prev > 7100) EnterCruiseMode();
 	}
 	if(prev < currentVolatage) {
 		if(prev > 7400) EnterCruiseMode();
-		if(prev > 7000) EnterPowerSafeMode();
+		else if(prev > 7000) EnterPowerSafeMode();
 	}
 
 	return 0;
