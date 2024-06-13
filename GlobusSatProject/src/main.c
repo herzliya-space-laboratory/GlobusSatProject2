@@ -50,8 +50,9 @@ void taskMain()
 		EPS_Conditioning();
 		vTaskDelay(10);
 	}
-}
+
 #endif
+}
 #endif
 
 // main operation function. will be called upon software boot.
