@@ -43,11 +43,11 @@ int StartTIME(){
 }
 
 int InitSubsystems(){
-	StartFRAM();
-
 	StartI2C();
 
 	StartSPI();
+
+	StartFRAM();
 
 	StartTIME();
 
