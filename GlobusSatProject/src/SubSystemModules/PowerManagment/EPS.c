@@ -20,11 +20,11 @@ int EPS_And_SP_Init(){
 #ifdef WE_HAVE_EPS
 	IMEPSV2_PIU_t stract_1;
 	stract_1.i2cAddr = EPS_I2C_ADDR;
-	errorEPS = IMEPSV2_PIU_Init(&stract_1, 1);
+	errorEPS = logError(IMEPSV2_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
 
 #endif
 #ifdef WE_HAVE_SP
-	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "Solar panels");
+	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "Solar panels - IsisSolarPanelv2_initialize");
 	if(errorSP == 0)
 		errorSP = logError(IsisSolarPanelv2_sleep(), "Solar panels - sleep");
 #endif

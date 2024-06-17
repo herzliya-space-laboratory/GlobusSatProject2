@@ -39,13 +39,13 @@ int InitTrxvuAndAnts(){
 
 	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)
 	{
-		logError(errorAnts, "Ants")
-		return logError(rv, "TRXVU");
+		logError(errorAnts, "Ants - IsisAntS_initialize")
+		logError(rv, "TRXVU - IsisTrxvu_initialize");
 	}
 
 	//Initialize the AntS system
-	return logError(errorAnts, "Ants");
+	return errorAnts + rv;
 #else
-	return logError(rv, "TRXVU");
+	return logError(rv, "TRXVU - IsisTrxvu_initialize");
 #endif
 }
