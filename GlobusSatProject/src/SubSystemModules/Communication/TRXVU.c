@@ -37,11 +37,9 @@ int InitTrxvuAndAnts(){
 	myAntennaAddress[0].addressSideB = ANTS_I2C_SIDE_B_ADDR;
 	int errorAnts = IsisAntS_initialize(myAntennaAddress, 1);
 
-	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)
-	{
-		logError(errorAnts, "Ants - IsisAntS_initialize")
-		logError(rv, "TRXVU - IsisTrxvu_initialize");
-	}
+	logError(errorAnts, "Ants - IsisAntS_initialize")
+	logError(rv, "TRXVU - IsisTrxvu_initialize");
+
 
 	//Initialize the AntS system
 	return errorAnts + rv;
