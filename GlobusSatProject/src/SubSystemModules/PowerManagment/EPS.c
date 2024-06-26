@@ -14,6 +14,7 @@
 #include <hal/Drivers/SPI.h>
 /*#define WE_HAVE_SP 1*/
 /*#define WE_HAVE_EPS 1*/
+
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
