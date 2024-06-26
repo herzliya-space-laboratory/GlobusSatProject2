@@ -178,7 +178,7 @@ int GetOnlineCommand(sat_packet_t *cmd);
 /*!
  * @brief transmits data as SPL packet
  * @param[in] cmd the given command.
- * @param[in] data the outout data.
+ * @param[in] data the out data.
  * @param[in] length number of bytes in 'data' fields.
  * @return errors according to <hal/errors.h>
  */

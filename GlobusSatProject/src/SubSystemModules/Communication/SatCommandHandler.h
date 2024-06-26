@@ -54,7 +54,7 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd);
  * @param[out] cmd pointer to parsed command buffer
  * @return	errors according to CMD_ERR
  */
-CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char type, char subtype,unsigned int id, sat_packet_t *cmd);
+CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char type, char subtype, unsigned int id, sat_packet_t *cmd);
 
 /*!
  * @brief returns a command to be executed if there is one in the delayed command buffer
