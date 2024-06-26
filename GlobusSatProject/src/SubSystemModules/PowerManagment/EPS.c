@@ -9,18 +9,22 @@
 /*
  *#TODO check if volt_brdsup is the right way to get volt
  *#TODO finish EPS loop and init
+ *#thoughts.
  */
-#include "satellite-subsystems/imepsv2_piu.h"
-
-#include "EPS.h"
 #include "EPSOperationModes.h"
+#include "satellite-subsystems/imepsv2_piu.h"
+#include "satellite-subsystems/GomEPS.h"
+
+
+#include "string.h"
+#include "EPS.h"
 #include "GlobalStandards.h"
 #include "utils.h"
-#include "satellite-subsystems/GomEPS.h"
 
 #define EPS_INDEX 100 //place holder
 
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
+voltage_t ThresholdsIndex[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 
 int UpdateState(voltage_t); //TODO del
 
@@ -72,14 +76,37 @@ int UpdateState(voltage_t current) {
 	return 0;
 }
 int GetAlpha(float *alpha) {
-	*alpha = Alpha;
+	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
+	FRAM_read(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE);
+	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
+	return 0;
+}
+int SetAlpha(float *alpha) {
+	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
+	memcpy(data, alpha, EPS_ALPHA_FILTER_VALUE_SIZE);
+	FRAM_write(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE);
+	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
 	return 0;
 }
 int RestoreDefaultAlpha() {
 	Alpha = DEFAULT_ALPHA_VALUE;
 	return 0;
 }
-
+int GetEPSThreshold(voltage_t* Threshold[4]) {
+//EPS_THRESH_VOLTAGES_ADDR
+//EPS_THRESH_VOLTAGES_SIZE
+	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
+	FRAM_read(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE);
+	memcpy(Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
+	return 0;
+}
+int SetEPSThreshold(voltage_t* Threshold[4]) {
+	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
+	memcpy(data, Threshold, EPS_THRESH_VOLTAGES_SIZE);
+	FRAM_write(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE);
+	memcpy(Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
+	return 0;
+}
 
 int GetBatteryVoltage(voltage_t *vbat) {
 	//gom_eps_hk_vi_t
@@ -95,5 +122,6 @@ int GetBatteryVoltage(voltage_t *vbat) {
 
 	return 0;
 }
+
 
 
