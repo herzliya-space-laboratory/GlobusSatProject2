@@ -7,6 +7,7 @@
 
 #include "main.h"
 #include "InitSystem.h"
+#include "SatCommandHandler.h"
 
 #include <stdio.h>
 
@@ -32,7 +33,6 @@
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/Housekepping/TelemetryCollector.h"
 #include "SubSystemModules/Maintenance/Maintenance.h"
-#include "InitSystem.h"
 #include "main.h"
 #include <stdlib.h>
 
@@ -43,7 +43,7 @@
 void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
-
+	ISIStrxvuRxFrame rx_frame;
 	InitSubsystems();
 #ifdef WE_HAVE_EPS
 	while (TRUE) {
@@ -52,6 +52,15 @@ void taskMain()
 	}
 
 #endif
+	unsigned char frameCount;
+	sat_packet_t cmd;
+	while(TRUE)
+	{
+		IsisTrxvu_rcGetFrameCount(0, &frameCount);
+		if(frameCount > 0)
+			IsisTrxvu_rcGetCommandFrame(0, &rx_frame);
+			ParseDataToCommand(rx_frame.rx_framedata, &cmd);
+	}
 }
 #endif
 
