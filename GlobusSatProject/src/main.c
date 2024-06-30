@@ -7,7 +7,7 @@
 
 #include "main.h"
 #include "InitSystem.h"
-#include "SatCommandHandler.h"
+#include "SubSystemModules/Communication/SatCommandHandler.h"
 
 #include <stdio.h>
 
