@@ -52,7 +52,7 @@ void taskMain()
 	}
 
 #endif
-	unsigned char frameCount;
+	unsigned short frameCount;
 	sat_packet_t cmd;
 	while(TRUE)
 	{
