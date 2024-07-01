@@ -43,7 +43,8 @@
 void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
-	ISIStrxvuRxFrame rx_frame;
+	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
+	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer};
 	InitSubsystems();
 #ifdef WE_HAVE_EPS
 	while (TRUE) {
