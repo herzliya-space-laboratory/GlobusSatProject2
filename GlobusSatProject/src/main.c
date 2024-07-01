@@ -58,8 +58,10 @@ void taskMain()
 	{
 		IsisTrxvu_rcGetFrameCount(0, &frameCount);
 		if(frameCount > 0)
-			IsisTrxvu_rcGetCommandFrame(0, &rx_frame);
-			ParseDataToCommand(rx_frame.rx_framedata, &cmd);
+		{
+			if(!logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"))
+				ParseDataToCommand(rx_frame.rx_framedata, &cmd);
+		}
 	}
 }
 #endif

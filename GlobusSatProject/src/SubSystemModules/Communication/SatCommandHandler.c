@@ -25,7 +25,7 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 		if(memcpy(&cmd->length, data + 6, 2) == NULL)
 			return null_pointer_error;
 
-		if(memcpy(cmd->data, data + 8, cmd->length) == NULL)
+		if(memcpy(&cmd->data, data + 8, cmd->length) == NULL)
 			return null_pointer_error;
 
 		return command_succsess;
