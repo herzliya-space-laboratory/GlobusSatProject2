@@ -13,20 +13,26 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 {
 	if(data != NULL && cmd != NULL)
 	{
-		if(memcpy(&cmd->ID, data, 4) == NULL)
+		int plusPlace = 0;
+		if(memcpy(&cmd->ID, data, sizeof(cmd->ID)) == NULL)
 			return null_pointer_error;
+		plusPlace += sizeof(cmd->ID);
 
-		if(memcpy(&cmd->cmd_type, data + 4, 1) == NULL)
+		if(memcpy(&cmd->cmd_type, data + plusPlace, sizeof(cmd->cmd_type)) == NULL)
 			return null_pointer_error;
+		plusPlace += sizeof(cmd->cmd_type);
 
-		if(memcpy(&cmd->cmd_subtype, data + 5, 1) == NULL)
+		if(memcpy(&cmd->cmd_subtype, data + plusPlace, sizeof(cmd->cmd_subtype)) == NULL)
 			return null_pointer_error;
+		plusPlace += sizeof(cmd->cmd_subtype);
 
-		if(memcpy(&cmd->length, data + 6, 2) == NULL)
+		if(memcpy(&cmd->length, data + plusPlace, sizeof(cmd->length)) == NULL)
 			return null_pointer_error;
+		plusPlace += sizeof(cmd->length);
 
 		if(memcpy(&cmd->data, data + 8, cmd->length) == NULL)
 			return null_pointer_error;
+
 
 		return command_succsess;
 	}
