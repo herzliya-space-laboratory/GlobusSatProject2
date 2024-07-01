@@ -30,7 +30,7 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 			return null_pointer_error;
 		plusPlace += sizeof(cmd->length);
 
-		if(memcpy(&cmd->data, data + 8, cmd->length) == NULL)
+		if(memcpy(&cmd->data, data + plusPlace, cmd->length) == NULL)
 			return null_pointer_error;
 
 
