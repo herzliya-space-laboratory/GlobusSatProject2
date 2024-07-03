@@ -47,3 +47,12 @@ int InitTrxvuAndAnts(){
 	return logError(rv, "TRXVU - IsisTrxvu_initialize");
 #endif
 }
+
+int GetNumberOfFramesInBuffer()
+{
+	unsigned short frameCount;
+	int err = logError(IsisTrxvu_rcGetFrameCount(0, &frameCount), "TRXVU - IsisTrxvu_rcGetFrameCount");
+	if(err)
+		return -1;
+	return frameCount;
+}
