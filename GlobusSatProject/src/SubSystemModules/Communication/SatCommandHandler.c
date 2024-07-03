@@ -11,7 +11,7 @@
 
 CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 {
-	if(data != NULL && cmd != NULL)
+	if(data == NULL || cmd == NULL)
 		return null_pointer_error;
 
 	int plusPlace = 0;
@@ -44,7 +44,7 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 
 CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char type, char subtype, unsigned int id, sat_packet_t *cmd)
 {
-	if(data != NULL && cmd != NULL)
+	if(data == NULL || cmd == NULL)
 		return null_pointer_error;
 
 	cmd->ID = id;
