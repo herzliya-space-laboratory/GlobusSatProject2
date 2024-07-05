@@ -53,12 +53,10 @@ void taskMain()
 	}
 
 #endif
-	unsigned short frameCount;
 	sat_packet_t cmd;
 	while(TRUE)
 	{
-		IsisTrxvu_rcGetFrameCount(0, &frameCount);
-		if(frameCount > 0)
+		if(GetNumberOfFramesInBuffer() > 0)
 		{
 			if(!logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"))
 				ParseDataToCommand(rx_frame.rx_framedata, &cmd);
