@@ -24,20 +24,19 @@
 #define EPS_INDEX 100 //place holder
 
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
-voltage_t ThresholdsIndex[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
-
+EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 voltage_t currentVolatage;
 voltage_t prevVolatage;
 float Alpha = DEFAULT_ALPHA_VALUE;
 
 int UpdateState(voltage_t current) {
 	if (current >= prevVolatage) {
-		if(current > ThresholdsIndex[3]) EnterOperationalMode();
-		else if(current > ThresholdsIndex[2]) EnterCruiseMode();
+		if(current > ThresholdsIndex.fields.Vup_operational) EnterOperationalMode();
+		else if(current > ThresholdsIndex.fields.Vup_cruise) EnterCruiseMode();
 	}
 	if(current < prevVolatage) {
-		if(current < ThresholdsIndex[1]) EnterCruiseMode();
-		else if(current < ThresholdsIndex[0]) EnterPowerSafeMode();
+		if(current < ThresholdsIndex.fields.Vdown_operational) EnterCruiseMode();
+		else if(current < ThresholdsIndex.fields.Vdown_cruise) EnterPowerSafeMode();
 	}
 	//printf("%d \r\n", current);
 	return 0;
@@ -53,8 +52,6 @@ int EPS_Init(void)
     int rv;
 
 	rv = GomEpsInitialize(&i2c_address, 1);
-		// we have a problem. Indicate the error. But we'll gracefully exit to the higher menu instead of
-		// hanging the code
 	logError(rv,"GomEps");
 	if(rv == 0)
 		GetBatteryVoltage(&prevVolatage);
@@ -63,7 +60,7 @@ int EPS_Init(void)
 #endif
 
 }
-int EPS_Conditioning() {
+int EPS_Loop() {
 	voltage_t temp;
 	GetBatteryVoltage(&temp);
 	currentVolatage = SMOOTHEN(temp, Alpha);
@@ -72,7 +69,7 @@ int EPS_Conditioning() {
 	prevVolatage = currentVolatage;
 	return 0;
 }
-//EPS_Conditioning
+
 
 int GetAlpha(float *alpha) {
 	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
@@ -80,36 +77,51 @@ int GetAlpha(float *alpha) {
 	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
 	return error;
 }
-int SetAlpha(float *alpha) {
+int UpdateAlpha(float *alpha) {
+	if(alpha == NULL) {
+		logerror(-2, "UpdateAlpha, alpha is null");
+		return -2;
+	}
+	else {
+	if (! (-1 < *alpha && *alpha < 1)) {
+		logerror(-2, "UpdateAlpha, alpa is not in valid range");
+		return -2;
+	}
+	else {
 	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
 	memcpy(data, alpha, EPS_ALPHA_FILTER_VALUE_SIZE);
 	int error = logError(FRAM_write(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
 	return error;
+	}
+	}
 }
 int RestoreDefaultAlpha() {
 	Alpha = DEFAULT_ALPHA_VALUE;
-	SetAlpha(&Alpha);
+	UpdateAlpha(&Alpha);
 	return 0;
 }
-int GetEPSThreshold(voltage_t Threshold[NUMBER_OF_THRESHOLD_VOLTAGES]) {
-//EPS_THRESH_VOLTAGES_ADDR
-//EPS_THRESH_VOLTAGES_SIZE
+
+int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
 	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
 	int error = logError(FRAM_read(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
-	memcpy(Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
+	memcpy(&Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
 	return error;
 }
-int SetEPSThreshold(voltage_t Threshold[NUMBER_OF_THRESHOLD_VOLTAGES]) {
+
+int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
+	if (Threshold == NULL) {
+		logError(-2, "SetEPSThreshold, threshold is null");
+		return -2;
+	}
 	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
 	memcpy(data, Threshold, EPS_THRESH_VOLTAGES_SIZE);
 	int error = logError(FRAM_write(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "SetEPSThreshold, FRAM_write");
-	memcpy(Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
+	memcpy(&Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
 	return error;
 }
 
 int GetBatteryVoltage(voltage_t *vbat) {
-	//gom_eps_hk_vi_t
 #ifdef GOMEPS_H_
 	gom_eps_hk_t myEpsStatus_hk;
 	int error = logError(GomEpsGetHkData_general(0, &myEpsStatus_hk), "GetBatteryVoltage, GomEpsGetHkData_general");

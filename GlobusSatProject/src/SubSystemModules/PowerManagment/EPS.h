@@ -71,11 +71,18 @@ int EPS_Init();
 /*!
  * @brief EPS logic. controls the state machine of which subsystem
  * is on or off, as a function of only the battery voltage
+ * @param current voltage of the EPS
  * @return	0 on success
  * 			-1 on failure setting state of channels
  */
-int EPS_Conditioning();
+int UpdateState(voltage_t current);
 
+/*!
+ * @brief. run this in the loop of the satillite
+ * @return	0 on success
+ * 			Error code according to <hal/errors.h>
+ */
+int EPS_Loop();
 /*!
  * @brief returns the current voltage on the battery
  * @param[out] vbat he current battery voltage
@@ -92,7 +99,7 @@ int GetBatteryVoltage(voltage_t *vbat);
  * 			-2 on invalid thresholds
  * 			ERR according to <hal/errors.h>
  */
-int UpdateThresholdVoltages(EpsThreshVolt_t *thresh_volts);
+int SetEPSThreshold(EpsThreshVolt_t *Threshold);
 
 /*!
  * @brief getting the EPS logic threshold  voltages on the FRAM.
@@ -121,7 +128,7 @@ int GetAlpha(float *alpha);
  * 			-2 on invalid alpha
  * @see LPF- Low Pass Filter at wikipedia: https://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
  */
-int UpdateAlpha(sat_packet_t *cmd);
+int UpdateAlpha(float *alpha);
 
 /*!
  * @brief setting the new voltage smoothing factor (alpha) to be the default value.

@@ -45,10 +45,16 @@ void taskMain()
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 
 	InitSubsystems();
+	EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
+//	SetEPSThreshold(&ThresholdsIndex);
+//	printf("sucess part 1 \n  ");
+//	GetEPSThreshold(&ThresholdsIndex);
+//	printf("Vdown_cruise, %d, Vdown_operational, %d, Vup_cruise, %d, Vup_operational, %d",ThresholdsIndex.fields.Vdown_cruise ,ThresholdsIndex.fields.Vdown_operational ,ThresholdsIndex.fields.Vup_cruise ,ThresholdsIndex.fields.Vup_operational);
 
 	while (TRUE) {
-		EPS_Conditioning();
+		EPS_Loop();
 		vTaskDelay(10);
+
 	}
 }
 #endif
