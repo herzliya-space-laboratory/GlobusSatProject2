@@ -26,12 +26,22 @@
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 voltage_t ThresholdsIndex[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 
-int UpdateState(voltage_t); //TODO del
-
 voltage_t currentVolatage;
 voltage_t prevVolatage;
 float Alpha = DEFAULT_ALPHA_VALUE;
 
+int UpdateState(voltage_t current) {
+	if (current >= prevVolatage) {
+		if(current > ThresholdsIndex[3]) EnterOperationalMode();
+		else if(current > ThresholdsIndex[2]) EnterCruiseMode();
+	}
+	if(current < prevVolatage) {
+		if(current < ThresholdsIndex[1]) EnterCruiseMode();
+		else if(current < ThresholdsIndex[0]) EnterPowerSafeMode();
+	}
+	//printf("%d \r\n", current);
+	return 0;
+}
 
 int EPS_Init(void)
 {
@@ -63,56 +73,46 @@ int EPS_Conditioning() {
 	return 0;
 }
 //EPS_Conditioning
-int UpdateState(voltage_t current) {
-	if (current >= prevVolatage) {
-		if(current > ThresholdsIndex[3]) EnterOperationalMode();
-		else if(current > ThresholdsIndex[2]) EnterCruiseMode();
-	}
-	if(current < prevVolatage) {
-		if(current > ThresholdsIndex[1]) EnterCruiseMode();
-		else if(current > ThresholdsIndex[0]) EnterPowerSafeMode();
-	}
-	printf("%d \r\n", current);
-	return 0;
-}
+
 int GetAlpha(float *alpha) {
 	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
-	FRAM_read(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE);
+	int error = logError(FRAM_read(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
-	return 0;
+	return error;
 }
 int SetAlpha(float *alpha) {
 	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
 	memcpy(data, alpha, EPS_ALPHA_FILTER_VALUE_SIZE);
-	FRAM_write(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE);
+	int error = logError(FRAM_write(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
-	return 0;
+	return error;
 }
 int RestoreDefaultAlpha() {
 	Alpha = DEFAULT_ALPHA_VALUE;
+	SetAlpha(&Alpha);
 	return 0;
 }
-int GetEPSThreshold(voltage_t* Threshold[4]) {
+int GetEPSThreshold(voltage_t Threshold[NUMBER_OF_THRESHOLD_VOLTAGES]) {
 //EPS_THRESH_VOLTAGES_ADDR
 //EPS_THRESH_VOLTAGES_SIZE
 	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
-	FRAM_read(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE);
+	int error = logError(FRAM_read(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
 	memcpy(Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
-	return 0;
+	return error;
 }
-int SetEPSThreshold(voltage_t* Threshold[4]) {
+int SetEPSThreshold(voltage_t Threshold[NUMBER_OF_THRESHOLD_VOLTAGES]) {
 	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
 	memcpy(data, Threshold, EPS_THRESH_VOLTAGES_SIZE);
-	FRAM_write(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE);
+	int error = logError(FRAM_write(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "SetEPSThreshold, FRAM_write");
 	memcpy(Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
-	return 0;
+	return error;
 }
 
 int GetBatteryVoltage(voltage_t *vbat) {
 	//gom_eps_hk_vi_t
 #ifdef GOMEPS_H_
 	gom_eps_hk_t myEpsStatus_hk;
-	GomEpsGetHkData_general(0, &myEpsStatus_hk);
+	int error = logError(GomEpsGetHkData_general(0, &myEpsStatus_hk), "GetBatteryVoltage, GomEpsGetHkData_general");
 	*vbat = (voltage_t)myEpsStatus_hk.fields.vbatt;
 #else
 	imepsv2_piu__gethousekeepingeng__from_t houseKeeping;
@@ -120,7 +120,7 @@ int GetBatteryVoltage(voltage_t *vbat) {
 	*vbat = (voltage_t)houseKeeping.fields.volt_brdsup;
 #endif
 
-	return 0;
+	return error;
 }
 
 
