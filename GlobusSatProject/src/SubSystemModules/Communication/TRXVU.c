@@ -10,6 +10,7 @@
 #include "satellite-subsystems/IsisTRXVU.h"
 #include "satellite-subsystems/IsisAntS.h"
 
+#include "SatCommandHandler.h"
 #include "TRXVU.h"
 #include "SysI2CAddr.h"
 
