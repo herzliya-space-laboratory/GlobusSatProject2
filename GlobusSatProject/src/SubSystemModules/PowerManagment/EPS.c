@@ -56,7 +56,7 @@ int EPS_Init(void)
 int EPS_Conditioning() {
 	voltage_t temp;
 	GetBatteryVoltage(&temp);
-	//currentVolatage = SMOOTHEN(temp, Alpha);
+	currentVolatage = SMOOTHEN(temp, Alpha);
 	currentVolatage = temp;
 	UpdateState(currentVolatage);
 	prevVolatage = currentVolatage;
