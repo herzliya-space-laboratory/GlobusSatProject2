@@ -65,12 +65,12 @@ int EPS_Conditioning() {
 //EPS_Conditioning
 int UpdateState(voltage_t current) {
 	if (current >= prevVolatage) {
-		if(current > 8200) EnterOperationalMode(); //7000, 6900
-		else if(current > 8100) EnterCruiseMode();
+		if(current > ThresholdsIndex[3]) EnterOperationalMode();
+		else if(current > ThresholdsIndex[2]) EnterCruiseMode();
 	}
 	if(current < prevVolatage) {
-		if(current > 8150) EnterCruiseMode();
-		else if(current > 8000) EnterPowerSafeMode();
+		if(current > ThresholdsIndex[1]) EnterCruiseMode();
+		else if(current > ThresholdsIndex[0]) EnterPowerSafeMode();
 	}
 	printf("%d \r\n", current);
 	return 0;
