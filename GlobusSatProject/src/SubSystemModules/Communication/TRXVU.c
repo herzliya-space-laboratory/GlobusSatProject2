@@ -73,9 +73,9 @@ int TRX_Logic()
 		if(error != E_NO_SS_ERR)
 			return error;
 		error = ParseDataToCommand(rx_frame.rx_framedata, &cmd);
-		if(error != 0)
+		if(error != command_succsess)
 			return error;
-		ActUponCommand(cmd);
+		ActUponCommand(&cmd);
 	}
 	return 0;
 }
