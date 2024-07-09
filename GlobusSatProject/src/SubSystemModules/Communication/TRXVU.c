@@ -72,7 +72,10 @@ int TRX_Logic()
 		error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame");
 		if(error != E_NO_SS_ERR)
 			return error;
-		ParseDataToCommand(rx_frame.rx_framedata, &cmd);
+		error = ParseDataToCommand(rx_frame.rx_framedata, &cmd);
+		if(error != 0)
+			return error;
+		ActUponCommand(cmd);
 	}
 	return 0;
 }
