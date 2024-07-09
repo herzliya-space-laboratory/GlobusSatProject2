@@ -43,8 +43,6 @@
 void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
-	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
-	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer};
 	InitSubsystems();
 #ifdef WE_HAVE_EPS
 	while (TRUE) {
@@ -53,14 +51,9 @@ void taskMain()
 	}
 
 #endif
-	sat_packet_t cmd;
 	while(TRUE)
 	{
-		if(GetNumberOfFramesInBuffer() > 0)
-		{
-			if(!logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"))
-				ParseDataToCommand(rx_frame.rx_framedata, &cmd);
-		}
+		TRX_Logic();
 	}
 }
 #endif
