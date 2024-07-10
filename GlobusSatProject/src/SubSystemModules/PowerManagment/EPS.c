@@ -73,6 +73,7 @@ int EPS_Loop() {
 
 
 int GetAlpha(float *alpha) {
+	if (alpha == NULL) return E_INPUT_POINTER_NULL;
 	return logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 }
 int UpdateAlpha(float *alpha) {
