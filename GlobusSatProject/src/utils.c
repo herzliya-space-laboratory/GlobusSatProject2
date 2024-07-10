@@ -6,7 +6,8 @@
  */
 
 #include <stdio.h>
-
+#include <stdbool.h>
+#define RANGE(number, min, max) (number >= min && number <= max)
 int logError(int error ,char* msg)
 {
 	if(error != 0)
@@ -15,3 +16,5 @@ int logError(int error ,char* msg)
 	}
 	return error;
 }
+
+//Boolean Range(int number, int min, int max) return {number >= min && number <= max}

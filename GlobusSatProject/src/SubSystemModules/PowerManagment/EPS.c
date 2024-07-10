@@ -22,7 +22,6 @@
 #include "utils.h"
 
 #define EPS_INDEX 100 //place holder
-
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 voltage_t currentVolatage;
@@ -72,41 +71,28 @@ int EPS_Loop() {
 
 
 int GetAlpha(float *alpha) {
-	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
-	int error = logError(FRAM_read(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
-	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
-	return error;
+	return logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 }
 int UpdateAlpha(float *alpha) {
 	if(alpha == NULL) {
-		logerror(-2, "UpdateAlpha, alpha is null");
+		logError(-2, "UpdateAlpha, alpha is null");
 		return -2;
 	}
-	else {
 	if (! (-1 < *alpha && *alpha < 1)) {
-		logerror(-2, "UpdateAlpha, alpa is not in valid range");
+		logError(-2, "UpdateAlpha, alpa is not in valid range");
 		return -2;
 	}
-	else {
-	unsigned char data[EPS_ALPHA_FILTER_VALUE_SIZE];
-	memcpy(data, alpha, EPS_ALPHA_FILTER_VALUE_SIZE);
-	int error = logError(FRAM_write(data, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
-	memcpy(alpha, data, EPS_ALPHA_FILTER_VALUE_SIZE);
+	int error = logError(FRAM_write((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	return error;
-	}
-	}
+
 }
 int RestoreDefaultAlpha() {
 	Alpha = DEFAULT_ALPHA_VALUE;
 	UpdateAlpha(&Alpha);
 	return 0;
 }
-
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
-	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
-	int error = logError(FRAM_read(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
-	memcpy(&Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
-	return error;
+	return logError(FRAM_read((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
 }
 
 int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
@@ -114,11 +100,12 @@ int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
 		logError(-2, "SetEPSThreshold, threshold is null");
 		return -2;
 	}
-	unsigned char data[EPS_THRESH_VOLTAGES_SIZE];
-	memcpy(data, Threshold, EPS_THRESH_VOLTAGES_SIZE);
-	int error = logError(FRAM_write(data, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "SetEPSThreshold, FRAM_write");
-	memcpy(&Threshold, data, EPS_THRESH_VOLTAGES_SIZE);
-	return error;
+	//0-2-1-3 0, lowest, 3, highest
+	if(Threshold->fields.Vdown_cruise > Threshold->fields.Vup_cruise && Threshold->fields.Vup_cruise > Threshold->fields.Vdown_operational && Threshold->fields.Vdown_operational > Threshold->fields.Vup_operational) {
+		logError(-2, "SetEPSThreshold, the values are incorrect");
+		return -2;
+	}
+	return logError(FRAM_write((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "SetEPSThreshold, FRAM_write");
 }
 
 int GetBatteryVoltage(voltage_t *vbat) {
