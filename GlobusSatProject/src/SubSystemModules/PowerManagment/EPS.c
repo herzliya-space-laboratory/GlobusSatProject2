@@ -14,6 +14,7 @@
 #include "EPSOperationModes.h"
 #include "satellite-subsystems/imepsv2_piu.h"
 #include "satellite-subsystems/GomEPS.h"
+#include <hal/errors.h>
 
 
 #include "string.h"
@@ -22,6 +23,7 @@
 #include "utils.h"
 
 #define EPS_INDEX 100 //place holder
+#define nullvalue
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 voltage_t currentVolatage;
@@ -75,8 +77,8 @@ int GetAlpha(float *alpha) {
 }
 int UpdateAlpha(float *alpha) {
 	if(alpha == NULL) {
-		logError(-2, "UpdateAlpha, alpha is null");
-		return -2;
+		logError(E_INPUT_POINTER_NULL, "UpdateAlpha, alpha is null");
+		return E_INPUT_POINTER_NULL;
 	}
 	if (! (-1 < *alpha && *alpha < 1)) {
 		logError(-2, "UpdateAlpha, alpa is not in valid range");
@@ -92,13 +94,14 @@ int RestoreDefaultAlpha() {
 	return 0;
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
+	if (Threshold == NULL) return E_INPUT_POINTER_NULL;
 	return logError(FRAM_read((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
 }
 
 int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
 	if (Threshold == NULL) {
-		logError(-2, "SetEPSThreshold, threshold is null");
-		return -2;
+		logError(E_INPUT_POINTER_NULL, "SetEPSThreshold, threshold is null");
+		return E_INPUT_POINTER_NULL;
 	}
 	//0-2-1-3 0, lowest, 3, highest
 	if(Threshold->fields.Vdown_cruise > Threshold->fields.Vup_cruise && Threshold->fields.Vup_cruise > Threshold->fields.Vdown_operational && Threshold->fields.Vdown_operational > Threshold->fields.Vup_operational) {

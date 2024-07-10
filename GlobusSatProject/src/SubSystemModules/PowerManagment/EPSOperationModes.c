@@ -33,7 +33,6 @@ int EnterCruiseMode() {
 
 int EnterPowerSafeMode() {
 	currentState = PowerSafeMode;
-	muteTRXVU()
 	printf("EnterPowerSafeMode\r\n");
 	return 0;
 }
