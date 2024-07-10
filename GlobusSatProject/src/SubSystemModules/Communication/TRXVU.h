@@ -172,7 +172,7 @@ int GetNumberOfFramesInBuffer();
  * @note cmd is set
  * @return	errors according to CMD_ERR
  */
-int GetOnlineCommand(sat_packet_t *cmd);
+CMD_ERR GetOnlineCommand(sat_packet_t *cmd);
 
 
 /*!

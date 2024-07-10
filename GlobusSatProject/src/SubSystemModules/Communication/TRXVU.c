@@ -61,18 +61,24 @@ int GetNumberOfFramesInBuffer()
 	return frameCount;
 }
 
+CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
+{
+	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
+	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer};
+	int error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame");
+	if(error != E_NO_SS_ERR)
+		return execution_error;
+	error = ParseDataToCommand(rx_frame.rx_framedata, cmd);
+	return error;
+}
+
 int TRX_Logic()
 {
 	sat_packet_t cmd;
-	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
-	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer};
 	int error = 0;
 	if(GetNumberOfFramesInBuffer() > 0)
 	{
-		error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame");
-		if(error != E_NO_SS_ERR)
-			return error;
-		error = ParseDataToCommand(rx_frame.rx_framedata, &cmd);
+		error = GetOnlineCommand(&cmd);
 		if(error != command_succsess)
 			return error;
 		ActUponCommand(&cmd);
