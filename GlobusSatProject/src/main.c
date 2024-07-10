@@ -45,7 +45,7 @@ void taskMain()
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 
 	InitSubsystems();
-	EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
+//	EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 //	SetEPSThreshold(&ThresholdsIndex);
 //	printf("sucess part 1 \n  ");
 //	GetEPSThreshold(&ThresholdsIndex);

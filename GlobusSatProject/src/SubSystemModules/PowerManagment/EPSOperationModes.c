@@ -7,14 +7,16 @@
 
 #include "EPSOperationModes.h"
 #include <stdio.h>
-
+#include <stdbool.h>
 EpsState_t currentState;
 
 
 EpsState_t GetSystemState() {
 	return currentState;
 }
-
+Boolean GetLowVoltFlag() {
+	return GetSystemState() == PowerSafeMode;
+}
 
 int EnterOperationalMode() {
 	currentState = OperationalMode;
@@ -31,6 +33,7 @@ int EnterCruiseMode() {
 
 int EnterPowerSafeMode() {
 	currentState = PowerSafeMode;
+	muteTRXVU()
 	printf("EnterPowerSafeMode\r\n");
 	return 0;
 }
