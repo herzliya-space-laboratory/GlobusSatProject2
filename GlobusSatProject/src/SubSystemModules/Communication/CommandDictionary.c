@@ -8,6 +8,7 @@
 
 #include "CommandDictionary.h"
 #include <stdio.h>
+#include "TRXVU.h"
 
 int trxvu_command_router(sat_packet_t *cmd)
 {
@@ -16,6 +17,5 @@ int trxvu_command_router(sat_packet_t *cmd)
 		printf("cmd_is_null\r\n");
 		return -1;
 	}
-	printf("hello world\r\n");
-	return 0;
+	return TransmitDataAsSPL_Packet(cmd, (unsigned char *)"hello world", sizeof("hello world"));
 }

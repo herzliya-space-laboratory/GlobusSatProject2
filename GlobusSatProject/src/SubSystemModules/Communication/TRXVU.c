@@ -6,6 +6,7 @@
  */
 
 #include <hal/errors.h>
+#include <string.h>
 
 #include "satellite-subsystems/IsisTRXVU.h"
 #include "satellite-subsystems/IsisAntS.h"
@@ -70,6 +71,18 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 		return execution_error;
 	error = ParseDataToCommand(rx_frame.rx_framedata, cmd);
 	return error;
+}
+
+int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length)
+{
+	unsigned char avail;
+	if(cmd == NULL || data == NULL)
+		return -1;
+	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2;
+	int place = 0;
+	place += sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length;
+
+	return IsisTrxvu_tcSendAX25DefClSign(I2C_TRXVU_TC_ADDR, (unsigned char *)&cmd, place, &avail);
 }
 
 int TRX_Logic()
