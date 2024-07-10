@@ -82,7 +82,7 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	int place = 0;
 	place += sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length;
 
-	return IsisTrxvu_tcSendAX25DefClSign(I2C_TRXVU_TC_ADDR, (unsigned char *)&cmd, place, &avail);
+	return IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)&cmd, place, &avail);
 }
 
 int TRX_Logic()
