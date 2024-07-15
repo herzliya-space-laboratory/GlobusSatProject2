@@ -75,22 +75,26 @@ int GetAlpha(float *alpha) {
 	if (alpha == NULL) return E_INPUT_POINTER_NULL;
 	return logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 }
-int UpdateAlpha(float *alpha) {
-	if(alpha == NULL) {
+int UpdateAlpha(float *newalpha) {
+	if(newalpha == NULL) {
 		logError(E_INPUT_POINTER_NULL, "UpdateAlpha, alpha is null");
 		return E_INPUT_POINTER_NULL;
 	}
-	if (! (-1 < *alpha && *alpha < 1)) {
+	if (! (0 < *newalpha && *newalpha < 1)) {
 		logError(E_PARAM_OUTOFBOUNDS, "UpdateAlpha, alpa is not in valid range");
 		return E_PARAM_OUTOFBOUNDS;
 	}
-	int error = logError(FRAM_write((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
+	Alpha = *newalpha;
+	int error = logError(FRAM_write((unsigned char *)newalpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	return error;
 
 }
 int RestoreDefaultAlpha() {
-	Alpha = DEFAULT_ALPHA_VALUE;
 	UpdateAlpha(&Alpha);
+	return 0;
+}
+int RestoreDefaultThresholdVoltages() {
+	SetEPSThreshold(&ThresholdsIndex);
 	return 0;
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
@@ -108,6 +112,7 @@ int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
 		logError(E_PARAM_OUTOFBOUNDS, "SetEPSThreshold, the values are incorrect");
 		return E_PARAM_OUTOFBOUNDS;
 	}
+	ThresholdsIndex = *Threshold;
 	return logError(FRAM_write((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "SetEPSThreshold, FRAM_write");
 }
 
