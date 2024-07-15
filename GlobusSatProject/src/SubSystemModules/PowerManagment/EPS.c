@@ -23,7 +23,6 @@
 #include "utils.h"
 
 #define EPS_INDEX 100 //place holder
-#define nullvalue
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 voltage_t currentVolatage;
@@ -82,8 +81,8 @@ int UpdateAlpha(float *alpha) {
 		return E_INPUT_POINTER_NULL;
 	}
 	if (! (-1 < *alpha && *alpha < 1)) {
-		logError(-2, "UpdateAlpha, alpa is not in valid range");
-		return -2;
+		logError(E_PARAM_OUTOFBOUNDS, "UpdateAlpha, alpa is not in valid range");
+		return E_PARAM_OUTOFBOUNDS;
 	}
 	int error = logError(FRAM_write((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	return error;
@@ -106,8 +105,8 @@ int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
 	}
 	//0-2-1-3 0, lowest, 3, highest
 	if(Threshold->fields.Vdown_cruise > Threshold->fields.Vup_cruise && Threshold->fields.Vup_cruise > Threshold->fields.Vdown_operational && Threshold->fields.Vdown_operational > Threshold->fields.Vup_operational) {
-		logError(-2, "SetEPSThreshold, the values are incorrect");
-		return -2;
+		logError(E_PARAM_OUTOFBOUNDS, "SetEPSThreshold, the values are incorrect");
+		return E_PARAM_OUTOFBOUNDS;
 	}
 	return logError(FRAM_write((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "SetEPSThreshold, FRAM_write");
 }
