@@ -25,7 +25,6 @@
 #define EPS_INDEX 100 //place holder
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
-voltage_t currentVolatage;
 voltage_t prevVolatage;
 float Alpha = DEFAULT_ALPHA_VALUE;
 
@@ -63,7 +62,7 @@ int EPS_Init(void)
 int EPS_Loop() {
 	voltage_t temp;
 	GetBatteryVoltage(&temp);
-	currentVolatage = SMOOTHEN(temp, Alpha);
+	voltage_t currentVolatage = SMOOTHEN(temp, Alpha);
 	UpdateState(currentVolatage);
 	prevVolatage = currentVolatage;
 	return 0;
