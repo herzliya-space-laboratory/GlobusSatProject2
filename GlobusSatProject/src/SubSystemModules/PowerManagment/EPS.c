@@ -77,22 +77,19 @@ int GetAlpha(float *alpha) {
 	}
 	return logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 }
-int UpdateAlpha(float *newalpha) {
-	if(newalpha == NULL) {
-		logError(E_INPUT_POINTER_NULL, "UpdateAlpha, alpha is null");
-		return E_INPUT_POINTER_NULL;
-	}
-	if (! (0 < *newalpha && *newalpha < 1)) {
+int UpdateAlpha(float newalpha) {
+	float alpha = newalpha;
+	if (! (0 < alpha && alpha < 1)) {
 		logError(E_PARAM_OUTOFBOUNDS, "UpdateAlpha, alpa is not in valid range");
 		return E_PARAM_OUTOFBOUNDS;
 	}
-	Alpha = *newalpha;
-	int error = logError(FRAM_write((unsigned char *)newalpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
+	Alpha = alpha;
+	int error = logError(FRAM_write((unsigned char)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	return error;
 
 }
 int RestoreDefaultAlpha() {
-	UpdateAlpha(&Alpha);
+	UpdateAlpha(Alpha);
 	return 0;
 }
 int RestoreDefaultThresholdVoltages() {
