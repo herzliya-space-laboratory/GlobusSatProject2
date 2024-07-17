@@ -19,7 +19,7 @@ int alphaTest() {
 
 	if (alpha != updatealpha) return ERR_FRAM_WRITE;
 
-	alpha = 2; //unvalid value
+	alpha = 2; //invalid value
 	error = UpdateAlpha(&alpha);
 	if (error != E_PARAM_OUTOFBOUNDS) {
 		RestoreDefaultAlpha();
