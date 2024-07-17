@@ -54,6 +54,11 @@ int EPS_Init(void)
 	logError(rv,"GomEps");
 	if(rv == 0)
 		GetBatteryVoltage(&prevVolatage);
+		float temp;
+		GetAlpha(&temp);
+		EpsThreshVolt_t temp2;
+		GetEPSThreshold(&temp2);
+
 	return rv;
 
 #endif
@@ -74,7 +79,9 @@ int GetAlpha(float *alpha) {
 		logError(E_INPUT_POINTER_NULL, "GetAlpha, alpha is null");
 		return E_INPUT_POINTER_NULL;
 	}
-	return logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
+	int error = logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
+	if (error == 0) Alpha = *alpha;
+	return error;
 }
 int UpdateAlpha(float newalpha) {
 	float alpha2 = newalpha;
@@ -93,14 +100,19 @@ int RestoreDefaultAlpha() {
 	return 0;
 }
 int RestoreDefaultThresholdVoltages() {
-	SetEPSThreshold(&ThresholdsIndex);
+	EpsThreshVolt_t ThresholdsIndexs = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
+	SetEPSThreshold(&ThresholdsIndexs);
 	return 0;
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
 	if (Threshold == NULL) {
 		logError(E_INPUT_POINTER_NULL, "GetEPSThreshold, Threshold is null"); }
 		return E_INPUT_POINTER_NULL;
-	return logError(FRAM_read((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
+		int error = logError(FRAM_read((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
+		if (error == 0)
+		ThresholdsIndex = *Threshold;
+	return error;
+
 }
 
 int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
