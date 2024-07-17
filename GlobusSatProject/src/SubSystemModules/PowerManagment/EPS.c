@@ -90,7 +90,7 @@ int UpdateAlpha(float newalpha) {
 
 }
 int RestoreDefaultAlpha() {
-	UpdateAlpha(Alpha);
+	UpdateAlpha(DEFAULT_ALPHA_VALUE);
 	return 0;
 }
 int RestoreDefaultThresholdVoltages() {
