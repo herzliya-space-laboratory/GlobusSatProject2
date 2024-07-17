@@ -14,13 +14,13 @@ int alphaTest() {
 
 	updatealpha = 0.58444465; //diffrent number so i can check. if it works DO NOT enter this value
 
-	error = UpdateAlpha(&updatealpha);
+	error = UpdateAlpha(updatealpha);
 	if (error !=0) return error;
 
 	if (alpha != updatealpha) return ERR_FRAM_WRITE;
 
 	alpha = 2; //unvalid value
-	error = UpdateAlpha(&alpha);
+	error = UpdateAlpha(alpha);
 	if (error != E_PARAM_OUTOFBOUNDS) {
 		RestoreDefaultAlpha();
 		return ERR_OUT_BOUND;
