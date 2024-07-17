@@ -35,7 +35,7 @@
 #include "InitSystem.h"
 #include "main.h"
 #include <stdlib.h>
-
+#include "SubSystemModules/PowerManagment/EPSTest.h"
 #ifdef TESTING
 	#include "TestingDemos/MainTest.h"
 #else
@@ -52,7 +52,8 @@ void taskMain()
 //	printf("Vdown_cruise, %d, Vdown_operational, %d, Vup_cruise, %d, Vup_operational, %d",ThresholdsIndex.fields.Vdown_cruise ,ThresholdsIndex.fields.Vdown_operational ,ThresholdsIndex.fields.Vup_cruise ,ThresholdsIndex.fields.Vup_operational);
 
 	while (TRUE) {
-		EPS_Loop();
+		Error_List errors = EPSTest();
+		printf("batt %d FRAM alpha %d FRAM threshold %d", errors.fields.battError, errors.fields.alphaError, errors.fields.TresholdError);
 		vTaskDelay(10);
 
 	}
