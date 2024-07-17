@@ -64,7 +64,6 @@ int EPS_Loop() {
 	voltage_t temp;
 	GetBatteryVoltage(&temp);
 	currentVolatage = SMOOTHEN(temp, Alpha);
-	currentVolatage = temp;
 	UpdateState(currentVolatage);
 	prevVolatage = currentVolatage;
 	return 0;
@@ -72,7 +71,10 @@ int EPS_Loop() {
 
 
 int GetAlpha(float *alpha) {
-	if (alpha == NULL) return E_INPUT_POINTER_NULL;
+	if (alpha == NULL)  {
+		logError(E_INPUT_POINTER_NULL, "GetAlpha, alpha is null");
+		return E_INPUT_POINTER_NULL;
+	}
 	return logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 }
 int UpdateAlpha(float *newalpha) {
@@ -98,7 +100,9 @@ int RestoreDefaultThresholdVoltages() {
 	return 0;
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
-	if (Threshold == NULL) return E_INPUT_POINTER_NULL;
+	if (Threshold == NULL) {
+		return E_INPUT_POINTER_NULL;
+	logError(E_INPUT_POINTER_NULL, "GetEPSThreshold, Threshold is null"); }
 	return logError(FRAM_read((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
 }
 
