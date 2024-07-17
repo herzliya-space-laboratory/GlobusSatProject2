@@ -99,8 +99,8 @@ int RestoreDefaultThresholdVoltages() {
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {
 	if (Threshold == NULL) {
+		logError(E_INPUT_POINTER_NULL, "GetEPSThreshold, Threshold is null"); }
 		return E_INPUT_POINTER_NULL;
-	logError(E_INPUT_POINTER_NULL, "GetEPSThreshold, Threshold is null"); }
 	return logError(FRAM_read((unsigned char *)Threshold, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetEPSThreshold, FRAM READ");
 }
 
