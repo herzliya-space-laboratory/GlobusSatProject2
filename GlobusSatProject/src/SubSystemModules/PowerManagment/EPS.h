@@ -128,7 +128,7 @@ int GetAlpha(float *alpha);
  * 			-2 on invalid alpha
  * @see LPF- Low Pass Filter at wikipedia: https://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
  */
-int UpdateAlpha(float *alpha);
+int UpdateAlpha(float alpha);
 
 /*!
  * @brief setting the new voltage smoothing factor (alpha) to be the default value.
