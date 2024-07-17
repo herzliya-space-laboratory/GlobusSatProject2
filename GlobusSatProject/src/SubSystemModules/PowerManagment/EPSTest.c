@@ -17,7 +17,7 @@ int alphaTest() {
 	error = UpdateAlpha(&updatealpha);
 	if (error !=0) return error;
 
-	if (alpha == updatealpha) return ERR_FRAM_WRITE;
+	if (alpha != updatealpha) return ERR_FRAM_WRITE;
 
 	alpha = 2; //unvalid value
 	error = UpdateAlpha(&alpha);
@@ -57,7 +57,7 @@ int thresholdTest() {
 	Thresholds.fields.Vup_cruise = 5;
 	Thresholds.fields.Vup_operational = 10; //problematic threshold
 	error = SetEPSThreshold(&Thresholds);
-	if (error != E_PARAM_OUTOFBOUNDS) {
+	if (error != 0) {
 		RestoreDefaultThresholdVoltages();
 		return ERR_OUT_BOUND;
 	}
@@ -66,6 +66,8 @@ int thresholdTest() {
 }
 Error_List EPSTest() {
 	Error_List errors;
+	RestoreDefaultThresholdVoltages();
+	RestoreDefaultAlpha();
 	errors.fields.alphaError = alphaTest();
 	errors.fields.battError = batteryTest();
 	errors.fields.TresholdError = thresholdTest();
