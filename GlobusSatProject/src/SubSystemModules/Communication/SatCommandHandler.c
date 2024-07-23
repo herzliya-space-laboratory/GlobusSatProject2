@@ -89,11 +89,6 @@ int ActUponCommand(sat_packet_t *cmd)
 			if(error != E_NO_SS_ERR)
 				return error;
 			break;
-		case telemetry_cmd_type:
-/*			error = logError(telemetry_command_router(cmd), "Command Dictionary - telemetry_command_router");*/
-			if(error != E_NO_SS_ERR)
-				return error;
-			break;
 		case filesystem_cmd_type:
 /*			error = logError(filesystem_command_router(cmd), "Command Dictionary - filesystem_command_router");*/
 			if(error != E_NO_SS_ERR)
@@ -101,6 +96,11 @@ int ActUponCommand(sat_packet_t *cmd)
 			break;
 		case managment_cmd_type:
 /*			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");*/
+			if(error != E_NO_SS_ERR)
+				return error;
+			break;
+		case payload_cmd_type:
+/*			error = logError(payload_command_router(cmd), "Command Dictionary - telemetry_command_router");*/
 			if(error != E_NO_SS_ERR)
 				return error;
 			break;

@@ -79,11 +79,10 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	if(cmd == NULL || data == NULL)
 		return -1;
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2;
-	int place = 0;
-	place += sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length;
+	int place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length;
 	int i;
 	for(i = 0; i < 4; i++)
-		logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail));
+		logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
 	return IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail);
 }
 
