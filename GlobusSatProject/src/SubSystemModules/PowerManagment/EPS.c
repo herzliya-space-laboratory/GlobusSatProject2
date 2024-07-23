@@ -120,7 +120,6 @@ int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
 		logError(E_INPUT_POINTER_NULL, "SetEPSThreshold, threshold is null");
 		return E_INPUT_POINTER_NULL;
 	}
-	//0-2-1-3 0, lowest, 3, highest
 	if(Threshold->fields.Vdown_cruise < Threshold->fields.Vup_cruise && Threshold->fields.Vup_cruise > Threshold->fields.Vdown_operational && Threshold->fields.Vdown_operational < Threshold->fields.Vup_operational) {
 		logError(E_PARAM_OUTOFBOUNDS, "SetEPSThreshold, the values are incorrect");
 		return E_PARAM_OUTOFBOUNDS;

@@ -57,7 +57,7 @@ int thresholdTest() {
 	Thresholds.fields.Vup_cruise = 5;
 	Thresholds.fields.Vup_operational = 10; //problematic threshold
 	error = SetEPSThreshold(&Thresholds);
-	if (error != 0) {
+	if (error != E_PARAM_OUTOFBOUNDS) {
 		RestoreDefaultThresholdVoltages();
 		return ERR_OUT_BOUND;
 	}
