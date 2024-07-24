@@ -104,7 +104,7 @@ int TRX_Logic()
 	{
 		error = GetOnlineCommand(&cmd);
 		if(error != command_succsess)
-			return error;
+			return logError(error, "GetOnlineCommand");
 		SendAckPacket(ACK_RECEIVE_COMM, &cmd, NULL, 0);
 		ActUponCommand(&cmd);
 	}
