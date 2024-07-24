@@ -16,11 +16,9 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd);
 
 int CMD_GetSmoothingFactor(sat_packet_t *cmd);
 
-int CMD_EnterCruiseMode(sat_packet_t *cmd);
+int CMD_EPSModeAutomatic(sat_packet_t *cmd);
 
-int CMD_EnterOperationalMode(sat_packet_t *cmd);
-
-int CMD_EnterPowerSafeMode(sat_packet_t *cmd);
+int CMD_EPSModeManual(sat_packet_t *cmd);
 
 int CMD_GetCurrentMode(sat_packet_t *cmd);
 

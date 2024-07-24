@@ -22,6 +22,11 @@ typedef enum{
 	PowerSafeMode
 }EpsState_t;
 
+typedef enum{
+	ManualMode,
+	AutmaticMode
+}EpsMode_t;
+
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Operational mode
  * @return	0 on success
