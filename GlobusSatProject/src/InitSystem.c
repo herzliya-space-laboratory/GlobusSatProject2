@@ -13,6 +13,7 @@
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
+#include "TLM_management.h"
 
 #include "GlobalStandards.h"
 #include "InitSystem.h"
@@ -20,38 +21,42 @@
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
+#define TIME_SYNCINTERVAL  60
 
 int StartFRAM(){
-	return logError(FRAM_start(), "FRAM");
+	return logError(FRAM_start(), "FRAM - FRAM_start");
 }
 
 //TODO: void WriteDefaultValuesToFRAM() {} // need to use FRAM_writeAndVerify or FRAM_write
 
 int StartI2C(){
-	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "I2C");
+	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "I2C - I2C_start");
 }
 
 int StartSPI(){
-	return logError(SPI_start(bus1_spi, slave1_spi), "SPI");
+	return logError(SPI_start(bus1_spi, slave1_spi), "SPI - SPI_start");
 }
 
-//TODO: need to be filled right.
-/*int StartTIME(){
+int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
-	return logError(Time_start(time, I2CTransferTimeout), "Time");
-}*/
+	return logError(Time_start(&time, TIME_SYNCINTERVAL), "Time - Time_start");
+}
 
 int InitSubsystems(){
-	if(StartFRAM())
-		return -1;
-	else if(StartI2C())
-		return -1;
-	else if(StartSPI())
-		return -1;
-	else if (EPS_Init())
-		return -1;
-/*	else if(StartTime())
-		return -1;*/
-	printf("Succeeded\r\n");
+	StartI2C();
+
+	StartSPI();
+
+	StartFRAM();
+
+	StartTIME();
+
+	InitializeFS();
+
+	EPS_And_SP_Init();
+
+	InitTrxvuAndAnts();
+
+	printf("Did init\r\n");
 	return 0;
 }

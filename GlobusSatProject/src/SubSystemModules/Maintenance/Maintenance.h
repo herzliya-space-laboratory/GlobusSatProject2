@@ -18,9 +18,9 @@ int HardResetMCU();
 /*
  * delete onld files from SD card
  * minFreeSpace - the minimum free space in bytes we want to keep in the SD in all times.
- * If free space<minFreeSpace we start deleteing old TLM files
+ * If free space<minFreeSpace we start deleting old TLM files
  */
-int DeleteOldFiels(int minFreeSpace);
+int DeleteOldFiles(int minFreeSpace);
 
 /*!
  * @brief checks if the period time has passed

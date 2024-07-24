@@ -5,9 +5,9 @@
 typedef enum __attribute__ ((__packed__)) spl_command_type_t {
 	trxvu_cmd_type,
 	eps_cmd_type,
-	telemetry_cmd_type, //2
-	filesystem_cmd_type,
+	filesystem_cmd_type, //2
 	managment_cmd_type,
+	payload_cmd_type,
 	ack_type,// 5
 	dump_type
 }spl_command_type;
@@ -102,7 +102,7 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 }eps_subtypes_t;
 
 
-typedef enum __attribute__ ((__packed__)) telemetry_subtypes_t
+typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 {
 	DELETE_FILE 		= 0xAA,		//0b10101010
 	DELETE_ALL_FILES	= 0xAB,		//0b10101010
@@ -112,7 +112,7 @@ typedef enum __attribute__ ((__packed__)) telemetry_subtypes_t
 	GET_IMAGE_INFO		= 0xE1,
 	GET_IMAGE_DATA		= 0xE2
 
-}telemetry_subtypes_t;
+}filesystem_subtypes_t;
 
 
 typedef enum __attribute__ ((__packed__)) management_subtypes_t
@@ -133,4 +133,11 @@ typedef enum __attribute__ ((__packed__)) management_subtypes_t
 }management_subtypes_t;
 //-----------------
 
+
+typedef enum __attribute__ ((__packed__)) payload_subtypes_t
+{
+	TURN_ON_PAYLOAD = 	0x11,
+	TURN_OFF_PAYLOAD = 	0x20
+
+}payload_subtypes_t;
 #endif /* SPL_H_ */

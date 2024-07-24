@@ -12,15 +12,20 @@
  *#thoughts.
  */
 #include "EPSOperationModes.h"
+#include "satellite-subsystems/IsisSolarPanelv2.h"
 #include "satellite-subsystems/imepsv2_piu.h"
 #include "satellite-subsystems/GomEPS.h"
-#include <hal/errors.h>
 
-
-#include "string.h"
 #include "EPS.h"
 #include "GlobalStandards.h"
 #include "utils.h"
+#include "SysI2CAddr.h"
+
+#include <string.h>
+#include <hal/errors.h>
+#include <hal/Drivers/SPI.h>
+/*#define WE_HAVE_SP 1*/
+/*#define WE_HAVE_EPS 1*/
 
 #define EPS_INDEX 100 //place holder
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
@@ -41,9 +46,32 @@ int UpdateState(voltage_t current) {
 	return 0;
 }
 
-int EPS_Init(void)
+int EPS_And_SP_Init(void)
 {
+	int errorEPS = 0;
+	int errorSP = 0;
+#ifdef WE_HAVE_EPS
+	IMEPSV2_PIU_t stract_1;
+	stract_1.i2cAddr = EPS_I2C_ADDR;
+	errorEPS = logError(IMEPSV2_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
+	if(errorEPS != E_NO_SS_ERR)
+	{
+		GetBatteryVoltage(&prevVolatage);
+		float temp;
+		GetAlpha(&temp);
+		EpsThreshVolt_t temp2;
+		GetEPSThreshold(&temp2);
+	}
 
+#endif
+#ifdef WE_HAVE_SP
+	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "Solar panels - IsisSolarPanelv2_initialize");
+	if(errorSP == 0)
+		errorSP = logError(IsisSolarPanelv2_sleep(), "Solar panels - sleep");
+#endif
+	if(errorSP || errorEPS)
+			return -1;
+		return 0;
 
 #ifdef GOMEPS_H_
 
@@ -141,6 +169,3 @@ int GetBatteryVoltage(voltage_t *vbat) {
 
 	return error;
 }
-
-
-

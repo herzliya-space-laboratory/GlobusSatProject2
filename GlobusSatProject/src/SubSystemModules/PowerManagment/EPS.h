@@ -62,11 +62,11 @@ struct {
 }value;
 }HeaterValues;
 /*!
- * @brief initializes the EPS subsystem.
+ * @brief initializes the EPS subsystem and the solar panels.
  * @return	0 on success
  * 			-1 on failure of init
  */
-int EPS_Init();
+int EPS_And_SP_Init();
 
 /*!
  * @brief EPS logic. controls the state machine of which subsystem

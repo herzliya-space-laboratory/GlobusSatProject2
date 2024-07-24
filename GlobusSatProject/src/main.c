@@ -7,6 +7,7 @@
 
 #include "main.h"
 #include "InitSystem.h"
+#include "SubSystemModules/Communication/SatCommandHandler.h"
 
 #include <stdio.h>
 
@@ -32,7 +33,6 @@
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/Housekepping/TelemetryCollector.h"
 #include "SubSystemModules/Maintenance/Maintenance.h"
-#include "InitSystem.h"
 #include "main.h"
 #include <stdlib.h>
 #include "SubSystemModules/PowerManagment/EPSTest.h"
@@ -43,19 +43,18 @@
 void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
-
 	InitSubsystems();
-//	EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
-//	SetEPSThreshold(&ThresholdsIndex);
-//	printf("sucess part 1 \n  ");
-//	GetEPSThreshold(&ThresholdsIndex);
-//	printf("Vdown_cruise, %d, Vdown_operational, %d, Vup_cruise, %d, Vup_operational, %d",ThresholdsIndex.fields.Vdown_cruise ,ThresholdsIndex.fields.Vdown_operational ,ThresholdsIndex.fields.Vup_cruise ,ThresholdsIndex.fields.Vup_operational);
 
+#ifdef WE_HAVE_EPS
 	while (TRUE) {
-		Error_List errors = EPSTest();
-		printf("batt %d FRAM alpha %d FRAM threshold %d", errors.fields.battError, errors.fields.alphaError, errors.fields.TresholdError);
+		EPS_Conditioning();
 		vTaskDelay(10);
+	}
 
+#endif
+	while(TRUE)
+	{
+		TRX_Logic();
 	}
 }
 #endif
