@@ -30,4 +30,5 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd) {
 }
 int CMD_RestoreDefaultAlpha(sat_packet_t *cmd) {
 	int error = RestoreDefaultAlpha();
+	return error;
 }
