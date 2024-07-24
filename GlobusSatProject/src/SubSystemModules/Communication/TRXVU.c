@@ -73,17 +73,25 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 	return error;
 }
 
+int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
+{
+	unsigned char avail;
+	if(packet == NULL)
+		return -1;
+	int place = sizeof(packet->ID) + sizeof(packet->cmd_subtype) + sizeof(packet->cmd_type) + sizeof(packet->length) + packet->length;
+	int error = logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)packet, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
+	*avalFrames = (int)avail;
+	return error;
+}
+
 int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length)
 {
 	unsigned char avail;
-	if(cmd == NULL || data == NULL)
+	if(cmd == NULL)
 		return -1;
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2;
 	int place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length;
-	int i;
-	for(i = 0; i < 4; i++)
-		logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
-	return IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail);
+	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
 }
 
 int TRX_Logic()

@@ -57,17 +57,25 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 
 CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char type, char subtype, unsigned int id, sat_packet_t *cmd)
 {
-	if(data == NULL || cmd == NULL)
+	if(cmd == NULL)
 		return null_pointer_error;
 
 	cmd->ID = id;
 	cmd->cmd_type = type;
 	cmd->cmd_subtype = subtype;
 	cmd->length = data_length;
-	if(data_length > MAX_COMMAND_DATA_LENGTH)
-		return index_out_of_bound;
+	if(data_length != 0)
+	{
+		if(data == NULL)
+			return null_pointer_error;
+		else
+		{
+			if(data_length > MAX_COMMAND_DATA_LENGTH)
+				return index_out_of_bound;
 
-	memcpy(&cmd->data, data, data_length);
+			memcpy(&cmd->data, data, data_length);
+		}
+	}
 
 	return command_succsess;
 }

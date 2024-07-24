@@ -4,6 +4,8 @@
 #include <hal/errors.h>
 #include "SatCommandHandler.h"
 #include "SPL.h"
+#include "utils.h"
+#include <freertos/FreeRTOS.h>
 
 
 #define SendAnonymosAck(acksubtype) SendAckPacket(acksubtype,NULL,NULL,0) //<! sends an ACK without command ID nor data
