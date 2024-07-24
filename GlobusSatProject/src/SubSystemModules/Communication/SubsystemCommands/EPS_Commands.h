@@ -3,7 +3,16 @@
 #define EPS_COMMANDS_H_
 
 #include "SubSystemModules/Communication/SatCommandHandler.h"
-
+/*
+ * #todo
+ * CMD_GetThresholdVoltages
+ * CMD_GetSmoothingFactor
+ * CMD_GetCurrentMode
+ * CMD_GetSolarPanelState
+ * CMD_SolarPanelSleep //Isn't this super dangerous????
+ * CMD_SolarPanelWake
+ *
+ */
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd);
 
 int CMD_GetThresholdVoltages(sat_packet_t *cmd);
@@ -16,9 +25,7 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd);
 
 int CMD_GetSmoothingFactor(sat_packet_t *cmd);
 
-int CMD_EPSModeAutomatic(sat_packet_t *cmd);
-
-int CMD_EPSModeManual(sat_packet_t *cmd);
+int CMD_EPSSetMode(sat_packet_t *cmd);
 
 int CMD_GetCurrentMode(sat_packet_t *cmd);
 

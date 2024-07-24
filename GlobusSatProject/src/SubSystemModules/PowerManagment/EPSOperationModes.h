@@ -73,5 +73,10 @@ Boolean EpsGetLowVoltageFlag();
 
 void EpsSetLowVoltageFlag(Boolean low_volt_flag);
 
+int EnterManualMode(EpsState_t State);
+
+int EnterAutomaticMode();
+
+EpsMode_t GetcurrentMode();
 
 #endif /* EPSOPERATIONMODES_H_ */

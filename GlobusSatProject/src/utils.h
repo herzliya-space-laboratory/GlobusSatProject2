@@ -26,8 +26,7 @@
 #define INVALID_TLM_TYPE			-208
 #define INVALID_IMG_TYPE			-209
 #define INFO_MSG				-210
-
-
+#define E_Manual_Override -222
 
 
 #define MAX_ERRORS       				 10 // max errors we want to log from the same type toghether
