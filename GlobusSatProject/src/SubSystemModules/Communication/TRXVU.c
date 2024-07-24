@@ -14,6 +14,8 @@
 #include "SatCommandHandler.h"
 #include "TRXVU.h"
 #include "SysI2CAddr.h"
+#include "AckHandler.h"
+#include "SPL.h"
 
 /*#define WE_HAVE_ANTS 0*/
 
@@ -103,6 +105,7 @@ int TRX_Logic()
 		error = GetOnlineCommand(&cmd);
 		if(error != command_succsess)
 			return error;
+		SendAckPacket(ACK_RECEIVE_COMM, &cmd, NULL, 0);
 		ActUponCommand(&cmd);
 	}
 	return 0;
