@@ -7,6 +7,8 @@
 #include "SubsystemModules/PowerManagment/EPSOperationModes.h"
 #include "GlobalStandards.h"
 #include "utils.h"
+#include "SubsystemModules/Communication/TRXVU.h"
+
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
 	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
@@ -35,11 +37,11 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	int error = UpdateAlpha(newalpha);
 	return error;
 }
-int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd) {
+int CMD_RestoreDefaultThresholdVoltages() {
 	int error = RestoreDefaultThresholdVoltages();
 	return error;
 }
-int CMD_RestoreDefaultAlpha(sat_packet_t *cmd) {
+int CMD_RestoreDefaultAlpha() {
 	int error = RestoreDefaultAlpha();
 	return error;
 }
@@ -74,4 +76,35 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 	}
 	int error = EnterManualMode(State_t);
 	return error;
+}
+int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
+	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	float alpha;
+	unsigned short size = sizeof(alpha);
+	GetAlpha(&alpha);
+	TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&alpha, size);
+	return 0;
+}
+int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
+	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	EpsThreshVolt_t Threshold;
+	unsigned short size = sizeof(Threshold);
+	GetEPSThreshold(&Threshold);
+	TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&Threshold, size);
+	return 0;
+}
+int CMD_GetCurrentMode(sat_packet_t *cmd) {
+	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	EpsMode_t mode = GetSystemMode();
+	EpsState_t state = GetSystemMode();
+	if (mode == ManualMode) {
+		unsigned char data;
+		memcpy(&data, &mode, 1);
+		memcpy(&data + 1, &state, 1);
+		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&data, 2);
+	}
+	else {
+		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&mode, 2);
+	}
+	return 0;
 }

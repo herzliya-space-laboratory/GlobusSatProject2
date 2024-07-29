@@ -15,7 +15,7 @@
 #include "satellite-subsystems/IsisSolarPanelv2.h"
 #include "satellite-subsystems/imepsv2_piu.h"
 #include "satellite-subsystems/GomEPS.h"
-
+#include "FRAM_FlightParameters.h"
 #include "EPS.h"
 #include "GlobalStandards.h"
 #include "utils.h"

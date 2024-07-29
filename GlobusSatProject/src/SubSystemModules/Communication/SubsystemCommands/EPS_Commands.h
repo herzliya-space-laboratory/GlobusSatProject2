@@ -19,9 +19,9 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd);
 
 int CMD_UpdateSmoothingFactor(sat_packet_t *cmd);
 
-int CMD_RestoreDefaultAlpha(sat_packet_t *cmd);
+int CMD_RestoreDefaultAlpha();
 
-int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd);
+int CMD_RestoreDefaultThresholdVoltages();
 
 int CMD_GetSmoothingFactor(sat_packet_t *cmd);
 

@@ -8,14 +8,18 @@
 #include "EPSOperationModes.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "FRAM_FlightParameters.h"
+#include "utils.h"
 
-EpsState_t currentState;
-EpsMode_t currentMode;
+EpsState_t currentState; //todo: place in FRAM
+EpsMode_t currentMode; //todo: place in FRAM
 
 EpsState_t GetSystemState() {
+	LogError(FRAM_read(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "GetSystemState, FRAM_Write");
 	return currentState;
 }
 EpsMode_t GetcurrentMode() {
+	LogError(FRAM_read(&currentMode, EPS_MODE_FLAG_ADDR, EPS_MODE_FLAG_SIZE), "GetcurrentMode, FRAM_Write");
 	return currentMode;
 }
 
@@ -27,7 +31,7 @@ Boolean GetLowVoltFlag() {
 int EnterOperationalMode() {
 	if(currentMode == AutmaticMode) {
 		currentState = OperationalMode;
-		printf("you are on the operationalMode\r\n");
+		LogError(FRAM_write(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "EnterOperationalMode, FRAM_Write");
 	}
 	return 0;
 
@@ -37,7 +41,7 @@ int EnterOperationalMode() {
 int EnterCruiseMode() {
 	if(currentMode == AutmaticMode) {
 		currentState = CruiseMode;
-		printf("you entered cruiseMode\r\n");
+		LogError(FRAM_write(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "EnterCruiseMode, FRAM_Write");
 	}
 	return 0;
 }
@@ -45,12 +49,13 @@ int EnterCruiseMode() {
 int EnterPowerSafeMode() {
 	if(currentMode == AutmaticMode) {
 		currentState = PowerSafeMode;
-		printf("EnterPowerSafeMode\r\n");
+		LogError(FRAM_write(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "EnterPowerSafeMode, FRAM_Write");
 	}
 	return 0;
 }
 int EnterManualMode(EpsState_t State) {
 	currentMode = ManualMode;
+	LogError(FRAM_write(&currentMode, EPS_MODE_FLAG_ADDR, EPS_MODE_FLAG_SIZE), "EnterManuelMode, FRAM_Write");
 	switch (State) {
 	case (OperationalMode):
 		EnterOperationalMode();
@@ -64,10 +69,10 @@ int EnterManualMode(EpsState_t State) {
 	default:
 		LogError(1, "No valid State");
 	}
-	currentMode = AutmaticMode;
 	return 0;
 }
 int EnterAutomaticMode() {
-	currentMode = ManualMode;
+	currentMode = AutmaticMode;
+	LogError(FRAM_write(&currentMode, EPS_MODE_FLAG_ADDR, EPS_MODE_FLAG_SIZE), "EnterAutomaticMode, FRAM_Write");
 	return 0;
 }
