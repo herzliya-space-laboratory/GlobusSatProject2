@@ -35,14 +35,14 @@
 #include "SubSystemModules/Maintenance/Maintenance.h"
 #include "main.h"
 #include <stdlib.h>
+#include "TestingDemos/TrxvuTestingDemo.h"
 
 #ifdef TESTING
 	#include "TestingDemos/MainTest.h"
 #else
-#ifdef Testing_TRXVU
-	#include "TestingDemos/TrxvuTestingDemo.h"
-#else
+
 #define Testing_TRXVU 1
+
 
 void taskMain()
 {
