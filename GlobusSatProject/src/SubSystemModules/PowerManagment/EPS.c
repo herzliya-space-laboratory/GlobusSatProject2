@@ -86,7 +86,8 @@ int EPS_And_SP_Init(void)
 		GetAlpha(&temp);
 		EpsThreshVolt_t temp2;
 		GetEPSThreshold(&temp2);
-
+		GetSystemState();
+		GetcurrentMode();
 	return rv;
 
 #endif

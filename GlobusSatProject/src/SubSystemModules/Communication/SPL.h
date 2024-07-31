@@ -95,10 +95,15 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 {
-	UPDATE_ALPHA 		= 0x01,
-    GET_HEATER_VALUES 	= 0x02,
-    SET_HEATER_VALUES 	= 0x03,
-    RESET_EPS_WDT	 	= 0x04
+	UPDATE_ALPHA 				= 0x01,
+    GET_ALPHA		 			= 0x02,
+    RESTORE_ALPHA 				= 0x03,
+    UPDATE_ThresholdVoltages 	= 0x04,
+    GET_ThresholdVoltages	 	= 0x05,
+    RESTORE_ThresholdVoltages   = 0x06,
+    SET_MODE					= 0x07,
+    GET_MODE					= 0x08,
+
 }eps_subtypes_t;
 
 
