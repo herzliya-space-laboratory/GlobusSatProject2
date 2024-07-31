@@ -62,8 +62,8 @@ void taskMain()
 	{
 		TRX_Logic();
 	}
-}
 #endif
+}
 #endif
 
 // main operation function. will be called upon software boot.
