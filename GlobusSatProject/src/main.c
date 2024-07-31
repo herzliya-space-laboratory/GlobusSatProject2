@@ -41,7 +41,7 @@
 	#include "TestingDemos/MainTest.h"
 #else
 
-#define Testing_TRXVU 1
+/*#define Testing_TRXVU 1*/
 
 
 void taskMain()
