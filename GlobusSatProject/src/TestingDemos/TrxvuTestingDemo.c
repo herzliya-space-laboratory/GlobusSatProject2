@@ -54,7 +54,7 @@ void AssembleCommandHaveDataAndLengthBiggerThenMaxLength_test()
 {
 	sat_packet_t test;
 	unsigned char data[] = "hello";
-	int error = logError(AssembleCommand(data, MAX_COMMAND_DATA_LENGTH, 0x00, 0x00, CUBE_SAT_ID, &test), "AssembleCommand - test 5");
+	int error = logError(AssembleCommand(data, MAX_COMMAND_DATA_LENGTH + 1, 0x00, 0x00, CUBE_SAT_ID, &test), "AssembleCommand - test 5");
 	if(error == command_succsess)
 	{
 		printf("something is wrong - test 5\n\r");
