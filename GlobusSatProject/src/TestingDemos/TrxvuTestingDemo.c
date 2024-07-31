@@ -61,9 +61,9 @@ void AssembleCommandHaveDataAndLengthBiggerThenMaxLength_test()
 	}
 }
 
-void ParseDataToCommendWorkNormal()
+void ParseDataToCommandWorkNormal()
 {
-	unsigned char pac[] = {0x13, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x15};
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x15};
 	sat_packet_t cmd;
 	int error = logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand - test 6");
 	if(error != command_succsess)
@@ -72,9 +72,9 @@ void ParseDataToCommendWorkNormal()
 	}
 }
 
-void ParseDataToCommendWrongSatId()
+void ParseDataToCommandWrongSatId()
 {
-	unsigned char pac[] = {0x15, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x15};
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x15, 0x00, 0x01, 0x01, 0x00, 0x15};
 	sat_packet_t cmd;
 	int error = logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand - test 7");
 	if(error == command_succsess)
@@ -83,9 +83,9 @@ void ParseDataToCommendWrongSatId()
 	}
 }
 
-void ParseDataToCommendDontHaveLength()
+void ParseDataToCommandDontHaveLength()
 {
-	unsigned char pac[] = {0x15, 0x00, 0x00, 0x00, 0x00, 0x01};
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01};
 	sat_packet_t cmd;
 	int error = logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand - test 8");
 	if(error == command_succsess)
@@ -94,9 +94,9 @@ void ParseDataToCommendDontHaveLength()
 	}
 }
 
-void ParseDataToCommendLengthEqualZero()
+void ParseDataToCommandLengthEqualZero()
 {
-	unsigned char pac[] = {0x15, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00};
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x00, 0x00};
 	sat_packet_t cmd;
 	int error = logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand - test 9");
 	if(error != command_succsess)
@@ -112,8 +112,8 @@ void MainTrxvuTestBench()
 	AssembleCommandNullDataAndLengthBiggerThenZero_test();
 	AssembleCommandHaveDataAndLengthBiggerThenZero_test();
 	AssembleCommandHaveDataAndLengthBiggerThenMaxLength_test();
-	ParseDataToCommendWorkNormal();
-	ParseDataToCommendWrongSatId();
-	ParseDataToCommendDontHaveLength();
-	ParseDataToCommendLengthEqualZero();
+	ParseDataToCommandWorkNormal();
+	ParseDataToCommandWrongSatId();
+	ParseDataToCommandDontHaveLength();
+	ParseDataToCommandLengthEqualZero();
 }
