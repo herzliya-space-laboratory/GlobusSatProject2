@@ -34,10 +34,6 @@ int CMD_SetRSSITransponder(sat_packet_t *cmd);
 
 int CMD_UnMuteTRXVU(sat_packet_t *cmd);
 
-int CMD_GetBaudRate(sat_packet_t *cmd);
-
-int CMD_SetBaudRate(sat_packet_t *cmd);
-
 int CMD_GetBeaconInterval(sat_packet_t *cmd);
 
 int CMD_TrasmitBeacon(sat_packet_t *cmd);
@@ -51,9 +47,9 @@ int CMD_GetNumOfDelayedCommands(sat_packet_t *cmd);
 
 int CMD_GetNumOfOnlineCommands(sat_packet_t *cmd);
 
-int CMD_DeleteDelyedCmdByID(sat_packet_t *cmd);
+int CMD_DeleteDelayedCmdByID(sat_packet_t *cmd);
 
-int CMD_DeleteAllDelyedBuffer(sat_packet_t *cmd);
+int CMD_DeleteAllDelayedBuffer(sat_packet_t *cmd);
 
 int CMD_AntSetArmStatus(sat_packet_t *cmd);
 

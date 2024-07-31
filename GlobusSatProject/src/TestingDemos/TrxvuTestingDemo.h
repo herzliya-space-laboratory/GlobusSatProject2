@@ -16,5 +16,12 @@ void AssembleCommandHaveDataAndLengthBiggerThenZero_test();
 
 void AssembleCommandHaveDataAndLengthBiggerThenMaxLength_test();
 
+void ParseDataToCommandWorkNormal();
+
+void ParseDataToCommandWrongSatId();
+
+void ParseDataToCommandDontHaveLength();
+
+void ParseDataToCommandLengthEqualZero();
 
 #endif /* TRXVUTESTINGDEMO_H_ */

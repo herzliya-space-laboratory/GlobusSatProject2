@@ -18,7 +18,7 @@
 #define SECONDS_SINCE_DEPLOY_ADDR		0x09		//<! counts how many seconds has past since wakup for use in deployment.
 #define SECONDS_SINCE_DEPLOY_SIZE		4			//<! size of the parameter in bytes
 
-#define DEFAULT_NO_COMM_WDT_KICK_TIME  (7*24*60*60)	//<! number of seconds in X days
+#define DEFAULT_NO_COMM_WDT_KICK_TIME  (7*24*60*60)	//<! number of seconds in 7 days
 #define NO_COMM_WDT_KICK_TIME_ADDR  	0x24		///< number of seconds of no communications before GS WDT kick
 #define NO_COMM_WDT_KICK_TIME_SIZE		4
 
@@ -89,6 +89,6 @@
 
 #define DEFAULT_BEACON_INTERVAL_TIME 	20			//<! how many seconds between two beacons [sec]
 #define MAX_BEACON_INTERVAL				60			// beacon every 1 minute
-#define MIN_BEACON_INTERVAL				10			// beacon every 10 seconds
+#define MIN_BEACON_INTERVAL				5			// beacon every 5 seconds
 
 #endif /* FRAM_FLIGHTPARAMETERS_H_ */

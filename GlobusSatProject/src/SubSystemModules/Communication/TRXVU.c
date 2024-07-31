@@ -19,6 +19,8 @@
 
 /*#define WE_HAVE_ANTS 0*/
 
+time_unix lastTimeSendingBeacon;
+
 /*
  * Initialize the TRXVU and ants.
  *
@@ -98,6 +100,16 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2;
 	int place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length;
 	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
+}
+
+int BeaconLogic(Boolean forceTX)
+{
+	sat_packet_t beacon;
+	short length = 96;
+	unsigned char *data;
+	logError(AssembleCommand(data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command");
+	int avalFrames;
+	return logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
 }
 
 int TRX_Logic()
