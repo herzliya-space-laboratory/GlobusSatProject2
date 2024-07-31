@@ -19,7 +19,11 @@
 
 /*#define WE_HAVE_ANTS 0*/
 
-
+/*
+ * Initialize the TRXVU and ants.
+ *
+ * @return error according to <hal/errors.h>
+ * */
 int InitTrxvuAndAnts(){
 	// Definition of I2C and TRXVU
 	ISIStrxvuI2CAddress myTRXVUAddress[1];
