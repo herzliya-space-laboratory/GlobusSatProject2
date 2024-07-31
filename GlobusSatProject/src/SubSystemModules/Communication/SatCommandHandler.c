@@ -93,7 +93,7 @@ CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char ty
 }
 
 /*
- * According to the type in the struct we go to the right type and there do the commend.
+ * According to the type in the struct we goes to the right type and there do the commend.
  *
  * @param[out] name= cmd; type= sat_packet_t *; The packet as sat_packet_t struct.
  * @return error according to <hal/errors.h>
