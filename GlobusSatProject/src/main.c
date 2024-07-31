@@ -56,7 +56,7 @@ void taskMain()
 
 #endif
 #ifdef Testing_TRXVU
-
+	MainTrxvuTestBench();
 #else
 	while(TRUE)
 	{
