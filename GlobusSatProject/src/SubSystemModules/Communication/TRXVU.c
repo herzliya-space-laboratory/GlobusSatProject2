@@ -8,6 +8,7 @@
 #include <hal/errors.h>
 #include <string.h>
 
+#include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 #include "satellite-subsystems/IsisTRXVU.h"
 #include "satellite-subsystems/IsisAntS.h"
 
@@ -102,7 +103,7 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
 }
 
-int BeaconLogic(Boolean forceTX)
+int BeaconLogic()
 {
 	sat_packet_t beacon;
 	short length = 96;

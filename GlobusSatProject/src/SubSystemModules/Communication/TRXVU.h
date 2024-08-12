@@ -125,7 +125,7 @@ void FinishDump(sat_packet_t *cmd,unsigned char *buffer, ack_subtype_t acktype,
 /*!
  * @brief transmits beacon according to beacon logic
  */
-int BeaconLogic(Boolean forceTX);
+int BeaconLogic();
 
 /*
  * @brief set the idle state of the trxvu

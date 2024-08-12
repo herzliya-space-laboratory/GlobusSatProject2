@@ -31,7 +31,7 @@
 
 #include "GlobalStandards.h"
 #include "SubSystemModules/Communication/TRXVU.h"
-#include "SubSystemModules/Housekepping/TelemetryCollector.h"
+#include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 #include "SubSystemModules/Maintenance/Maintenance.h"
 #include "main.h"
 #include <stdlib.h>
