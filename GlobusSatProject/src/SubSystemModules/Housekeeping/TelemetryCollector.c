@@ -11,10 +11,11 @@
 #include <hcc/api_fat.h>
 
 
-void GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
+int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
-		int error = Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX); //gets the variables to the struct and also check error.
-		F_SPACE space; //same just to SD
-		int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
+	int error = Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX); //gets the variables to the struct and also check error.
+	F_SPACE space; //same just to SD
+	int ret = f_getfreespace(f_getdrive(), &space); //gets the variables to the struct
+	return error;
 }
