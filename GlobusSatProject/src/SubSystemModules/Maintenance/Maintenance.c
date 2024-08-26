@@ -14,7 +14,7 @@ Boolean CheckExecutionTime(time_unix prev_time, time_unix period)
 {
 	unsigned int timeNow;
 	int error = logError(Time_getUnixEpoch(&timeNow), "Maintenance - Time_getUnixEpoch");
-	if(!error)
+	if(error)
 		return FALSE;
 	if(timeNow - prev_time >= period)
 		return TRUE;
