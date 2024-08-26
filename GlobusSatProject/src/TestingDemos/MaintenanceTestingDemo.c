@@ -23,7 +23,7 @@ Boolean CheckExecutionTimeFiveTimes()
 				prev_time = (time_unix)time;
 		while(!CheckExecutionTime(prev_time, 10))
 		{
-			printf("%d\n\r", i);
+
 		}
 		printf("hello\n\r");
 	}
