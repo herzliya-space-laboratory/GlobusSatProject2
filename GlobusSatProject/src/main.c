@@ -36,13 +36,14 @@
 #include "main.h"
 #include <stdlib.h>
 #include "TestingDemos/TrxvuTestingDemo.h"
+#include "TestingDemos/MaintenanceTestingDemo.h"
 
 #ifdef TESTING
 	#include "TestingDemos/MainTest.h"
 #else
 
-#define Testing_TRXVU 1
-
+//#define Testing_TRXVU 1
+#define Testing_Maintenance 1
 
 void taskMain()
 {
@@ -57,6 +58,8 @@ void taskMain()
 #endif
 #ifdef Testing_TRXVU
 	MainTrxvuTestBench();
+#elif Testing_Maintenance
+	MainMaintenanceTestBench();
 #else
 	while(TRUE)
 	{
