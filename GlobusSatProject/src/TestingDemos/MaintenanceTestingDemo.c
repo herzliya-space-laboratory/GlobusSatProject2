@@ -18,9 +18,9 @@ Boolean CheckExecutionTimeFiveTimes()
 	for(int i = 0; i < 5; i++)
 	{
 		error = logError(Time_getUnixEpoch(&time), "Maintenance - Time_getUnixEpoch");
-				if(error)
-					return FALSE;
-				prev_time = (time_unix)time;
+		if(error)
+			return FALSE;
+		prev_time = (time_unix)time;
 		while(!CheckExecutionTime(prev_time, 10))
 		{
 
