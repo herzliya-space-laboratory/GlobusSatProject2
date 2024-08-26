@@ -106,8 +106,9 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 int BeaconLogic()
 {
 	sat_packet_t beacon;
-	short length = 96;
+	short length = sizeof(WOD_Telemetry_t);
 	unsigned char *data;
+	//TODO: get data from the sat
 	logError(AssembleCommand(data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command");
 	int avalFrames;
 	return logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
@@ -117,6 +118,7 @@ int TRX_Logic()
 {
 	sat_packet_t cmd;
 	int error = 0;
+	//TODO: send beacon every 20 second and update the past time
 	if(GetNumberOfFramesInBuffer() > 0)
 	{
 		error = GetOnlineCommand(&cmd);

@@ -17,8 +17,7 @@ Boolean CheckExecutionTime(time_unix prev_time, time_unix period)
 	if(!error)
 		return FALSE;
 	if(timeNow - prev_time >= period)
-	{
 		return TRUE;
-	}
 	return FALSE;
 }
+//TODO: need to create testing
