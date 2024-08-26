@@ -13,21 +13,19 @@
 Boolean CheckExecutionTimeFiveTimes()
 {
 	unsigned int time;
-	int error = logError(Time_getUnixEpoch(&time), "Maintenance - Time_getUnixEpoch");
-	if(error)
-		return FALSE;
-	time_unix prev_time = (time_unix)time;
+	int error;
+	time_unix prev_time;
 	for(int i = 0; i < 5; i++)
 	{
+		error = logError(Time_getUnixEpoch(&time), "Maintenance - Time_getUnixEpoch");
+				if(error)
+					return FALSE;
+				prev_time = (time_unix)time;
 		while(!CheckExecutionTime(prev_time, 10))
 		{
 			printf("%d\n\r", i);
 		}
 		printf("hello\n\r");
-		int error = logError(Time_getUnixEpoch(&time), "Maintenance - Time_getUnixEpoch");
-		if(error)
-			return FALSE;
-		time_unix prev_time = (time_unix)time;
 	}
 	return TRUE;
 }
