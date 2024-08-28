@@ -133,8 +133,6 @@ int TRX_Logic()
 	sat_packet_t cmd;
 	int error = 0;
 	BeaconLogic();
-
-	//TODO: send beacon every 20 second and update the past time
 	if(GetNumberOfFramesInBuffer() > 0)
 	{
 		error = GetOnlineCommand(&cmd);

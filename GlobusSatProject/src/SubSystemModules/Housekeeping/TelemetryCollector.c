@@ -96,6 +96,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	{
 		wod->sat_time = -1;
 	}
+	wod->num_of_cmd_resets = -1;
 	/*
 	unsigned int num_of_cmd_resets;
 	 */
