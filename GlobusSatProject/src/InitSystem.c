@@ -61,6 +61,8 @@ int InitSubsystems(){
 
 	InitializeFS();
 
+	InitSupervisor();
+
 	EPS_And_SP_Init();
 
 	InitTrxvuAndAnts();
