@@ -156,8 +156,11 @@ static Boolean PrintBeacon(void)
 
 static Boolean SetBeaconPeriodPlaceToTwenty()
 {
-	const unsigned char data[] = "20";
-	FRAM_write(data, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE);
+	int data = "20";
+	print_error(FRAM_write((const unsigned char*)&data, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE));
+	int writtenData;
+	print_error(FRAM_read((unsigned char)&writtenData, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE)); //Read data from the address and from there to the length of the data and put it in writtenData.
+	printf("%s, %d\r\n", (unsigned char)writtenData, writtenData);
 	return TRUE;
 }
 
