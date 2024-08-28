@@ -20,7 +20,7 @@
 
 /*#define WE_HAVE_ANTS 0*/
 
-time_unix lastTimeSendingBeacon = 0;
+time_unix lastTimeSendingBeacon;
 time_unix period;
 /*
  * Initialize the TRXVU and ants.
@@ -47,6 +47,7 @@ int InitTrxvuAndAnts(){
 	unsigned char beaconIntervalTime[BEACON_INTERVAL_TIME_SIZE];
 	logError(FRAM_read(beaconIntervalTime, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
 	period = (time_unix)beaconIntervalTime;
+	logError(Time_getUnixEpoch((unsigned int*)&lastTimeSendingBeacon), "TRXVU - Time_getUnixEpoch");
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
