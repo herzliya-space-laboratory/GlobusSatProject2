@@ -37,7 +37,10 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	float newalpha;
 	memcpy(&newalpha, cmd->data, cmd->length);
 	int error = UpdateAlpha(newalpha);
+	SendAckPacket(ACK_UPDATE_EPS_ALPHA, &cmd, NULL, 0);
+
 	return error;
+
 }
 int CMD_RestoreDefaultThresholdVoltages() {
 	int error = RestoreDefaultThresholdVoltages();
@@ -93,6 +96,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 	unsigned short size = sizeof(Threshold);
 	GetEPSThreshold(&Threshold);
 	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&Threshold, size);
+	SendAckPacket(ACK_UPDATE_EPS_VOLTAGES, &cmd, NULL, 0);
 	return 0;
 }
 int CMD_GetCurrentMode(sat_packet_t *cmd) {
