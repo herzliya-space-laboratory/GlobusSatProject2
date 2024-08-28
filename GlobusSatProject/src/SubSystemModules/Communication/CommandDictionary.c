@@ -25,7 +25,7 @@ int eps_command_router(sat_packet_t *cmd)
 {
 	if(cmd == NULL)
 	{
-		LogError(-1, "cmd_is_null\r\n");
+		logError(-1, "cmd_is_null\r\n");
 		return -1;
 	}
 	int error = 0;

@@ -72,7 +72,7 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 		break;
 	}
 	default:
-		LogError(1, "No valid State");
+		logError(1, "No valid State");
 		break;
 	}
 	int error = EnterManualMode(State_t);
@@ -96,8 +96,8 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 }
 int CMD_GetCurrentMode(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
-	EpsMode_t mode = GetSystemMode();
-	EpsState_t state = GetSystemMode();
+	EpsMode_t mode = GetcurrentMode();
+	EpsState_t state = GetSystemState();
 	if (mode == ManualMode) {
 		unsigned char data;
 		memcpy(&data, &mode, 1);
@@ -113,7 +113,7 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 int CMD_GET_STATE_CHANGES(sat_packet_t *cmd) {
 	int error = 0;
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
-	error = LogError(FRAM_read((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE), "CMD_GET_STATE_CHANGES, FRAM_read");
+	error = logError(FRAM_read((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE), "CMD_GET_STATE_CHANGES, FRAM_read");
 	unsigned char data[sizeof(int)+sizeof(int)+sizeof(Time)] ;
 	memcpy(data, (unsigned char *)&CHANGES_OPERATIONAL, sizeof(int));
 	memcpy(data+sizeof(int), (unsigned char *)&CHANGES_POWERSAFE, sizeof(int));
