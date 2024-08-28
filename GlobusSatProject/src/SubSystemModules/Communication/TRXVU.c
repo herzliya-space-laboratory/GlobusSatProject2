@@ -116,9 +116,10 @@ int BeaconLogic()
 		return -1;
 	sat_packet_t beacon;
 	short length = sizeof(WOD_Telemetry_t);
-	unsigned char data[] = {0, 0, 0, 0};
+	WOD_Telemetry_t data;
+	GetCurrentWODTelemetry(&data);
 	//TODO: get data from the sat
-	logError(AssembleCommand(data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command");
+	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command");
 	int avalFrames;
 	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
 	if(error)
