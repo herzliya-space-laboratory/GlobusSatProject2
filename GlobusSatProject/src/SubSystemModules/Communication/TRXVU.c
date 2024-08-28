@@ -115,7 +115,7 @@ Boolean CheckTransmitionAllowed()
 
 int BeaconLogic()
 {
-	if(CheckExecutionTime(lastTimeSendingBeacon, period) || CheckTransmitionAllowed())
+	if(!(CheckExecutionTime(lastTimeSendingBeacon, period) && CheckTransmitionAllowed()))
 		return -1;
 	sat_packet_t beacon;
 	short length = sizeof(WOD_Telemetry_t);
