@@ -41,6 +41,8 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->voltBattery = -1;
 		wod->consumed_power = -1;
 		wod->electric_current = -1;
+		wod->mcu_temp = ((double)responseEPS.fields.temp) * 0.01;
+wod->bat_temp = ((double)responseEPS.fields.temp2) * 0.01;
 	}
 	//TODO: need to add Solar_Panels
 	if(!error_supervisor)

@@ -25,7 +25,7 @@
 #include <hal/errors.h>
 
 #include <satellite-subsystems/IsisTRXVU.h>
-
+#include <hal/Storage/FRAM.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +34,9 @@
 #if USING_GOM_EPS == 1
 #include <SatelliteSubsystems/GomEPS.h>
 #endif
+
+#define BEACON_INTERVAL_TIME_ADDR 		0x4590		//<! address of value of the delay between 2 beacons
+#define BEACON_INTERVAL_TIME_SIZE 		4			//<! size of parameter in bytes
 
 ////General Variables
 #define TX_UPBOUND				30
@@ -637,6 +640,13 @@ static Boolean printTransmitterState() {
 	       		}
 	 return TRUE;
 }
+
+static Boolean SetBeaconPeriodPlaceToTwenty()
+{
+	FRAM_write("20", BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE);
+	return TRUE;
+}
+
 /*
  * brief, checks how much time it takes to send an 8 byte package at a 9600 bitrate
  * */
@@ -733,6 +743,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 19:
 		offerMoreTests = IsisTrxvu_tcEstimateTransmissionTimeTest();
+		break;
+	case 20:
+		offerMoreTests = SetBeaconPeriodPlaceToTwenty();
 		break;
 	default:
 		break;
