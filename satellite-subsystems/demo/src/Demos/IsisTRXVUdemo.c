@@ -680,8 +680,8 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 17) prints Get Tx Telemetry Value Array \n\r");
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate\n\r");
-
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 19) == 0);
+	printf("\t 20) Change place in Fram for beacon period to 20\n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 20) == 0);
 
 	switch(selection) {
 	case 0:
