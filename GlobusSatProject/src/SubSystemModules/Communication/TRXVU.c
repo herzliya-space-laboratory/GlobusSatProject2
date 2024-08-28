@@ -44,9 +44,7 @@ int InitTrxvuAndAnts(){
 	myTRXVUBitrates[0] = trxvu_bitrate_9600;
 	//Initialize the trxvu subsystem
 	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
-	unsigned char beaconIntervalTime[BEACON_INTERVAL_TIME_SIZE];
-	logError(FRAM_read(beaconIntervalTime, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
-	period = (time_unix)beaconIntervalTime;
+	logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
