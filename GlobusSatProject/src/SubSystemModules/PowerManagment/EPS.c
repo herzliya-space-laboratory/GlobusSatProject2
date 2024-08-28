@@ -20,19 +20,18 @@
 #include "GlobalStandards.h"
 #include "utils.h"
 #include "SysI2CAddr.h"
-
+#include <Time.h>
 #include <string.h>
 #include <hal/errors.h>
 #include <hal/Drivers/SPI.h>
 /*#define WE_HAVE_SP 1*/
 /*#define WE_HAVE_EPS 1*/
-
+Time TimeSinceLastChangeReset;
 #define EPS_INDEX 100 //place holder
 #define SMOOTHEN(volt, alpha) (currentVolatage - (alpha * (volt - currentVolatage)))
 EpsThreshVolt_t ThresholdsIndex = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 voltage_t prevVolatage;
 float Alpha = DEFAULT_ALPHA_VALUE;
-
 int UpdateState(voltage_t current) {
 	if (current >= prevVolatage) {
 		if(current > ThresholdsIndex.fields.Vup_operational) EnterOperationalMode();
@@ -99,6 +98,7 @@ int EPS_Loop() {
 	voltage_t currentVolatage = SMOOTHEN(temp, Alpha);
 	UpdateState(currentVolatage);
 	prevVolatage = currentVolatage;
+	CheckAndResetStateChanges();
 	return 0;
 }
 
@@ -131,6 +131,23 @@ int RestoreDefaultAlpha() {
 int RestoreDefaultThresholdVoltages() {
 	EpsThreshVolt_t ThresholdsIndexs = {.raw = DEFAULT_EPS_THRESHOLD_VOLTAGES};
 	SetEPSThreshold(&ThresholdsIndexs);
+	return 0;
+}
+int CheckAndResetStateChanges() {
+	Time temp;
+	Time_get(&temp);
+	int error = 0;
+	if(temp.hours == TimeSinceLastChangeReset.hours && temp.minutes == TimeSinceLastChangeReset.minutes) {
+	TimeSinceLastChangeReset = temp;
+	error = LogError(FRAM_write((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE), "CheckAndResetStateChanges, FRAM_write");
+	}
+	return error;
+
+}
+int InitStateChangesValues() {
+	FRAM_read((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE);
+	LogError(FRAM_read((unsigned char *)&CHANGES_OPERATIONAL, EPS_CHANGES_OPERATIONAL_ADDR, EPS_CHANGES_OPERATIONAL_SIZE), "EnterOperationalMode, FRAM_Write");
+	LogError(FRAM_read((unsigned char *)&CHANGES_POWERSAFE, EPS_CHANGES_POWERSAFE_ADDR, EPS_CHANGES_POWERSAFE_SIZE), "EnterPowerSafeMode, FRAM_Write");
 	return 0;
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {

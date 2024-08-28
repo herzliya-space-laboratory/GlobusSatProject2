@@ -16,5 +16,4 @@ int logError(int error ,char* msg)
 	}
 	return error;
 }
-
 //Boolean Range(int number, int min, int max) return {number >= min && number <= max}

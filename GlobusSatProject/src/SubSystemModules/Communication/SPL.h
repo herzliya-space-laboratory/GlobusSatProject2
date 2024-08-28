@@ -103,6 +103,7 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
     RESTORE_ThresholdVoltages   = 0x06,
     SET_MODE					= 0x07,
     GET_MODE					= 0x08,
+    GET_STATE_CHANGES			= 0x09,
 
 }eps_subtypes_t;
 

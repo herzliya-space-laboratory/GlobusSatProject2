@@ -11,6 +11,7 @@
 #include "EPSOperationModes.h"
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 #include <stdint.h>
+#include <Time.h>
 
 /*
  	 	 	 	    ____
@@ -146,9 +147,6 @@ int RestoreDefaultAlpha();
  */
 int RestoreDefaultThresholdVoltages();
 
-int CMDGetHeaterValues(sat_packet_t *cmd);
-
-int CMDSetHeaterValues(sat_packet_t *cmd);
-
+int CheckAndResetStateChanges();
 
 #endif

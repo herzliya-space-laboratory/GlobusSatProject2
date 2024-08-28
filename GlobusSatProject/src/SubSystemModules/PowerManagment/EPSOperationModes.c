@@ -11,8 +11,9 @@
 #include "FRAM_FlightParameters.h"
 #include "utils.h"
 
-EpsState_t currentState; //todo: place in FRAM
-EpsMode_t currentMode; //todo: place in FRAM
+
+EpsState_t currentState;
+EpsMode_t currentMode;
 
 EpsState_t GetSystemState() {
 	LogError(FRAM_read(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "GetSystemState, FRAM_Write");
@@ -31,7 +32,11 @@ Boolean GetLowVoltFlag() {
 int EnterOperationalMode() {
 	if(currentMode == AutmaticMode) {
 		currentState = OperationalMode;
-		LogError(FRAM_write(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "EnterOperationalMode, FRAM_Write");
+		LogError(FRAM_write(( unsigned char *)&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "EnterOperationalMode, FRAM_Write");
+		LogError(FRAM_read(( unsigned char *)&CHANGES_OPERATIONAL, EPS_CHANGES_OPERATIONAL_ADDR, EPS_CHANGES_OPERATIONAL_SIZE), "EnterOperationalMode, FRAM_Write");
+		CHANGES_OPERATIONAL++;
+		LogError(FRAM_write(( unsigned char *)&CHANGES_OPERATIONAL, EPS_CHANGES_OPERATIONAL_ADDR, EPS_CHANGES_OPERATIONAL_SIZE), "EnterOperationalMode, FRAM_Write");
+
 	}
 	return 0;
 
@@ -50,6 +55,9 @@ int EnterPowerSafeMode() {
 	if(currentMode == AutmaticMode) {
 		currentState = PowerSafeMode;
 		LogError(FRAM_write(&currentState, EPS_STATE_FLAG_ADDR, EPS_STATE_FLAG_SIZE), "EnterPowerSafeMode, FRAM_Write");
+		LogError(FRAM_read((unsigned char *)&CHANGES_POWERSAFE, EPS_CHANGES_POWERSAFE_ADDR, EPS_CHANGES_POWERSAFE_SIZE), "EnterPowerSafeMode, FRAM_Write");
+		CHANGES_POWERSAFE++;
+		LogError(FRAM_write((unsigned char *)&CHANGES_POWERSAFE, EPS_CHANGES_POWERSAFE_ADDR, EPS_CHANGES_POWERSAFE_SIZE), "EnterPowerSafeMode, FRAM_Write");
 	}
 	return 0;
 }

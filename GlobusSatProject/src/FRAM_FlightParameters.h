@@ -9,7 +9,7 @@
 #define FRAM_FLIGHTPARAMETERS_H_
 
 #include <hal/Storage/FRAM.h>
-
+#include <Time.h>
 
 // <Satellite Management>
 #define DEPLOYMENT_TIME_ADDR			0X05		//<! time at which the satellites starts deployment
@@ -88,6 +88,15 @@
 
 #define EPS_THRESH_VOLTAGES_ADDR		0x556		//<! starting address for eps threshold voltages array
 #define EPS_THRESH_VOLTAGES_SIZE (NUMBER_OF_THRESHOLD_VOLTAGES * sizeof(voltage_t)) //<! number of bytes in eps threshold voltages array
+
+#define EPS_CHANGES_OPERATIONAL_ADDR 0x55F
+#define EPS_CHANGES_OPERATIONAL_SIZE 2
+
+#define EPS_CHANGES_POWERSAFE_ADDR 0x562
+#define EPS_CHANGES_POWERSAFE_SIZE 2
+
+#define EPS_LAST_STATE_CHANGE_ADDR 0x564
+#define EPS_LAST_STATE_CHANGE_SIZE sizeof(Time)
 
 #define BEACON_INTERVAL_TIME_ADDR 		0x4590		//<! address of value of the delay between 2 beacons
 #define BEACON_INTERVAL_TIME_SIZE 		4			//<! size of parameter in bytes

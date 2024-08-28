@@ -1,13 +1,14 @@
 #include "EPS_Commands.h"
 #include <hal/errors.h>
 
-
+#include <Time.h>
 #include "string.h"
 #include "SubsystemModules/PowerManagment/EPS.h"
 #include "SubsystemModules/PowerManagment/EPSOperationModes.h"
 #include "GlobalStandards.h"
 #include "utils.h"
 #include "SubsystemModules/Communication/TRXVU.h"
+Time TimeSinceLastChangeReset;
 
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
@@ -107,4 +108,16 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&mode, 2);
 	}
 	return 0;
+}
+int CMD_GET_STATE_CHANGES(sat_packet_t *cmd) {
+	int error = 0;
+	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	error = LogError(FRAM_read((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE), "CMD_GET_STATE_CHANGES, FRAM_read");
+	unsigned char data[sizeof(int)+sizeof(int)+sizeof(Time)] ;
+	memcpy(data, (unsigned char *)&CHANGES_OPERATIONAL, sizeof(int));
+	memcpy(data+sizeof(int), (unsigned char *)&CHANGES_POWERSAFE, sizeof(int));
+	memcpy(data+sizeof(int)*2, (unsigned char *)&TimeSinceLastChangeReset, sizeof(Time));
+	TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&data, sizeof(int)+sizeof(int)+sizeof(Time));
+
+	return error;
 }

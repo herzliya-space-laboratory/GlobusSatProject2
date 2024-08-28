@@ -62,6 +62,10 @@ int eps_command_router(sat_packet_t *cmd)
 			error = CMD_GetCurrentMode(cmd);
 			break;
 		}
+		case (GET_STATE_CHANGES): {
+			error = CMD_GET_STATE_CHANGES(cmd);
+			break;
+		}
 	}
 	return error;
 }

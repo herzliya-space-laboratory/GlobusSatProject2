@@ -3,7 +3,7 @@
 
 
 #include "GlobalStandards.h"
-
+#include <time.h>
 
 #define CHANNELS_OFF 0x00 	//!< channel state when all systems are off
 #define CHNNELS_ON	 0XFF	//!< channel
@@ -78,5 +78,7 @@ int EnterManualMode(EpsState_t State);
 int EnterAutomaticMode();
 
 EpsMode_t GetcurrentMode();
+int CHANGES_OPERATIONAL;
+int CHANGES_POWERSAFE;
 
 #endif /* EPSOPERATIONMODES_H_ */
