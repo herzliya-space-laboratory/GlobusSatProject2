@@ -93,7 +93,7 @@ int ActUponCommand(sat_packet_t *cmd)
 				return error;
 			break;
 		case eps_cmd_type:
-/*			error = logError(eps_command_router(cmd), "Command Dictionary - eps_command_router");*/
+			error = logError(eps_command_router(cmd), "Command Dictionary - eps_command_router");
 			if(error != E_NO_SS_ERR)
 				return error;
 			break;
