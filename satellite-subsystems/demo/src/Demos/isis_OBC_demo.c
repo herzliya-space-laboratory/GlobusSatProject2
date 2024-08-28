@@ -199,6 +199,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
+	printf("\t 3) Set beacon period place in FRAM to 20\n\r");
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
