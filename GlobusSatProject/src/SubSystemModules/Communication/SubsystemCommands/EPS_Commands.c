@@ -104,6 +104,7 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 		memcpy(&data + 1, &state, 1);
 		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&data, 2);
 	}
+
 	else {
 		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&mode, 2);
 	}
