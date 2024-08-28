@@ -27,14 +27,15 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 
 }
 int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd == NULL)
+		return E_INPUT_POINTER_NULL;
+
 	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
-	if(GetcurrentMode() != AutmaticMode) {
-		return E_Manual_Override;
-	}
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	//if(GetcurrentMode() != AutmaticMode) {
+	//	return E_Manual_Override;
+	//}
 	float newalpha;
-	memcpy(&newalpha, cmd->data, sizeof(float));
+	memcpy(&newalpha, cmd->data, cmd->length);
 	int error = UpdateAlpha(newalpha);
 	return error;
 }
@@ -83,7 +84,7 @@ int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
 	float alpha;
 	unsigned short size = sizeof(alpha);
 	GetAlpha(&alpha);
-	TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&alpha, size);
+	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&alpha, size);
 	return 0;
 }
 int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
@@ -91,7 +92,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 	EpsThreshVolt_t Threshold;
 	unsigned short size = sizeof(Threshold);
 	GetEPSThreshold(&Threshold);
-	TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&Threshold, size);
+	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&Threshold, size);
 	return 0;
 }
 int CMD_GetCurrentMode(sat_packet_t *cmd) {
@@ -102,11 +103,11 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 		unsigned char data;
 		memcpy(&data, &mode, 1);
 		memcpy(&data + 1, &state, 1);
-		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&data, 2);
+		TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, 2);
 	}
 
 	else {
-		TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&mode, 2);
+		TransmitDataAsSPL_Packet(cmd, (unsigned char *)&mode, 2);
 	}
 	return 0;
 }
@@ -118,7 +119,7 @@ int CMD_GET_STATE_CHANGES(sat_packet_t *cmd) {
 	memcpy(data, (unsigned char *)&CHANGES_OPERATIONAL, sizeof(int));
 	memcpy(data+sizeof(int), (unsigned char *)&CHANGES_POWERSAFE, sizeof(int));
 	memcpy(data+sizeof(int)*2, (unsigned char *)&TimeSinceLastChangeReset, sizeof(Time));
-	TransmitDataAsSPL_Packet((sat_packet_t *)&cmd, (unsigned char *)&data, sizeof(int)+sizeof(int)+sizeof(Time));
+	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, sizeof(int)+sizeof(int)+sizeof(Time));
 
 	return error;
 }

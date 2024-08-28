@@ -109,7 +109,7 @@ int SetEPSThreshold(EpsThreshVolt_t *Threshold);
  * 			-1 on NULL input array
  * 			-2 on FRAM read errors
  */
-int GetThresholdVoltages(EpsThreshVolt_t *Threshold);
+int GetEPSThreshold(EpsThreshVolt_t *Threshold);
 
 /*!
  * @brief getting the smoothing factor (alpha) from the FRAM.
