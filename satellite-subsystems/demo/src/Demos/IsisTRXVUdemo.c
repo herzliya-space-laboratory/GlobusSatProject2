@@ -35,9 +35,6 @@
 #include <SatelliteSubsystems/GomEPS.h>
 #endif
 
-#define BEACON_INTERVAL_TIME_ADDR 		0x4590		//<! address of value of the delay between 2 beacons
-#define BEACON_INTERVAL_TIME_SIZE 		4			//<! size of parameter in bytes
-
 ////General Variables
 #define TX_UPBOUND				30
 #define TIMEOUT_UPBOUND			10
@@ -641,12 +638,6 @@ static Boolean printTransmitterState() {
 	 return TRUE;
 }
 
-static Boolean SetBeaconPeriodPlaceToTwenty()
-{
-	FRAM_write("20", BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE);
-	return TRUE;
-}
-
 /*
  * brief, checks how much time it takes to send an 8 byte package at a 9600 bitrate
  * */
@@ -680,8 +671,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 17) prints Get Tx Telemetry Value Array \n\r");
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate\n\r");
-	printf("\t 20) Change place in Fram for beacon period to 20\n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 20) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 19) == 0);
 
 	switch(selection) {
 	case 0:
@@ -743,9 +733,6 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 19:
 		offerMoreTests = IsisTrxvu_tcEstimateTransmissionTimeTest();
-		break;
-	case 20:
-		offerMoreTests = SetBeaconPeriodPlaceToTwenty();
 		break;
 	default:
 		break;

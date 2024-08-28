@@ -26,6 +26,10 @@
 #include "IsisSPv2demo.h"
 #include "isis_eps_demo.h"
 
+
+#define BEACON_INTERVAL_TIME_ADDR 		0x4590		//<! address of value of the delay between 2 beacons
+#define BEACON_INTERVAL_TIME_SIZE 		4			//<! size of parameter in bytes
+
 /*
  * Gets and prints the solar panels temperature.
  * */
@@ -150,6 +154,13 @@ static Boolean PrintBeacon(void)
 	return TRUE;
 }
 
+static Boolean SetBeaconPeriodPlaceToTwenty()
+{
+	const unsigned char data[] = "20";
+	FRAM_write(data, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE);
+	return TRUE;
+}
+
 /*
  * Write to the FRAM memory, read from it and check we have put it in the right place and put the right thing
  * */
@@ -188,7 +199,7 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -199,6 +210,9 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 2:
 		offerMoreTests = WriteAndReadFromFRAM();
+		break;
+	case 3:
+		offerMoreTests = SetBeaconPeriodPlaceToTwenty();
 		break;
 	default:
 		break;
