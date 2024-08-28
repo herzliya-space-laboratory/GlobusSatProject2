@@ -6,11 +6,13 @@
 #include <freertos/task.h>
 
 #include <satellite-subsystems/IsisTRXVU.h>
+#include "FRAM_FlightParameters.h"
 #include "GlobalStandards.h"
 #include "AckHandler.h"
 #include "SatCommandHandler.h"
 #include "utils.h"
 #include <hal/Timing/Time.h>
+#include "Maintenance.h"
 
 
 #define MAX_MUTE_TIME 		(60*60*24*3) 	///< max mute duration will be 3 days = 60*60*24*3 [sec]

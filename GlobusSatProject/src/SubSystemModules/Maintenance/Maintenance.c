@@ -20,4 +20,3 @@ Boolean CheckExecutionTime(time_unix prev_time, time_unix period)
 		return TRUE;
 	return FALSE;
 }
-//TODO: need to create testing

@@ -20,8 +20,8 @@
 
 /*#define WE_HAVE_ANTS 0*/
 
-time_unix lastTimeSendingBeacon;
-
+time_unix lastTimeSendingBeacon = 0;
+time_unix period;
 /*
  * Initialize the TRXVU and ants.
  *
@@ -44,6 +44,9 @@ int InitTrxvuAndAnts(){
 	myTRXVUBitrates[0] = trxvu_bitrate_9600;
 	//Initialize the trxvu subsystem
 	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
+	unsigned char beaconIntervalTime[BEACON_INTERVAL_TIME_SIZE];
+	logError(FRAM_read(beaconIntervalTime, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
+	period = (time_unix)beaconIntervalTime;
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
@@ -103,21 +106,35 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
 }
 
+Boolean CheckTransmitionAllowed()
+{
+	//TODO: all the function
+	return TRUE;
+}
+
 int BeaconLogic()
 {
+	if(CheckExecutionTime(lastTimeSendingBeacon, period) || CheckTransmitionAllowed())
+		return -1;
 	sat_packet_t beacon;
 	short length = sizeof(WOD_Telemetry_t);
-	unsigned char *data;
+	unsigned char data[] = {0, 0, 0, 0};
 	//TODO: get data from the sat
 	logError(AssembleCommand(data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command");
 	int avalFrames;
-	return logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
+	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");
+	if(error)
+		return error;
+	return logError(Time_getUnixEpoch((unsigned int*)&lastTimeSendingBeacon), "TRXVU - Time_getUnixEpoch");
+
 }
 
 int TRX_Logic()
 {
 	sat_packet_t cmd;
 	int error = 0;
+	BeaconLogic();
+
 	//TODO: send beacon every 20 second and update the past time
 	if(GetNumberOfFramesInBuffer() > 0)
 	{

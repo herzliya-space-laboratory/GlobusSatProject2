@@ -86,7 +86,7 @@ static Boolean PrintBeacon(void)
 		//todo:Volt 3.3V [mV]
 		//todo:Charging power [mW]
 		printf("\t Consumed power [mW]: %d\r\n", responseEPS.fields.dist_input.fields.power * 10);
-		printf("\t Electric current [mA]: %d\r\n", response.fields.batt_input.fields.current);
+		printf("\t Electric current [mA]: %d\r\n", responseEPS.fields.batt_input.fields.current);
 		//todo: Current 3.3V [mA]
 		//todo:Current 5V [mA]
 		printf("\t MCU Temperature [°C]: %2f\r\n",((double)responseEPS.fields.temp) * 0.01);
