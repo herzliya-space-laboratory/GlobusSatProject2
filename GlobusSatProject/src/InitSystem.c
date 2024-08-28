@@ -10,6 +10,7 @@
 #include <hal/Drivers/SPI.h>
 #include <hal/Timing/Time.h>
 #include <hal/Utility/util.h>
+#include <hal/supervisor.h>
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
@@ -40,6 +41,13 @@ int StartSPI(){
 int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
 	return logError(Time_start(&time, TIME_SYNCINTERVAL), "Time - Time_start");
+}
+
+int InitSupervisor()
+{
+	uint8_t po = SUPERVISOR_SPI_INDEX;
+	int error = Supervisor_start(&po, 0);
+	return logError(error, "Supervisor - Supervisor_start");
 }
 
 int InitSubsystems(){

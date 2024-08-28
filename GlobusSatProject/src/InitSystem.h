@@ -43,6 +43,11 @@ int StartSPI();
  */
 int StartTIME();
 
+/*
+ * @brief	Starts the supervisor module using drivers, and checks for errors.
+ * @see supervisor.h
+ */
+int InitSupervisor();
 
 /*!
  * @brief	executes all required initializations of systems, including sub-systems, and checks for errors
