@@ -15,43 +15,38 @@
 #define ANTENNA_DEPLOYMENT_TIMEOUT 10 //<! in seconds
 
 
-int CMD_StartDump(sat_packet_t *cmd);
-
-int CMD_SendDumpAbortRequest(sat_packet_t *cmd);
-
-int CMD_ForceDumpAbort(sat_packet_t *cmd);
-
 int CMD_MuteTRXVU(sat_packet_t *cmd);
 /**
  * set trxvu idle state
  * cmd data should include 0x01 (On) or 0x00 (Off). if sent ON than also pass the duration (4 bytes int)
  */
-int CMD_SetIdleState(sat_packet_t *cmd);
+int CMD_SetOn_dleState(sat_packet_t *cmd);
 
-int CMD_SetTransponder(sat_packet_t *cmd);
+int CMD_SetOff_dleState(sat_packet_t *cmd);
 
-int CMD_SetRSSITransponder(sat_packet_t *cmd);
+int CMD_SetOn_Transponder(sat_packet_t *cmd);
+
+int CMD_SetOff_Transponder(sat_packet_t *cmd);
+
+int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
 int CMD_UnMuteTRXVU(sat_packet_t *cmd);
 
-int CMD_GetBeaconInterval(sat_packet_t *cmd);
+int CMD_GetBeacon_Interval(sat_packet_t *cmd);
 
-int CMD_TrasmitBeacon(sat_packet_t *cmd);
+int CMD_SetBeacon_Interval(sat_packet_t *cmd);
+
+
+//int CMD_Trasmit_Beacon(sat_packet_t *cmd);
 
 
 int CMD_GetTxUptime(sat_packet_t *cmd);
 
 int CMD_GetRxUptime(sat_packet_t *cmd);
 
-int CMD_GetNumOfDelayedCommands(sat_packet_t *cmd);
+//int CMD_DeleteDelayedCmdByID(sat_packet_t *cmd);
 
-int CMD_GetNumOfOnlineCommands(sat_packet_t *cmd);
-
-int CMD_DeleteDelayedCmdByID(sat_packet_t *cmd);
-
-int CMD_DeleteAllDelayedBuffer(sat_packet_t *cmd);
-
-int CMD_AntSetArmStatus(sat_packet_t *cmd);
+//int CMD_DeleteAllDelayedBuffer(sat_packet_t *cmd);
 
 int CMD_AntGetArmStatus(sat_packet_t *cmd);
 
@@ -59,10 +54,12 @@ int CMD_AntGetUptime(sat_packet_t *cmd);
 
 int CMD_AntCancelDeployment(sat_packet_t *cmd);
 
-int CMD_AntennaDeploy(sat_packet_t *cmd);
+int CMD_AntDeploy(sat_packet_t *cmd);
+
+int CMD_Ping(sat_packet_t *cmd);
 
 
-int CMD_StopReDeployment(sat_packet_t *cmd);
+//int CMD_StopReDeployment(sat_packet_t *cmd);
 
 #endif
 /*COMMANDS_H_ */

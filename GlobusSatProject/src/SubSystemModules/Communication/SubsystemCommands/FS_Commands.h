@@ -1,6 +1,7 @@
 
 #ifndef FS_COMMANDS_H_
 #define FS_COMMANDS_H_
+#define WAIT_TIME_SEM_DUMP	3
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 
 /**
@@ -27,6 +28,12 @@ int CMD_GetFileLengthByTime(sat_packet_t *cmd);
 int CMD_GetTimeOfLastElementInFile(sat_packet_t *cmd);
 
 int CMD_GetTimeOfFirstElement(sat_packet_t *cmd);
+
+int CMD_StartDump(sat_packet_t *cmd);
+
+int CMD_SendDumpAbortRequest(sat_packet_t *cmd);
+
+int CMD_ForceDumpAbort(sat_packet_t *cmd);
 
 
 #endif /* FS_COMMANDS_H_ */
