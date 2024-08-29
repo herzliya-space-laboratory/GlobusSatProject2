@@ -139,15 +139,15 @@ int CheckAndResetStateChanges() {
 	int error = 0;
 	if(temp.hours == TimeSinceLastChangeReset.hours && temp.minutes == TimeSinceLastChangeReset.minutes) {
 	TimeSinceLastChangeReset = temp;
-	error = LogError(FRAM_write((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE), "CheckAndResetStateChanges, FRAM_write");
+	error = logError(FRAM_write((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE), "CheckAndResetStateChanges, FRAM_write");
 	}
 	return error;
 
 }
 int InitStateChangesValues() {
 	FRAM_read((unsigned char *)&TimeSinceLastChangeReset, EPS_LAST_STATE_CHANGE_ADDR, EPS_LAST_STATE_CHANGE_SIZE);
-	LogError(FRAM_read((unsigned char *)&CHANGES_OPERATIONAL, EPS_CHANGES_OPERATIONAL_ADDR, EPS_CHANGES_OPERATIONAL_SIZE), "EnterOperationalMode, FRAM_Write");
-	LogError(FRAM_read((unsigned char *)&CHANGES_POWERSAFE, EPS_CHANGES_POWERSAFE_ADDR, EPS_CHANGES_POWERSAFE_SIZE), "EnterPowerSafeMode, FRAM_Write");
+	logError(FRAM_read((unsigned char *)&CHANGES_OPERATIONAL, EPS_CHANGES_OPERATIONAL_ADDR, EPS_CHANGES_OPERATIONAL_SIZE), "EnterOperationalMode, FRAM_Write");
+	logError(FRAM_read((unsigned char *)&CHANGES_POWERSAFE, EPS_CHANGES_POWERSAFE_ADDR, EPS_CHANGES_POWERSAFE_SIZE), "EnterPowerSafeMode, FRAM_Write");
 	return 0;
 }
 int GetEPSThreshold(EpsThreshVolt_t *Threshold) {

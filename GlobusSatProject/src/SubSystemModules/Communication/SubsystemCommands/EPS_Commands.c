@@ -36,7 +36,12 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	//}
 	float newalpha;
 	memcpy(&newalpha, cmd->data, cmd->length);
+
 	int error = UpdateAlpha(newalpha);
+	if (error == E_PARAM_OUTOFBOUNDS) {
+		unsigned char errmsg[] = "alpha is outofbound";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg , sizeof(errmsg));
+	}
 	return error;
 }
 int CMD_RestoreDefaultThresholdVoltages() {
