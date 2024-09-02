@@ -36,9 +36,13 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	//}
 	float newalpha;
 	memcpy(&newalpha, cmd->data, cmd->length);
-	int error = UpdateAlpha(newalpha);
-	SendAckPacket(ACK_UPDATE_EPS_ALPHA, &cmd, NULL, 0);
 
+	int error = UpdateAlpha(newalpha);
+	if (error == E_PARAM_OUTOFBOUNDS) {
+		unsigned char errmsg[] = "alpha is outofbound";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg , sizeof(errmsg));
+	}
+	SendAckPacket(ACK_UPDATE_EPS_ALPHA, &cmd, NULL, 0);
 	return error;
 
 }
