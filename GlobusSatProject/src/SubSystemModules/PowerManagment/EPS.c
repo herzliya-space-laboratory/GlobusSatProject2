@@ -114,7 +114,8 @@ int GetAlpha(float *alpha) {
 }
 int UpdateAlpha(float newalpha) {
 	float alpha2 = newalpha;
-	if (! (0 < alpha2 && alpha2 < 1)) {
+	if (0 > alpha2 || alpha2 > 1) {
+		printf("%f", newalpha);
 		logError(E_PARAM_OUTOFBOUNDS, "UpdateAlpha, alpa is not in valid range");
 		return E_PARAM_OUTOFBOUNDS;
 	}
