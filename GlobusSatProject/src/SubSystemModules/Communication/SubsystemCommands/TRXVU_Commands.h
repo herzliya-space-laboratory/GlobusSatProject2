@@ -6,6 +6,9 @@
 #include "SubSystemModules/Communication/AckHandler.h"
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 
+#include <hal/Drivers/I2C.h>
+#include <string.h>
+
 // wait time for taking semaphores
 #define WAIT_TIME_SEM_DUMP	3
 #define WAIT_TIME_SEM_TX	3

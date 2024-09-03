@@ -41,6 +41,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_MUTE = 0x8D,
 	ACK_UNMUTE = 0x8E,
 	ACK_ALLOW_TRANSPONDER = 0x8F,
+	ACK_TRANSPONDER_OFF = 0x9F,
 
 	ACK_DUMP_START = 0x90,
 	ACK_DUMP_ABORT = 0x91,

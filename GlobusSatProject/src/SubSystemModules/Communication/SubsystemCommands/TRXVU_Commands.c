@@ -6,7 +6,6 @@
  */
 
 #include "TRXVU_Commands.h"
-#include <string.h>
 
 int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 {
@@ -58,4 +57,21 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	}
 
 	return logError(SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)&new_interval, sizeof(new_interval)), "CMD_SetBeacon_Interval - SendAckPacket");
+}
+
+
+int CMD_SetOff_Transponder(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+		return -1;
+	unsigned char data[] = {0x38, 0x01};
+	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write");
+	if(error)
+	{
+		unsigned char error_msg[] = "CMD_SetOff_Transponder - can't turn off transponder. Probably a fault in I2C write";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg));
+		return error;
+	}
+	return logError(SendAckPacket(ACK_TRANSPONDER_OFF , cmd, NULL, 0), "CMD_SetOff_Transponder - SendAckPacket");
+
 }
