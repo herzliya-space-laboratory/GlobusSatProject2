@@ -56,6 +56,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 	ACK_PING = 0xAA,
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
+	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
 	ACK_ERROR_MSG = 0XFF 					// send this ACK when error has occurred
 }ack_subtype_t;
 

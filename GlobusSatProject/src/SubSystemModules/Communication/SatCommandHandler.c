@@ -9,6 +9,7 @@
 
 #include "SatCommandHandler.h"
 #include "CommandDictionary.h"
+#include "AckHandler.h"
 
 #include "SPL.h"
 #include "utils.h"
@@ -108,32 +109,23 @@ int ActUponCommand(sat_packet_t *cmd)
 	switch(cmd->cmd_type)
 	{
 		case trxvu_cmd_type:
-			error = logError(trxvu_command_router(cmd), "Command Dictionary - trxvu_command_router");
-			if(error != E_NO_SS_ERR)
-				return error;
-			break;
+			return logError(trxvu_command_router(cmd), "Command Dictionary - trxvu_command_router");
 		case eps_cmd_type:
 /*			error = logError(eps_command_router(cmd), "Command Dictionary - eps_command_router");*/
-			if(error != E_NO_SS_ERR)
-				return error;
-			break;
+			return error;
 		case filesystem_cmd_type:
 /*			error = logError(filesystem_command_router(cmd), "Command Dictionary - filesystem_command_router");*/
-			if(error != E_NO_SS_ERR)
-				return error;
-			break;
+			return error;
 		case managment_cmd_type:
 /*			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");*/
-			if(error != E_NO_SS_ERR)
-				return error;
-			break;
+			return error;
 		case payload_cmd_type:
 /*			error = logError(payload_command_router(cmd), "Command Dictionary - telemetry_command_router");*/
-			if(error != E_NO_SS_ERR)
-				return error;
-			break;
+			return error;
 		default:
-			break;
+		{
+			unsigned char unknownType_msg[] = "Unknown type";
+			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, unknownType_msg, sizeof(unknownType_msg)), "ActUponCommand - SendAckPacket invalid type");
+		}
 	}
-	return error;
 }
