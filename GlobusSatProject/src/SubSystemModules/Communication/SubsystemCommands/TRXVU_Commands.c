@@ -72,6 +72,6 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg));
 		return error;
 	}
-	return logError(SendAckPacket(ACK_TRANSPONDER_OFF , cmd, NULL, 0), "CMD_SetOff_Transponder - SendAckPacket");
+	return logError(SendAckPacket(ACK_TRANSPONDER_OFF , cmd, (unsigned char*)"Transponder off", sizeof("Transponder off")), "CMD_SetOff_Transponder - SendAckPacket");
 
 }
