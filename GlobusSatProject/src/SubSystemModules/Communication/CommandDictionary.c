@@ -5,10 +5,9 @@
  *      Author: Maayan
  */
 
-
+#include "SubsystemCommands/TRXVU_Commands.h"
 #include "CommandDictionary.h"
 #include <stdio.h>
-#include "TRXVU.h"
 
 int trxvu_command_router(sat_packet_t *cmd)
 {
@@ -17,5 +16,16 @@ int trxvu_command_router(sat_packet_t *cmd)
 		printf("cmd_is_null\r\n");
 		return -1;
 	}
-	return TransmitDataAsSPL_Packet(cmd, (unsigned char *)"hello world", sizeof("hello world"));
+	switch(cmd->cmd_subtype)
+	{
+		case GET_BEACON_INTERVAL:
+			return CMD_GetBeacon_Interval(cmd);
+		case SET_BEACON_INTERVAL:
+			return CMD_SetBeacon_Interval(cmd);
+		default:
+		{
+			unsigned char unknownSubtype_msg[] = "TRXVU - unknown subtype";
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, unknownSubtype_msg, sizeof(unknownSubtype_msg)), "trxvu_command_router - SendAckPacket invalid subtype");
+		}
+	}
 }

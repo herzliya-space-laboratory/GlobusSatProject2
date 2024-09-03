@@ -33,7 +33,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 	ACK_UPDATE_TIME = 0x12,					// after updating time
 	ACK_UPDATE_BEACON_BIT_RATE = 0x13,
-	ACK_UPDATE_BEACON_TIME_DELAY = 0x14,
+	ACK_UPDATE_BEACON_INTERVAL = 0x14,
 	ACK_UPDATE_EPS_VOLTAGES = 0x15,
 	ACK_UPDATE_EPS_HEATER_VALUES = 0x16,
 	ACK_UPDATE_EPS_ALPHA = 0x17,
