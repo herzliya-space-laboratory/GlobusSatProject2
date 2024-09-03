@@ -13,6 +13,11 @@
 #include <satellite-subsystems/IsisSolarPanelv2.h>
 #include "utils.h"
 
+/*!
+ * @brief Gets all necessary telemetry and arranges it into a WOD structure
+ * @param[out] name=wod; type=WOD_Telemetry_t*; output WOD telemetry. If an error occurred while getting TLM the fields will be -1
+ * @return 0
+ */
 int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 {
 	//TODO: finish the function
@@ -35,7 +40,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->current_5V = -1; //TODO
 		wod->current_3V3 = -1; //TODO
 	}
-	else
+	else // if have error in the eps put everything in that section to -1
 	{
 		wod->voltBattery = -1;
 		wod->consumed_power = -1;
@@ -72,7 +77,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->number_of_resets = mySupervisor_housekeeping_hk.fields.iobcResetCount;
 		wod->sat_uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
 	}
-	else
+	else // if have error in the supervisor put everything in that section to -1
 	{
 		wod->number_of_resets = -1;
 		wod->sat_uptime = -1;
@@ -85,18 +90,18 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->total_memory = space.total;
 		wod->used_bytes = space.used;
 	}
-	else
+	else // if have error in the file_system put everything in that section to -1
 	{
 		wod->free_memory = -1;
 		wod->corrupt_bytes = -1;
 		wod->total_memory = -1;
 		wod->used_bytes = -1;
 	}
-	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "TelemetryCollector - Time_getUnixEpoch"))
+	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "TelemetryCollector - Time_getUnixEpoch")) // if have error in geting the sat time put the time to -1
 	{
 		wod->sat_time = -1;
 	}
-	wod->num_of_cmd_resets = -1;
+	wod->num_of_cmd_resets = -1; //TODO
 	/*
 	unsigned int num_of_cmd_resets;
 	 */

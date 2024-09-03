@@ -29,14 +29,29 @@ int CMD_SetOff_dleState(sat_packet_t *cmd);
 
 int CMD_SetOn_Transponder(sat_packet_t *cmd);
 
+/*
+* The command sets the transponder off.
+* @param[in and out] name=cmd; type=sat_packet_t; The packet the sat got and use to find all the required information (like the headers we add)
+* @return type=int; return type of error and if the parameter is NULL return -1.
+* */
 int CMD_SetOff_Transponder(sat_packet_t *cmd);
 
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
 int CMD_UnMuteTRXVU(sat_packet_t *cmd);
 
+/*
+* The command get the beacon interval from the FRAM and send it back.
+* @param[in and out] name=cmd; type=sat_packet_t; The packet the sat got and use to find all the required information (like the headers we add)
+* @return type=int; return type of error and if the parameter (cmd) is NULL return -1.
+* */
 int CMD_GetBeacon_Interval(sat_packet_t *cmd);
 
+/*
+* The command change the beacon interval in the FRAM and check it change correctly. also check the new interval is between the max and min interval
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the new_interval and the headers we add)
+* @return type=int; return type of error and if the parameter is NULL return -1.
+* */
 int CMD_SetBeacon_Interval(sat_packet_t *cmd);
 
 

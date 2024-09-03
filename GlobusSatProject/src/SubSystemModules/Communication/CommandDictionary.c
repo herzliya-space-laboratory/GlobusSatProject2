@@ -9,6 +9,12 @@
 #include "CommandDictionary.h"
 #include <stdio.h>
 
+/*!
+ * @brief routes the data into the appropriate trxvu command according to the command sub type
+ * @param[in] name=cmd; type=sat_packet_t*: command pertaining to the TRXVU system, to be executed.
+ * @note if subtype not exist an unknown subtype ack is send.
+ * @return errors according to <hal/errors.h>
+ */
 int trxvu_command_router(sat_packet_t *cmd)
 {
 	if(cmd == NULL)
@@ -16,6 +22,7 @@ int trxvu_command_router(sat_packet_t *cmd)
 		printf("cmd_is_null\r\n");
 		return -1;
 	}
+	// Go to each subtype known and according to trxvu_subtypes_t struct and check if it's equal to the subtype in the cmd. if equal go the function of the command
 	switch(cmd->cmd_subtype)
 	{
 		case GET_BEACON_INTERVAL:
@@ -27,7 +34,7 @@ int trxvu_command_router(sat_packet_t *cmd)
 		default:
 		{
 			unsigned char unknownSubtype_msg[] = "TRXVU - unknown subtype";
-			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, unknownSubtype_msg, sizeof(unknownSubtype_msg)), "trxvu_command_router - SendAckPacket invalid subtype");
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, unknownSubtype_msg, sizeof(unknownSubtype_msg)), "trxvu_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
 		}
 	}
 }

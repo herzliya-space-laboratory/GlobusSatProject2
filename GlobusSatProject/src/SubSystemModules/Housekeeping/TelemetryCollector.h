@@ -81,8 +81,8 @@ void TelemetrySaveWOD();
 
 /*!
  * @brief Gets all necessary telemetry and arranges it into a WOD structure
- * @param[out] output WOD telemetry. If an error occurred while getting TLM the fields will be zero
- * @return error according to <hal/errors.h>
+ * @param[out] output WOD telemetry. If an error occurred while getting TLM the fields will be -1
+ * @return 0 	//error according to <hal/errors.h>
  */
 int GetCurrentWODTelemetry(WOD_Telemetry_t *wod);
 

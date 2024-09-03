@@ -126,6 +126,9 @@ void FinishDump(sat_packet_t *cmd,unsigned char *buffer, ack_subtype_t acktype,
 
 /*!
  * @brief transmits beacon according to beacon logic
+ * @ return 0 if everything is fine
+ * 			-1 if we not suppose to send beacon now
+ * 	 	else it return error according to the stuff that didn't work
  */
 int BeaconLogic();
 

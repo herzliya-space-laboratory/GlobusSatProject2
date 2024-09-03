@@ -54,7 +54,7 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 			return null_pointer_error;
 	}
 
-	return command_succsess;
+	return command_success;
 }
 
 /*
@@ -91,13 +91,14 @@ CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char ty
 		}
 	}
 
-	return command_succsess;
+	return command_success;
 }
 
 /*
- * According to the type in the struct goes to the right type and there do the commend.
+ * According to the type in the cmd struct goes to the right type and there do the commend.
  *
  * @param[out] name= cmd; type= sat_packet_t *; The packet as sat_packet_t struct.
+ * @note if type not exist an unknown tpye ack is send.
  * @return error according to <hal/errors.h>
  *
  * */
@@ -106,6 +107,7 @@ int ActUponCommand(sat_packet_t *cmd)
 	int error = 0;
 	if(cmd == NULL)
 		return null_pointer_error;
+	// Go to each type known and according to spl_command_type struct and check if it's equal to the type in the cmd. if equal go the right router
 	switch(cmd->cmd_type)
 	{
 		case trxvu_cmd_type:
@@ -125,7 +127,7 @@ int ActUponCommand(sat_packet_t *cmd)
 		default:
 		{
 			unsigned char unknownType_msg[] = "Unknown type";
-			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, unknownType_msg, sizeof(unknownType_msg)), "ActUponCommand - SendAckPacket invalid type");
+			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, unknownType_msg, sizeof(unknownType_msg)), "ActUponCommand - SendAckPacket invalid type"); // Send ack that says what written in unknownType_msg
 		}
 	}
 }

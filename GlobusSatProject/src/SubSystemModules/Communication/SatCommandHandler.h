@@ -17,7 +17,7 @@
 
 
 typedef enum __attribute__ ((__packed__)) CMD_ERR{
-	command_succsess = 0,				///< a successful operation. no errors
+	command_success = 0,				///< a successful operation. no errors
 	command_found = 0,					///< a command was found
 	no_command_found ,					///< no commands were found in command buffers
 	index_out_of_bound,					///< index out of bound error
