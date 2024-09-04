@@ -84,7 +84,7 @@ CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char ty
 			return null_pointer_error;
 		else
 		{
-			if(data_length > MAX_COMMAND_DATA_LENGTH)
+			if(data_length > MAX_COMMAND_DATA_LENGTH) // Check the data_length is not larger then the max length available
 				return index_out_of_bound;
 
 			memcpy(&cmd->data, data, data_length);
