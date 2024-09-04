@@ -72,9 +72,11 @@ int InitTrxvuAndAnts(){
  */
 int setMuteEndTime(time_unix endTime)
 {
+	if(endTime > MAX_MUTE_TIME) // check we are in range and if not round it.
+		endTime = MAX_MUTE_TIME;
 	if(logError(FRAM_write((unsigned char*)&endTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_write"))
 		return -1;
-	short check = 0;
+	time_unix check = 0;
 	logError(FRAM_read((unsigned char*)&check, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_read");
 	if(check != endTime)
 		return logError(-1, "setMuteEndTime - Not written what needed to be");
@@ -205,9 +207,16 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign"); // Transmit packet
 }
 
+/*
+ * Check if we can transmit. (according to mute and EPS condition) (maybe idle too?)
+ * @return type=Boolean; TRUE if we can transmit
+ * 						 FALSE if we can't
+ */
 Boolean CheckTransmitionAllowed()
 {
-	//TODO: all the function
+	if(!CheckExecutionTime(getMuteEndTime(), 0)) // check we are after the mute end time. (!(timeNow - getMuteEndTime >= 0)) => (timeNow - getMuteEndTime < 0) => (timeNow < getMuteEndTime)
+		return FALSE;
+	//TODO: check function and continue it
 	return TRUE;
 }
 
@@ -219,7 +228,7 @@ Boolean CheckTransmitionAllowed()
  */
 int BeaconLogic()
 {
-	if(!(CheckExecutionTime(lastTimeSendingBeacon, period) && CheckTransmitionAllowed())) // Check if we can transmit beacon and also if the period of time we need to wait pass
+	if(!(CheckExecutionTime(lastTimeSendingBeacon, period) || !CheckTransmitionAllowed())) // Check if we can transmit beacon and also if the period of time we need to wait pass
 		return -1;
 	sat_packet_t beacon;
 	short length = sizeof(WOD_Telemetry_t);
