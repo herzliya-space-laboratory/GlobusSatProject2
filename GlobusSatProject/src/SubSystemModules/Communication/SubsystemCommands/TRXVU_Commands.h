@@ -36,6 +36,11 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd);
 * */
 int CMD_SetOff_Transponder(sat_packet_t *cmd);
 
+/*
+* The command change the rssi value in the FRAM and check it change correctly. also check the new rssi value is between the 0 and 4095
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the new rssi val and the headers we add)
+* @return type=int; return type of error and if the parameter is NULL return -1 and on error in setTransponderRSSIinFRAM, -2 if length isn't in size.
+ * */
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
 /*

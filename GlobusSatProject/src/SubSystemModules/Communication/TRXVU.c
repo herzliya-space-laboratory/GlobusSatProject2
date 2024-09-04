@@ -67,8 +67,9 @@ int InitTrxvuAndAnts(){
 
 /*
  * Sets Mute time end value in FRAM and check
- * @return -1 on error
- * 			0 on success
+ * @return type=int;	-1 on error
+ * 						-2 on wrong set
+ * 						0 on success
  */
 int setMuteEndTime(time_unix endTime)
 {
@@ -82,7 +83,7 @@ int setMuteEndTime(time_unix endTime)
 	time_unix check = 0;
 	logError(FRAM_read((unsigned char*)&check, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_read");
 	if(check != endTime)
-		return logError(-1, "setMuteEndTime - Not written what needed to be");
+		return logError(-2, "setMuteEndTime - Not written what needed to be");
 	return 0;
 }
 
@@ -114,18 +115,23 @@ time_unix getTransponderEndTime()
 
 /**
  * Sets transponder RSSI value in FRAM and check
- * @return -1 on error
- * 			0 on success
+ * @return type=int;	-1 on error
+ * 						-2 on wrong set
+ * 						0 on success
  *
  */
 int setTransponderRSSIinFRAM(short val)
 {
+	if(val < 0) //min according to TRXVU Transponder Mode Addendum (in drive)
+		val = 0;
+	else if(val > 4095) //max according to TRXVU Transponder Mode Addendum (in drive)
+		val = 4095;
 	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))
 		return -1;
 	short check = 0;
 	logError(FRAM_read((unsigned char*)&check, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_read");
 	if(check != val)
-		return logError(-1, "setTransponderRSSIinFRAM - Not written what needed to be");
+		return logError(-2, "setTransponderRSSIinFRAM - Not written what needed to be");
 	return 0;
 }
 

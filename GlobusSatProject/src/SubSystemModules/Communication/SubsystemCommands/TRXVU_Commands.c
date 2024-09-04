@@ -31,12 +31,18 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 /*
 * The command change the beacon interval in the FRAM and check it change correctly. also check the new interval is between the max and min interval
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the new_interval and the headers we add)
-* @return type=int; return type of error and if the parameter is NULL return -1.
+* @return type=int; return type of error and if the parameter is NULL return -1, -2 if length isn't in size.
 * */
 int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 {
 	if(cmd == NULL)
 		return -1;
+	if(cmd->length < 4)
+	{
+		unsigned char error_msg[] = "CMD_SetBeacon_Interval - the length isn't in size";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (wrong length)
+		return -2;
+	}
 	time_unix new_interval;
 	int error;
 	memcpy(&new_interval, &cmd->data, cmd->length);
@@ -103,11 +109,50 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 		return error;
 	}
 	error = setMuteEndTime(timeNow); // set new end time to time now
-	if(error)
+	if(error == -2)
+	{
+		unsigned char error_msg[] = "CMD_UnMuteTRXVU - written the wrong number in FRAM";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (written wrong number)
+		return error;
+	}
+	else if(error)
 	{
 		unsigned char error_msg[] = "CMD_UnMuteTRXVU - can't set new end time";
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new end time)
 		return error;
 	}
 	return logError(SendAckPacket(ACK_UNMUTE , cmd, NULL, 0), "CMD_UnMuteTRXVU - SendAckPacket"); // Send ack of success in unmuting the transmitter
+}
+
+/*
+* The command change the rssi value in the FRAM and check it change correctly. also check the new rssi value is between the 0 and 4095
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the new rssi val and the headers we add)
+* @return type=int; return type of error and if the parameter is NULL return -1 and on error in setTransponderRSSIinFRAM, -2 if length isn't in size.
+ * */
+int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+		return -1;
+	short new_rssi_val = -1;
+	if(cmd->length != 2)
+	{
+		unsigned char error_msg[] = "CMD_SetRSSI_Transponder - the length isn't in size";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (wrong length)
+		return -2;
+	}
+	memcpy(&new_rssi_val, &cmd->data, cmd->length);
+	int error = setTransponderRSSIinFRAM(new_rssi_val);
+	if(error = -2)
+	{
+		unsigned char error_msg[] = "CMD_SetRSSI_Transponder - written the wrong number in FRAM";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
+		return error;
+	}
+	else if(error)
+	{
+		unsigned char error_msg[] = "CMD_SetRSSI_Transponder - can't set new rssi";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
+		return error;
+	}
+	return logError(SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)), "CMD_UnMuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
 }
