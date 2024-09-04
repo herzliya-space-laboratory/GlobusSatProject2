@@ -41,7 +41,7 @@ typedef enum __attribute__ ((__packed__)) _ISIStrxvuTransponderMode
 } ISIStrxvutransponderMode;
 
 
-void setMuteEndTime(time_unix endTime);
+int setMuteEndTime(time_unix endTime);
 
 time_unix getMuteEndTime();
 
@@ -51,7 +51,7 @@ time_unix getTransponderEndTime();
 /**
  * Sets transponder RSSI value in FRAM
  */
-void setTransponderRSSIinFRAM(short val);
+int setTransponderRSSIinFRAM(short val);
 
 /**
  * Gets transponder RSSI value from FRAM

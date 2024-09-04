@@ -66,6 +66,78 @@ int InitTrxvuAndAnts(){
 }
 
 /*
+ * Sets Mute time end value in FRAM and check
+ * @return -1 on error
+ * 			0 on success
+ */
+int setMuteEndTime(time_unix endTime)
+{
+	if(logError(FRAM_write((unsigned char*)&endTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_write"))
+		return -1;
+	short check = 0;
+	logError(FRAM_read((unsigned char*)&check, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_read");
+	if(check != endTime)
+		return logError(-1, "setMuteEndTime - Not written what needed to be");
+	return 0;
+}
+
+/*
+ * Gets Mute time end value from FRAM
+ * @return type=time_unix; 0 on fail
+ * 						   mute end time on success
+ */
+time_unix getMuteEndTime()
+{
+	time_unix muteEndTime;
+	if(logError(FRAM_read((unsigned char*)&muteEndTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "getMuteEndTime - FRAM_read"))
+		return 0;
+	return muteEndTime;
+}
+
+/*
+ * Gets transponder end time value from FRAM
+ * @return type=time_unix; 0 on fail
+ * 						   mute end time on success
+ */
+time_unix getTransponderEndTime()
+{
+	time_unix transponderEndTime;
+	if(logError(FRAM_read((unsigned char*)&transponderEndTime, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "getTransponderEndTime - FRAM_read"))
+		return 0;
+	return transponderEndTime;
+}
+
+/**
+ * Sets transponder RSSI value in FRAM and check
+ * @return -1 on error
+ * 			0 on success
+ *
+ */
+int setTransponderRSSIinFRAM(short val)
+{
+	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))
+		return -1;
+	short check = 0;
+	logError(FRAM_read((unsigned char*)&check, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_read");
+	if(check != val)
+		return logError(-1, "setTransponderRSSIinFRAM - Not written what needed to be");
+	return 0;
+}
+
+/**
+ * Gets transponder RSSI value from FRAM
+ * @return type=short; RSSI value from FRAM, -1 on error
+ */
+short getTransponderRSSIFromFRAM()
+{
+	short rssi_val;
+	if(logError(FRAM_read((unsigned char*)&rssi_val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "getTransponderRSSIFromFRAM - FRAM_read"))
+		return -1;
+	return rssi_val;
+}
+
+
+/*
  * Gets number of packets in waiting.
  * @return type=int; -1 on error
  * 					 number of packets on success
