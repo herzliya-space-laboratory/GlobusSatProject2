@@ -72,8 +72,11 @@ int InitTrxvuAndAnts(){
  */
 int setMuteEndTime(time_unix endTime)
 {
-	if(endTime > MAX_MUTE_TIME) // check we are in range and if not round it.
-		endTime = MAX_MUTE_TIME;
+	time_unix timeNow;
+	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch"))
+		return -1;
+	if(endTime - timeNow> MAX_MUTE_TIME) // check we are in range and if not round it.
+		endTime = MAX_MUTE_TIME + timeNow;
 	if(logError(FRAM_write((unsigned char*)&endTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_write"))
 		return -1;
 	time_unix check = 0;

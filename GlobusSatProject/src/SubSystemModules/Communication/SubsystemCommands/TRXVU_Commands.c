@@ -72,12 +72,10 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 /*
 * The command sets the transponder off.
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
-* @return type=int; return type of error and if the parameter is NULL return -1.
+* @return type=int; return type of error.
 * */
 int CMD_SetOff_Transponder(sat_packet_t *cmd)
 {
-	if(cmd == NULL)
-		return -1;
 	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
 	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
 	if(error)
@@ -87,5 +85,29 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 		return error;
 	}
 	return logError(SendAckPacket(ACK_TRANSPONDER_OFF , cmd, (unsigned char*)"Transponder off", sizeof("Transponder off")), "CMD_SetOff_Transponder - SendAckPacket"); // Send ack of success in turn off transponder
+}
 
+/*
+ * Change the end time of mute to unmute the transmiter.
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error.
+ * */
+int CMD_UnMuteTRXVU(sat_packet_t *cmd)
+{
+	time_unix timeNow;
+	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch"); //get time now
+	if(error)
+	{
+		unsigned char error_msg[] = "CMD_UnMuteTRXVU - can't get the time";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't get time)
+		return error;
+	}
+	error = setMuteEndTime(timeNow); // set new end time to time now
+	if(error)
+	{
+		unsigned char error_msg[] = "CMD_UnMuteTRXVU - can't set new end time";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new end time)
+		return error;
+	}
+	return logError(SendAckPacket(ACK_UNMUTE , cmd, NULL, 0), "CMD_UnMuteTRXVU - SendAckPacket"); // Send ack of success in unmuting the transmitter
 }

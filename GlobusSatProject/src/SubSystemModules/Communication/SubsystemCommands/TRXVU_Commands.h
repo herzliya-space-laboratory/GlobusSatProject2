@@ -38,6 +38,11 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd);
 
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
+/*
+ * Change the end time of mute to unmute the transmiter.
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error.
+ * */
 int CMD_UnMuteTRXVU(sat_packet_t *cmd);
 
 /*
