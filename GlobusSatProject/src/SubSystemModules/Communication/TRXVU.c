@@ -80,8 +80,7 @@ int setMuteEndTime(time_unix endTime)
 		endTime = MAX_MUTE_TIME + timeNow;
 	if(logError(FRAM_write((unsigned char*)&endTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_write"))
 		return -1;
-	time_unix check = 0;
-	logError(FRAM_read((unsigned char*)&check, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_read");
+	time_unix check = getMuteEndTime(); //TODO: need explanation for what to do if can't read
 	if(check != endTime)
 		return logError(-2, "setMuteEndTime - Not written what needed to be");
 	return 0;

@@ -142,7 +142,7 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 	}
 	memcpy(&new_rssi_val, &cmd->data, cmd->length);
 	int error = setTransponderRSSIinFRAM(new_rssi_val);
-	if(error = -2)
+	if(error == -2)
 	{
 		unsigned char error_msg[] = "CMD_SetRSSI_Transponder - written the wrong number in FRAM";
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
