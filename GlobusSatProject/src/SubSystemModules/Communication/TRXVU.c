@@ -151,6 +151,10 @@ short getTransponderRSSIFromFRAM()
 	return rssi_val;
 }
 
+int setNewBeaconIntervalToPeriod()
+{
+	return logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
+}
 
 /*
  * Gets number of packets in waiting.

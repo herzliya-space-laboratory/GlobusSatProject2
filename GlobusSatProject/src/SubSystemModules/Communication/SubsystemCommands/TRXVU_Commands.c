@@ -65,6 +65,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't read from FRAM)
 		return error;
 	}
+	setNewBeaconIntervalToPeriod();
 	if(check != new_interval) // Check if what we wrote and what have been written is the same
 	{
 		unsigned char error_msg[] = "CMD_SetBeacon_Interval - didn't write the right number in FRAM. To check what is the number that written use the command CMD_GetBeacon_Interval";

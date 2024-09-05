@@ -41,10 +41,11 @@ typedef enum __attribute__ ((__packed__)) _ISIStrxvuTransponderMode
 } ISIStrxvutransponderMode;
 
 
-	int setMuteEndTime(time_unix endTime);
+int setMuteEndTime(time_unix endTime);
 
 time_unix getMuteEndTime();
 
+int setNewBeaconIntervalToPeriod();
 
 time_unix getTransponderEndTime();
 
