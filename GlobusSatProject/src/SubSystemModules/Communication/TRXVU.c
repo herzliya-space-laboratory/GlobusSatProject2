@@ -117,6 +117,7 @@ time_unix getTransponderEndTime()
  * Sets transponder RSSI value in FRAM and check
  * @return type=int;	-1 on error
  * 						-2 on wrong set
+ * 						-3 on I2C_write error
  * 						0 on success
  *
  */
@@ -126,6 +127,9 @@ int setTransponderRSSIinFRAM(short val)
 		val = 0;
 	else if(val > 4095) //max according to TRXVU Transponder Mode Addendum (in drive)
 		val = 4095;
+	unsigned char data[] = {0x52, val,0};
+	if(logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 3)), "setTransponderRSSIinFRAM - I2C_write")
+			return -3;
 	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))
 		return -1;
 	short check = 0;

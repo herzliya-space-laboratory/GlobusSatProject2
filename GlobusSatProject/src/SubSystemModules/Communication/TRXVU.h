@@ -41,7 +41,7 @@ typedef enum __attribute__ ((__packed__)) _ISIStrxvuTransponderMode
 } ISIStrxvutransponderMode;
 
 
-int setMuteEndTime(time_unix endTime);
+	int setMuteEndTime(time_unix endTime);
 
 time_unix getMuteEndTime();
 
@@ -141,27 +141,13 @@ int BeaconLogic();
  */
 int SetIdleState(ISIStrxvuIdleState state, time_unix duration);
 
-/*!
- * @brief	mutes the TRXVU for a specified time frame
- * @param[in] duration for how long will the satellite be in mute state
- * @return	0 in successful
- * 			-1 in failure
- */
-int muteTRXVU(time_unix duration);
-
-/*!
- * @brief Cancels TRXVU mute - transmission is now enabled
- */
-void UnMuteTRXVU();
-
-
 
 /*!
  * @brief checks if the Trxvu mute time has terminated
  * @return	TRUE if the termination time has arrived
  * 			FALSE else
  */
-Boolean CheckForMuteEnd();
+/*Boolean CheckForMuteEnd();*/
 
 /*!
  * @brief returns number of online frames are in the TRX frame buffer

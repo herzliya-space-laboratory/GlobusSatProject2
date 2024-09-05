@@ -203,5 +203,5 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 		return error;
 	}
 	return logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
-
 }
+
