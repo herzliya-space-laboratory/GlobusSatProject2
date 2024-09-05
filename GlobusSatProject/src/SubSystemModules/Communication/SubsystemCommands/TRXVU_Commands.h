@@ -47,6 +47,12 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd);
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
 /*
+ *Set the default of Transponder RSSI
+ */
+int CMD_SetRSSI_Transponder_DEFAULT(sat_packet_t *cmd);
+
+
+/*
  * turn off the mute flag
  */
 int CMD_UnMuteTRXVU(sat_packet_t *cmd);
@@ -55,6 +61,12 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd);
  * Get the beacon cycle time in FRAM
  */
 int CMD_GetBeacon_Interval(sat_packet_t *cmd);
+
+/*
+ * Set the default Beacon Interval
+ */
+int CMD_GetBeacon_Interval_DEFAULT(sat_packet_t *cmd);
+
 
 /*
  * Set a new beacon cycle time in FRAM
