@@ -84,6 +84,11 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd);
 
 int CMD_AntDeploy(sat_packet_t *cmd);
 
+/*
+ * Send ack ping
+* @param[in] name=cmd; type=sat_packet_t*; Not needed can be NULL
+* @return type=int; according to errors <hal/errors.h>
+ * */
 int CMD_Ping(sat_packet_t *cmd);
 
 

@@ -37,7 +37,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 {
 	if(cmd == NULL)
 		return -1;
-	if(cmd->length < 4)
+	if(cmd->length != 4)
 	{
 		unsigned char error_msg[] = "CMD_SetBeacon_Interval - the length isn't in size";
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (wrong length)
@@ -154,5 +154,54 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
 		return error;
 	}
-	return logError(SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)), "CMD_UnMuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
+	return logError(SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)), "CMD_SetRSSI_Transponder - SendAckPacket"); // Send ack of success in change rssi and to what
+}
+
+/*
+ * Send ack ping
+* @param[in] name=cmd; type=sat_packet_t*; Not needed can be NULL
+* @return type=int; according to errors <hal/errors.h>
+ * */
+int CMD_Ping(sat_packet_t *cmd)
+{
+	unsigned char pong_msg[] = "pong";
+	return SendAckPacket(ACK_PING , cmd, pong_msg, sizeof(pong_msg)); // send ack ping (says pong)
+}
+
+/*
+ * Set transmitter to mute for the time written in the data in cmd
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the mute duration and the headers we add)
+ * @return type=int; -1 on cmd NULL
+ * 					 -3 on incorrect length
+ * 					 errors according to setMuteEndTime
+ * */
+int CMD_MuteTRXVU(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+		return -1;
+	if(cmd->length != 4)
+	{
+		unsigned char error_msg[] = "CMD_MuteTRXVU - the length isn't in size";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (wrong length)
+		return -3;
+	}
+	time_unix muteEndTime;
+	memcpy(&muteEndTime, cmd->data, cmd->length);
+	if(muteEndTime > MAX_MUTE_TIME)
+		muteEndTime = MAX_MUTE_TIME;
+	int error = setMuteEndTime(muteEndTime);
+	if(error == -2)
+	{
+		unsigned char error_msg[] = "CMD_MuteTRXVU - written the wrong number in FRAM";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
+		return error;
+	}
+	else if(error)
+	{
+		unsigned char error_msg[] = "CMD_MuteTRXVU - can't set end time";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
+		return error;
+	}
+	return logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
+
 }

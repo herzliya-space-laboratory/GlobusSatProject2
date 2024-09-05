@@ -74,10 +74,11 @@ int InitTrxvuAndAnts(){
 int setMuteEndTime(time_unix endTime)
 {
 	time_unix timeNow;
+	if(endTime > MAX_MUTE_TIME) // check we are in range and if not round it.
+		endTime = MAX_MUTE_TIME;
 	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch"))
 		return -1;
-	if(endTime - timeNow> MAX_MUTE_TIME) // check we are in range and if not round it.
-		endTime = MAX_MUTE_TIME + timeNow;
+	endTime += timeNow;
 	if(logError(FRAM_write((unsigned char*)&endTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_write"))
 		return -1;
 	time_unix check = getMuteEndTime(); //TODO: need explanation for what to do if can't read
@@ -183,10 +184,13 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
  * @param name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
  * @param name=avalFrames; type=int*; availed frames
  * @return type=int; return -1 on cmd NULL
+ * 							-2 if we can't transmmit
  * 							Error code according to <hal/errors.h>
  * */
 int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 {
+	if(!CheckTransmitionAllowed())
+		return -2;
 	unsigned char avail;
 	if(packet == NULL)
 		return -1;
@@ -203,10 +207,13 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
  * @param name=length; type=unsigned short; length of data
  * @return type=int; return -1 on cmd NULL
  * 							-2 on fail in Assemble commend
+  * 						-3 if we can't transmmit
  * 							Error code according to <hal/errors.h>
  * */
 int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length)
 {
+	if(!CheckTransmitionAllowed())
+			return -3;
 	unsigned char avail;
 	if(cmd == NULL)
 		return -1;
@@ -216,7 +223,7 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 }
 
 /*
- * Check if we can transmit. (according to mute and EPS condition) (maybe idle too?)
+ * Check if we can transmit. (according to mute and EPS condition)
  * @return type=Boolean; TRUE if we can transmit
  * 						 FALSE if we can't
  */

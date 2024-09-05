@@ -35,6 +35,10 @@ int trxvu_command_router(sat_packet_t *cmd)
 			return CMD_UnMuteTRXVU(cmd);
 		case SET_RSSI_TRANSPONDER:
 			return CMD_SetRSSI_Transponder(cmd);
+		case PING:
+			return CMD_Ping(cmd);
+		case MUTE_TRXVU:
+			return CMD_MuteTRXVU(cmd);
 		default:
 		{
 			unsigned char unknownSubtype_msg[] = "TRXVU - unknown subtype";
