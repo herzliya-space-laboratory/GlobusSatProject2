@@ -7,7 +7,7 @@
 
 #include <hal/errors.h>
 #include <string.h>
-
+#include <hal/Drivers/I2C.h>
 #include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 #include "satellite-subsystems/IsisTRXVU.h"
 #include "satellite-subsystems/IsisAntS.h"
@@ -128,7 +128,7 @@ int setTransponderRSSIinFRAM(short val)
 	else if(val > 4095) //max according to TRXVU Transponder Mode Addendum (in drive)
 		val = 4095;
 	unsigned char data[] = {0x52, val,0};
-	if(logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 3)), "setTransponderRSSIinFRAM - I2C_write")
+	if(logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 3), "setTransponderRSSIinFRAM - I2C_write"))
 			return -3;
 	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))
 		return -1;
