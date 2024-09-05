@@ -189,6 +189,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	memcpy(&muteEndTime, cmd->data, cmd->length);
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
+	logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
 	int error = setMuteEndTime(muteEndTime);
 	if(error == -2)
 	{
@@ -202,6 +203,6 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
 		return error;
 	}
-	return logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
+	return 0;
 }
 
