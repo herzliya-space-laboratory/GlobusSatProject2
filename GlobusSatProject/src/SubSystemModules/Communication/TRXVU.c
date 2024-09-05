@@ -237,7 +237,9 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
  */
 Boolean CheckTransmitionAllowed()
 {
-	if(!CheckExecutionTime(getMuteEndTime(), 0)) // check we are after the mute end time. (!(timeNow - getMuteEndTime >= 0)) => (timeNow - getMuteEndTime < 0) => (timeNow < getMuteEndTime)
+	time_unix timeNow;
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch");
+	if(timeNow < getMuteEndTime()) // check we are after the mute end time.
 		return FALSE;
 	//TODO: check function and continue it
 	return TRUE;
