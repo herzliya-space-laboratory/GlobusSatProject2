@@ -65,20 +65,22 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 	BEACON_SUBTYPE =		0x01,	//0b00000001 =
 	MUTE_TRXVU = 			0x02,	//0b00010001 *
 	UNMUTE_TRXVU = 			0x03,	//0b10001000 *
-	ON_IDLE = 		       	0x08,   // *
-	OFF_IDLE =              0x09,
-	GET_BEACON_INTERVAL = 	0x05,	//0b00100011 =
+	ON_IDLE = 		       	0x09,   // *
+	OFF_IDLE =              0x0A,
+	GET_BEACON_INTERVAL = 	0x06,	//0b00100011 =
 	SET_BEACON_INTERVAL = 	0x04,	//0b00100100 *
-	GET_TX_UPTIME = 		0x06,	//0b01100110 = //long int
-	GET_RX_UPTIME = 		0x07,	//0b01101000 = same func as the TX uptime //long int
-	SET_RSSI_TRANSPONDER =  0x0C,   //0b10100101
-	SET_ON_TRANSPONDER =    0x0A,   //0b10100110
-	SET_OFF_TRANSPONDER =   0x0B,   //0b10100110
-	ANT_GET_ARM_STATUS = 	0x0D,	//0b10110010 =
-	ANT_GET_UPTIME =		0x0E,	//0b10110011 = //long int
-	ANT_CANCEL_DEPLOY = 	0x0F,	//0b10110111 *//delete before fllght
-	ANT_DEPLOY = 			0x10,	//0b10110111 *//delete before fllght
-	PING = 					0x11,
+	SET_BEACON_INTERVAL_DEFAULT = 0x05,	//0b00100100 *
+	GET_TX_UPTIME = 		0x07,	//0b01100110 = //long int
+	GET_RX_UPTIME = 		0x08,	//0b01101000 = same func as the TX uptime //long int
+	SET_RSSI_TRANSPONDER =  0x0D,   //0b10100101
+	SET_RSSI_TRANSPONDER_DEFAULT =  0x0E,   //0b10100101
+	SET_ON_TRANSPONDER =    0x0B,   //0b10100110
+	SET_OFF_TRANSPONDER =   0x0C,   //0b10100110
+	ANT_GET_ARM_STATUS = 	0x0F,	//0b10110010 =
+	ANT_GET_UPTIME =		0x10,	//0b10110011 = //long int
+	ANT_CANCEL_DEPLOY = 	0x11,	//0b10110111 *//delete before fllght
+	ANT_DEPLOY = 			0x12,	//0b10110111 *//delete before fllght
+	PING = 					0x13,
 
 }trxvu_subtypes_t;
 
