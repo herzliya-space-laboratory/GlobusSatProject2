@@ -30,8 +30,20 @@ Boolean CheckExecutionTimeFiveTimes()
 	return TRUE;
 }
 
+Boolean CheckExecutionTimeFutureNumber()
+{
+	time_unix prev_time;
+	logError(Time_getUnixEpoch((unsigned int*)&prev_time), "Maintenance - Time_getUnixEpoch");
+	prev_time += 100;
+	if(!CheckExecutionTime(prev_time, 0))
+			return FALSE;
+		return TRUE;
+	return TRUE;
+}
+
 
 void MainMaintenanceTestBench()
 {
 	CheckExecutionTimeFiveTimes();
+	CheckExecutionTimeFutureNumber();
 }
