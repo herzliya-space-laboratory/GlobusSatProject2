@@ -23,7 +23,7 @@ int CMD_RestoreDefaultAlpha();
 
 int CMD_RestoreDefaultThresholdVoltages();
 
-int CMD_GetSmoothingFactor(sat_packet_t *cmd);
+int CMD_GetSmoothingFactor();
 
 int CMD_EPSSetMode(sat_packet_t *cmd);
 

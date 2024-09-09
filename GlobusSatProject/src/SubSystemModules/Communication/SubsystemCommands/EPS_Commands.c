@@ -119,6 +119,7 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 	}
 	return 0;
 }
+
 int CMD_GET_STATE_CHANGES(sat_packet_t *cmd) {
 	int error = 0;
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;

@@ -35,22 +35,22 @@ int eps_command_router(sat_packet_t *cmd)
 			break;
 		}
 		case (GET_ALPHA): {
-				error = CMD_GetSmoothingFactor(cmd);
+				error = CMD_GetSmoothingFactor();
 				break;
 		}
-		case (RESTORE_ALPHA): {
+		case (UPDATE_ALPHA_DEFAULT): {
 			error = CMD_RestoreDefaultAlpha();
 			break;
 		}
-		case (UPDATE_ThresholdVoltages): {
+		case (UPDATE_THRESHOLD): {
 			error = CMD_UpdateThresholdVoltages(cmd);
 			break;
 		}
-		case (GET_ThresholdVoltages): {
+		case (GET_THRESHOLD): {
 			error = CMD_GetThresholdVoltages(cmd);
 			break;
 		}
-		case (RESTORE_ThresholdVoltages): {
+		case (UPDATE_THRESHOLD_DEFAULT): {
 			error = CMD_RestoreDefaultAlpha();
 			break;
 		}
@@ -62,7 +62,7 @@ int eps_command_router(sat_packet_t *cmd)
 			error = CMD_GetCurrentMode(cmd);
 			break;
 		}
-		case (GET_STATE_CHANGES): {
+		case (GET_STATE_CHANGES_OVERTIME): {
 			error = CMD_GET_STATE_CHANGES(cmd);
 			break;
 		}
