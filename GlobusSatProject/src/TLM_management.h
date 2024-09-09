@@ -10,7 +10,7 @@
 
 #include <hal/Boolean.h>
 #include <GlobalStandards.h>
-#include "SubSystemModules/Housekepping/TelemetryFiles.h"
+#include "SubSystemModules/Housekeeping/TelemetryFiles.h"
 #include <hal/Timing/Time.h>
 #include <time.h>
 #include "SubSystemModules/Communication/SatCommandHandler.h"

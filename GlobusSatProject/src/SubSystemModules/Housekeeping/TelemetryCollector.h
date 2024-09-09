@@ -12,7 +12,7 @@
 
 typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 {
-	voltage_t vbat;					///< the current voltage on the battery [mV]
+	voltage_t voltBattery;					///< the current voltage on the battery [mV]
 	voltage_t volt_5V;				///< the current voltage on the 5V bus [mV]
 	voltage_t volt_3V3;				///< the current voltage on the 3V3 bus [mV]
 	power_t charging_power;			///< the current charging power [mW]
@@ -26,9 +26,10 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 	time_unix sat_time;				///< current Unix time of the satellites clock [sec]
 	unsigned int free_memory;		///< number of bytes free in the satellites SD [byte]
 	unsigned int corrupt_bytes;		///< number of currpted bytes in the memory	[bytes]
+	unsigned int total_memory;		///< number of bytes in the memory	[bytes]
+	unsigned int used_bytes;		///< number of used bytes in the memory	[bytes]
 	unsigned int number_of_resets;	///< counts the number of resets the satellite has gone through [#]
 	time_unix sat_uptime;			///< Sat uptime
-	unsigned int photo_diodes[5]; 			// photo diodes
 	unsigned int num_of_cmd_resets;///< counts the number of resets the satellite has gone through due to ground station command [#]
 } WOD_Telemetry_t;
 
@@ -81,7 +82,8 @@ void TelemetrySaveWOD();
 /*!
  * @brief Gets all necessary telemetry and arranges it into a WOD structure
  * @param[out] output WOD telemetry. If an error occurred while getting TLM the fields will be zero
+ * @return error according to <hal/errors.h>
  */
-void GetCurrentWODTelemetry(WOD_Telemetry_t *wod);
+int GetCurrentWODTelemetry(WOD_Telemetry_t *wod);
 
 #endif /* TELEMETRYCOLLECTOR_H_ */

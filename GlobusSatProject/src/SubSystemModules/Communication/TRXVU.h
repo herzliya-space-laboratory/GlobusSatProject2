@@ -6,16 +6,17 @@
 #include <freertos/task.h>
 
 #include <satellite-subsystems/IsisTRXVU.h>
+#include "FRAM_FlightParameters.h"
 #include "GlobalStandards.h"
 #include "AckHandler.h"
 #include "SatCommandHandler.h"
 #include "utils.h"
 #include <hal/Timing/Time.h>
+#include "SubSystemModules/Maintenance/Maintenance.h"
 
 
-#define MAX_MUTE_TIME 		(60*60*24) 	///< max mute duration will be 90 minutes = 60 *90 [sec]
-#define MAX_IDLE_TIME 		(2400) 	///< max IDLE duration will be 20 minutes = 120 *20 [sec]
-#define MIN_BEACON_INTRAVL	5 // min of 5 sec between beacons
+#define MAX_MUTE_TIME 		(60*60*24*3) 	///< max mute duration will be 3 days = 60*60*24*3 [sec]
+#define MAX_IDLE_TIME 		(2400) 	///< max IDLE duration will be 40 minutes = 120 *20 [sec]
 
 #define SIZE_RXFRAME	200
 #define SIZE_TXFRAME	235
@@ -126,7 +127,7 @@ void FinishDump(sat_packet_t *cmd,unsigned char *buffer, ack_subtype_t acktype,
 /*!
  * @brief transmits beacon according to beacon logic
  */
-int BeaconLogic(Boolean forceTX);
+int BeaconLogic();
 
 /*
  * @brief set the idle state of the trxvu

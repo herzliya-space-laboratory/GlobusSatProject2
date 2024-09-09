@@ -25,7 +25,7 @@
 #include <hal/errors.h>
 
 #include <satellite-subsystems/IsisTRXVU.h>
-
+#include <hal/Storage/FRAM.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -637,6 +637,7 @@ static Boolean printTransmitterState() {
 	       		}
 	 return TRUE;
 }
+
 /*
  * brief, checks how much time it takes to send an 8 byte package at a 9600 bitrate
  * */
@@ -670,7 +671,6 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 17) prints Get Tx Telemetry Value Array \n\r");
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate\n\r");
-
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 19) == 0);
 
 	switch(selection) {

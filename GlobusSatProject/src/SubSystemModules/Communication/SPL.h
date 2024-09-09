@@ -62,48 +62,47 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 {
-	BEACON_SUBTYPE =		0x01,	//0b00000001 =
-	MUTE_TRXVU = 			0x11,	//0b00010001 *
-	UNMUTE_TRXVU = 			0x88,	//0b10001000 *
-	TRXVU_IDLE = 			0x87,   // *
-	DUMP_DAYS =				0x69,	//0b01101001 +
-	DUMP_TIME_RANGE =		0x70,   // +
-	ABORT_DUMP_SUBTYPE = 	0x22,	//0b00100010 *
-	GET_BAUD_RATE = 		0x13,	//0b00010011 =
-	GET_BEACON_INTERVAL = 	0x23,	//0b00100011 =
-	SET_BEACON_INTERVAL = 	0x24,	//0b00100100 *
-	TRANSMIT_BEACON		= 	0x25,
-	SET_BAUD_RATE = 		0x15,	//0b00010101 *
-	SET_BEACON_CYCLE_TIME =	0x25,	//0b00100101 //its not in the cmd dictionary
-	GET_TX_UPTIME = 		0x66,	//0b01100110 = //long int
-	GET_RX_UPTIME = 		0x68,	//0b01101000 = same func as the TX uptime //long int
-	GET_NUM_OF_ONLINE_CMD = 0xA7,	//0b10100111 =
-	SET_RSSI_TRANSPONDER =  0xA5,   //0b10100101
-	SET_TRANSPONDER =       0xA6,   //0b10100110
-	ANT_SET_ARM_STATUS = 	0xB0,	//0b10110000 *
-	ANT_GET_ARM_STATUS = 	0xB2,	//0b10110010 =
-	ANT_GET_UPTIME =		0xB3,	//0b10110011 = //long int
-	ANT_CANCEL_DEPLOY = 	0xB7,	//0b10110111 *
-	ANT_DEPLOY = 			0xB9,	//0b10110111 *
-	ANT_STOP_REDEPLOY = 	0xC0,
-	PING = 					0xC2,
-	FORCE_ABORT_DUMP_SUBTYPE = 0x33,//0b00110011 *
-	DELETE_DUMP_TASK = 0x44			//0b00100010 //its not in the cmd dictionary
+	BEACON_SUBTYPE =	        	0x01,	//0b00000001 =
+	MUTE_TRXVU = 		        	0x02,	//0b00010001 *
+	UNMUTE_TRXVU = 		        	0x03,	//0b10001000 *
+	ON_IDLE = 		               	0x09,   // *
+	OFF_IDLE =                      0x0A,
+	GET_BEACON_INTERVAL =         	0x06,	//0b00100011 =
+	SET_BEACON_INTERVAL =         	0x04,	//0b00100100 *
+	SET_BEACON_INTERVAL_DEFAULT =   0x05,	//0b00100100 *
+	GET_TX_UPTIME = 	        	0x07,	//0b01100110 = //long int
+	GET_RX_UPTIME = 	        	0x08,	//0b01101000 = same func as the TX uptime //long int
+	SET_RSSI_TRANSPONDER =          0x0D,   //0b10100101
+	SET_RSSI_TRANSPONDER_DEFAULT =  0x0E,   //0b10100101
+	SET_ON_TRANSPONDER =            0x0B,   //0b10100110
+	SET_OFF_TRANSPONDER =           0x0C,   //0b10100110
+	ANT_GET_ARM_STATUS =        	0x0F,	//0b10110010 =
+	ANT_GET_UPTIME =	        	0x10,	//0b10110011 = //long int
+	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//delete before fllght
+	ANT_DEPLOY = 		        	0x12,	//0b10110111 *//delete before fllght
+	PING = 				        	0x13,
 
 }trxvu_subtypes_t;
 
 
 typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 {
-	UPDATE_ALPHA 				= 0x01,
-    GET_ALPHA		 			= 0x02,
-    RESTORE_ALPHA 				= 0x03,
-    UPDATE_ThresholdVoltages 	= 0x04,
-    GET_ThresholdVoltages	 	= 0x05,
-    RESTORE_ThresholdVoltages   = 0x06,
-    SET_MODE					= 0x07,
-    GET_MODE					= 0x08,
-    GET_STATE_CHANGES			= 0x09,
+	RESET_EPS_WDT	 	       = 0x01,
+	UPDATE_ALPHA 		       = 0x02,
+    UPDATE_ALPHA_DEFAULT       = 0x03,
+    GET_ALPHA	    	       = 0x04,
+    UPDATE_THRESHOLD	       = 0x05,
+    UPDATE_THRESHOLD_DEFAULT   = 0x06,
+    GET_THRESHOLD	           = 0x07,
+    SET_MODE     	           = 0x08,
+    GET_MODE    	           = 0x09,
+    GET_STATE_CHANGES_OVERTIME = 0x0A,
+    GET_HEATER_VALUES   	   = 0x0B,
+    SET_HEATER_VALUES          = 0x0C,
+
+
+
+
 
 }eps_subtypes_t;
 

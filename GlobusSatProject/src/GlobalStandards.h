@@ -23,7 +23,7 @@
 
 
 
-#define TELEMETRY_SAVE_TIME_PERIOD	(10)						///< save telemetry every 10 secondss
+#define TELEMETRY_SAVE_TIME_PERIOD	(10)						///< save telemetry every 10 seconds
 
 #define MINUTES_TO_MILLISECONDS(minute) ((minute)*60*1000)
 #define SECONDS_TO_TICKS(secs) (portTickType)(((secs) * 1000) /portTICK_RATE_MS)

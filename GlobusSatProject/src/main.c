@@ -14,6 +14,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
+#include <stdlib.h>
 
 #include <hal/Timing/WatchDogTimer.h>
 #include <hal/boolean.h>
@@ -31,14 +32,18 @@
 
 #include "GlobalStandards.h"
 #include "SubSystemModules/Communication/TRXVU.h"
-#include "SubSystemModules/Housekepping/TelemetryCollector.h"
+#include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 #include "SubSystemModules/Maintenance/Maintenance.h"
 #include "main.h"
-#include <stdlib.h>
 #include "SubSystemModules/PowerManagment/EPSTest.h"
+#include "TestingDemos/TrxvuTestingDemo.h"
+#include "TestingDemos/MaintenanceTestingDemo.h"
 #ifdef TESTING
 	#include "TestingDemos/MainTest.h"
 #else
+
+//#define Testing_TRXVU 1
+//#define Testing_Maintenance 1
 
 void taskMain()
 {
@@ -52,10 +57,16 @@ void taskMain()
 	}
 
 #endif
+#ifdef Testing_TRXVU
+	MainTrxvuTestBench();
+#elif Testing_Maintenance
+	MainMaintenanceTestBench();
+#else
 	while(TRUE)
 	{
 		TRX_Logic();
 	}
+#endif
 }
 #endif
 

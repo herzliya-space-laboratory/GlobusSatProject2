@@ -20,6 +20,7 @@
  *
  * @param[in] name= data; type= unsigned char *; The packet we get after reading from the frame (without the headers of the Ax25 protocol).
  * @param[out] name= cmd; type= sat_packet_t *; The struct we put all the info we get from the packet.
+ * @return error according to CMD_ERR
  *
  * */
 CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
@@ -47,14 +48,26 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 		return null_pointer_error;
 	plusPlace += sizeof(cmd->length);
 
-	if(memcpy(&cmd->data, data + plusPlace, cmd->length) == NULL) // same just to the data which is the length that equal to the value of the variable length.
-		return null_pointer_error;
-
+	if(cmd->length != 0){
+		if(memcpy(&cmd->data, data + plusPlace, cmd->length) == NULL) // same just to the data which is the length that equal to the value of the variable length.
+			return null_pointer_error;
+	}
 
 	return command_succsess;
 }
 
-
+/*
+ * Create a sat_packet_t struct that in the end the sat send to us
+ *
+ * @param[in] name= data; type= unsigned char *; The data part in the struct
+ * @param[in] name= data_length; type= unsigned short; The length of the data that going to in the struct. Also it will be in the length part in the struct
+ * @param[in] name= type; type= char; The cmd_type part in the struct. Says which subsystem its from.
+ * @param[in] name= subtype; type= char; The cmd_subtype part in the struct. Says which commend of the subsystem its from.
+ * @param[in] name= id; type= unsigned int;  The ID part in the struct. Have the id of the sat and some other things.
+ * @param[out] name= cmd; type= sat_packet_t *; The struct we put all the info we get from the params.
+ * @return error according to CMD_ERR
+ *
+ * */
 CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char type, char subtype, unsigned int id, sat_packet_t *cmd)
 {
 	if(cmd == NULL)
@@ -80,6 +93,13 @@ CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char ty
 	return command_succsess;
 }
 
+/*
+ * According to the type in the struct goes to the right type and there do the commend.
+ *
+ * @param[out] name= cmd; type= sat_packet_t *; The packet as sat_packet_t struct.
+ * @return error according to <hal/errors.h>
+ *
+ * */
 int ActUponCommand(sat_packet_t *cmd)
 {
 	int error = 0;

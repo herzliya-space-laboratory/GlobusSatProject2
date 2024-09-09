@@ -26,6 +26,10 @@
 #include "IsisSPv2demo.h"
 #include "isis_eps_demo.h"
 
+
+#define BEACON_INTERVAL_TIME_ADDR 		0x4590		//<! address of value of the delay between 2 beacons
+#define BEACON_INTERVAL_TIME_SIZE 		4			//<! size of parameter in bytes
+
 /*
  * Gets and prints the solar panels temperature.
  * */
@@ -86,7 +90,7 @@ static Boolean PrintBeacon(void)
 		//todo:Volt 3.3V [mV]
 		//todo:Charging power [mW]
 		printf("\t Consumed power [mW]: %d\r\n", responseEPS.fields.dist_input.fields.power * 10);
-		printf("\t Electric current [mA]: %d\r\n", response.fields.batt_input.fields.current);
+		printf("\t Electric current [mA]: %d\r\n", responseEPS.fields.batt_input.fields.current);
 		//todo: Current 3.3V [mA]
 		//todo:Current 5V [mA]
 		printf("\t MCU Temperature [°C]: %2f\r\n",((double)responseEPS.fields.temp) * 0.01);
@@ -150,6 +154,16 @@ static Boolean PrintBeacon(void)
 	return TRUE;
 }
 
+static Boolean SetBeaconPeriodPlaceToTwenty()
+{
+	int data = 20;
+	print_error(FRAM_write((const unsigned char*)&data, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE));
+	int writtenData;
+	print_error(FRAM_read((unsigned char*)&writtenData, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE)); //Read data from the address and from there to the length of the data and put it in writtenData.
+	printf("%d\r\n", writtenData);
+	return TRUE;
+}
+
 /*
  * Write to the FRAM memory, read from it and check we have put it in the right place and put the right thing
  * */
@@ -188,7 +202,8 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\t 0) Return to main menu \n\r");
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 2) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	printf("\t 3) Set beacon period place in FRAM to 20\n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -199,6 +214,9 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 2:
 		offerMoreTests = WriteAndReadFromFRAM();
+		break;
+	case 3:
+		offerMoreTests = SetBeaconPeriodPlaceToTwenty();
 		break;
 	default:
 		break;

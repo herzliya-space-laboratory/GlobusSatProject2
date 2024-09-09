@@ -3,7 +3,10 @@
 #define MAINTENANCETESTINGDEMO_H_
 
 #include "GlobalStandards.h"
+#include "SubSystemModules/Maintenance/Maintenance.h"
 
-Boolean MainMaintenanceTestBench();
+Boolean CheckExecutionTimeFiveTimes();
+
+void MainMaintenanceTestBench();
 
 #endif /* MAINTENANCETESTINGDEMO_H_ */
