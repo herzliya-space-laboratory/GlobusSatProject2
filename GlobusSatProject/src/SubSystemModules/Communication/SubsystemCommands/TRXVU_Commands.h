@@ -17,7 +17,13 @@
 
 #define ANTENNA_DEPLOYMENT_TIMEOUT 10 //<! in seconds
 
-
+/*
+ * Set transmitter to mute for the time written in the data in cmd
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the mute duration and the headers we add)
+ * @return type=int; -1 on cmd NULL
+ * 					 -3 on incorrect length
+ * 					 errors according to setMuteEndTime
+ * */
 int CMD_MuteTRXVU(sat_packet_t *cmd);
 /**
  * set trxvu idle state
@@ -25,8 +31,17 @@ int CMD_MuteTRXVU(sat_packet_t *cmd);
  */
 int CMD_SetOn_dleState(sat_packet_t *cmd);
 
+
 int CMD_SetOff_dleState(sat_packet_t *cmd);
 
+/*
+ * Set transmitter to transponder state for the time written in the data in cmd
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the mute duration and the headers we add)
+ * @return type=int; -1 on cmd NULL
+ * 					 -2 on written wrong number to FRAM
+ * 					 -3 on incorrect length
+ * 					 errors according to I2C_write
+ * */
 int CMD_SetOn_Transponder(sat_packet_t *cmd);
 
 /*

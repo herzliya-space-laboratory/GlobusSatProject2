@@ -190,20 +190,66 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	memcpy(&muteEndTime, cmd->data, cmd->length);
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
-	logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success in change rssi and to what
+	logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success at mute
 	int error = setMuteEndTime(muteEndTime);
 	if(error == -2)
 	{
 		unsigned char error_msg[] = "CMD_MuteTRXVU - written the wrong number in FRAM";
-		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't write to FRAM)
 		return error;
 	}
 	else if(error)
 	{
 		unsigned char error_msg[] = "CMD_MuteTRXVU - can't set end time";
-		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new rssi)
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't set new end time)
 		return error;
 	}
 	return 0;
 }
 
+/*
+ * Set transmitter to transponder state for the time written in the data in cmd
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the mute duration and the headers we add)
+ * @return type=int; -1 on cmd NULL
+ * 					 -2 on written wrong number to FRAM
+ * 					 -3 on incorrect length
+ * 					 errors according to I2C_write
+ * */
+int CMD_SetOn_Transponder(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+		return -1;
+	if(cmd->length != 4)
+	{
+		unsigned char error_msg[] = "CMD_SetOn_Transponder - the length isn't in size";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (wrong length)
+		return -3;
+	}
+	time_unix duration;
+	memcpy(&duration, cmd->data, cmd->length);
+	if(duration > MAX_TRANS_TIME)
+		duration = MAX_TRANS_TIME;
+	int timeNow;
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_SetOn_Transponder - Time_getUnixEpoch");
+	duration += timeNow;
+	if(logError(FRAM_write((unsigned char*)&duration, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOn_Transponder - FRAM_write"))
+		return -1;
+	time_unix check = getTransponderEndTime(); //TODO: need explanation for what to do if can't read
+	if(check != duration)
+	{
+		unsigned char error_msg[] = "CMD_SetOn_Transponder - Not written what needed to be in FRAM";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (write to FRAM wrong)
+		return -2;
+	}
+	logError(SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)), "CMD_SetOn_Transponder - SendAckPacket"); // Send ack of success in turn on transponder and to how much time
+	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
+	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOn_Transponder - I2C_write"); // Set transponder on
+	if(error)
+	{
+		unsigned char error_msg[] = "CMD_SetOn_Transponder - can't turn on transponder. Probably a fault in I2C write";
+		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error that says what written in error_msg (couldn't turn off)
+		return error;
+	}
+	return 0;
+
+}

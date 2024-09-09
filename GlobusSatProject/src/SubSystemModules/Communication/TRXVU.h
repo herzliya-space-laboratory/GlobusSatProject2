@@ -90,9 +90,9 @@ int TRX_Logic();
 int SetRSSITransponder(short rssiValue);
 
 /**
- * turn on the transponder
+ * turn off the transponder
  */
-int turnOnTransponder();
+int turnOffTransponder();
 
 Boolean CheckDumpAbort();
 

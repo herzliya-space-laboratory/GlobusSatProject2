@@ -46,7 +46,7 @@ int InitTrxvuAndAnts(){
 	//Initialize the trxvu subsystem
 	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
 	//Get beacon interval from FRAM
-	logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
+	setNewBeaconIntervalToPeriod();
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
@@ -63,6 +63,24 @@ int InitTrxvuAndAnts(){
 #else
 	return logError(rv, "TRXVU - IsisTrxvu_initialize");
 #endif
+}
+
+/*
+ * Check if we pass the time of the transponder and if so get out of this state.
+ * return type=int; -1 time end not smaller then time now
+ * 					0 on success
+ * 					error according to <hal/errors.h>
+ * */
+int turnOffTransponder()
+{
+	time_unix timeNow;
+	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
+	if(error) return error;
+	time_unix timeEnd = getTransponderEndTime();
+	if(timeEnd > timeNow)
+		return -1;
+	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
 }
 
 /*
@@ -99,6 +117,8 @@ time_unix getMuteEndTime()
 		return 0;
 	return muteEndTime;
 }
+
+
 
 /*
  * Gets transponder end time value from FRAM
@@ -276,6 +296,7 @@ int TRX_Logic()
 {
 	sat_packet_t cmd;
 	int error = 0;
+	turnOffTransponder();
 	BeaconLogic(); // do the beacon logic
 	if(GetNumberOfFramesInBuffer() > 0) // Check if we have packets waiting
 	{ // if so
