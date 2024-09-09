@@ -89,10 +89,19 @@ int TRX_Logic();
  */
 int SetRSSITransponder(short rssiValue);
 
-/**
- * turn off the transponder
- */
+/*
+ * Check if we pass the time of the transponder and if so get out of this state.
+ * return type=int; -1 time end not smaller then time now
+ * 					0 on success
+ * 					error according to <hal/errors.h>
+ * */
 int turnOffTransponder();
+
+/*
+ * set transponder on
+ * return type=int; according to I2C_write error list
+ * */
+int setTransponderOn();
 
 Boolean CheckDumpAbort();
 

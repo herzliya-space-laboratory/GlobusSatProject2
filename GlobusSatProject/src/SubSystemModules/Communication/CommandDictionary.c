@@ -32,7 +32,7 @@ int trxvu_command_router(sat_packet_t *cmd)
 		case SET_OFF_TRANSPONDER:
 			return CMD_SetOff_Transponder(cmd);
 		case SET_ON_TRANSPONDER:
-			return CMD_SetON_Transponder(cmd);
+			return CMD_SetOn_Transponder(cmd);
 		case UNMUTE_TRXVU:
 			return CMD_UnMuteTRXVU(cmd);
 		case SET_RSSI_TRANSPONDER:

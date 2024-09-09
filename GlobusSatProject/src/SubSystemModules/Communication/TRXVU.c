@@ -47,6 +47,10 @@ int InitTrxvuAndAnts(){
 	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
+	time_unix timeNow;
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
+	if(timeNow < getTransponderEndTime())
+		setTransponderOn();
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
 	ISISantsI2Caddress myAntennaAddress[2];
@@ -63,6 +67,16 @@ int InitTrxvuAndAnts(){
 #else
 	return logError(rv, "TRXVU - IsisTrxvu_initialize");
 #endif
+}
+
+/*
+ * set transponder on
+ * return type=int; according to I2C_write error list
+ * */
+int setTransponderOn()
+{
+	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOn_Transponder - I2C_write"); // Set transponder on
 }
 
 /*
