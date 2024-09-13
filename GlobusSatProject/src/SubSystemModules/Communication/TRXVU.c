@@ -94,7 +94,7 @@ int turnOffTransponder()
 	if(timeEnd > timeNow)
 		return -1;
 	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "turnOffTransponder - I2C_write"); // Set transponder off
 }
 
 /*
