@@ -87,6 +87,7 @@ int setTransponderOn()
  * */
 int turnOffTransponder()
 {
+	vTaskDelay(10);
 	time_unix timeNow;
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
 	if(error) return error;
