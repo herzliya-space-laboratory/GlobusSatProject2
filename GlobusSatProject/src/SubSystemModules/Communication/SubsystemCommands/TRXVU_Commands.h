@@ -12,7 +12,6 @@
 // wait time for taking semaphores
 #define WAIT_TIME_SEM_DUMP	3
 #define WAIT_TIME_SEM_TX	3
-#define MAX_TRANS_TIME  	259200    // max time of transponder - 72 hours
 
 
 #define ANTENNA_DEPLOYMENT_TIMEOUT 10 //<! in seconds

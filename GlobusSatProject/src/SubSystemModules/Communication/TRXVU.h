@@ -17,6 +17,7 @@
 
 #define MAX_MUTE_TIME 		(60*60*24*3) 	///< max mute duration will be 3 days = 60*60*24*3 [sec]
 #define MAX_IDLE_TIME 		(2400) 	///< max IDLE duration will be 40 minutes = 120 *20 [sec]
+#define MAX_TRANS_TIME  	259200    // max time of transponder - 72 hours
 
 #define SIZE_RXFRAME	200
 #define SIZE_TXFRAME	235
@@ -102,6 +103,19 @@ int turnOffTransponder();
  * return type=int; according to I2C_write error list
  * */
 int setTransponderOn();
+
+/*
+ * set transponder off
+ * return type=int; according to I2C_write error list
+ * */
+int setTransponderOff();
+
+/*
+ * Sets transponder end time value from FRAM
+ * @return type=time_unix; 0 on success
+ * 						   error according to <hal/errors.h>
+ */
+int setTransponderEndTime(time_unix transponderEndTime);
 
 Boolean CheckDumpAbort();
 

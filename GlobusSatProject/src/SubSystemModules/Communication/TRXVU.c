@@ -107,7 +107,10 @@ int turnOffTransponder()
 	if(timeEnd == 0) return -1;
 	if(timeEnd > timeNow)
 		return 0;
-	return setTransponderOff();
+	error = setTransponderOff();
+	if(error) return error;
+	time_unix new = 0;
+	return setTransponderEndTime(new);
 }
 
 /*
@@ -145,12 +148,25 @@ time_unix getMuteEndTime()
 	return muteEndTime;
 }
 
+/*
+ * Sets transponder end time value from FRAM
+ * @return type=time_unix; 0 on success
+ * 						   error according to <hal/errors.h>
+ */
+int setTransponderEndTime(time_unix transponderEndTime)
+{
+	if(transponderEndTime > MAX_TRANS_TIME)
+		transponderEndTime = MAX_TRANS_TIME;
+	return logError(FRAM_write((unsigned char*)&transponderEndTime, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "setTransponderEndTime - FRAM_write");
+
+}
+
 
 
 /*
  * Gets transponder end time value from FRAM
  * @return type=time_unix; 0 on fail
- * 						   mute end time on success
+ * 						   Transponder end time on success
  */
 time_unix getTransponderEndTime()
 {
