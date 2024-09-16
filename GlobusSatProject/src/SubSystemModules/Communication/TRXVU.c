@@ -49,8 +49,9 @@ int InitTrxvuAndAnts(){
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
-// TODO: delete the line below
-	FRAM_write((unsigned char*)1, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
+// TODO: delete the 2 lines below
+	time_unix param = 1;
+	FRAM_write((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
