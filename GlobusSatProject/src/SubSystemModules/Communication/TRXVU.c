@@ -50,7 +50,7 @@ int InitTrxvuAndAnts(){
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
 // TODO: delete the line below
-	FRAM_write((unsigned char*)&(1), TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
+	FRAM_write((unsigned char*)1, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
