@@ -49,6 +49,8 @@ int InitTrxvuAndAnts(){
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
+// TODO: delete the line below
+	FRAM_write((unsigned char*)&(1), TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
@@ -80,22 +82,31 @@ int setTransponderOn()
 }
 
 /*
+ * set transponder off
+ * return type=int; according to I2C_write error list
+ * */
+int setTransponderOff()
+{
+	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
+}
+
+/*
  * Check if we pass the time of the transponder and if so get out of this state.
- * return type=int; -1 time end not smaller then time now
+ * return type=int; -1 on error in getTransponderEndTime
  * 					0 on success
- * 					error according to <hal/errors.h>
+ * 					error according to I2C_write errors
  * */
 int turnOffTransponder()
 {
-	vTaskDelay(10);
 	time_unix timeNow;
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
 	if(error) return error;
 	time_unix timeEnd = getTransponderEndTime();
+	if(timeEnd == 0) return -1;
 	if(timeEnd > timeNow)
-		return -1;
-	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "turnOffTransponder - I2C_write"); // Set transponder off
+		return 0;
+	return setTransponderOff();
 }
 
 /*

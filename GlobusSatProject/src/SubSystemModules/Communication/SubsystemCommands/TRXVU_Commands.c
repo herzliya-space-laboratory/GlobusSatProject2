@@ -192,6 +192,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 		muteEndTime = MAX_MUTE_TIME;
 	logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success at mute
 	int error = setMuteEndTime(muteEndTime);
+	setTransponderOff();
 	if(error == -2)
 	{
 		unsigned char error_msg[] = "CMD_MuteTRXVU - written the wrong number in FRAM";
