@@ -57,6 +57,10 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd);
  * */
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
+int CMD_SetRSSI_Transponder_DEFAULT(sat_packet_t *cmd);
+
+int CMD_GetRSSI_Transponder(sat_packet_t *cmd);
+
 /*
  * The command change the end time of mute to unmute the transmiter.
  * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
@@ -70,6 +74,13 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd);
 * @return type=int; return type of error and if the parameter (cmd) is NULL return -1.
 * */
 int CMD_GetBeacon_Interval(sat_packet_t *cmd);
+
+/*
+* The command change the beacon interval in the FRAM to default interval
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error.
+* */
+int CMD_GetBeacon_Interval_DEFAULT(sat_packet_t *cmd);
 
 /*
 * The command change the beacon interval in the FRAM and check it change correctly. also check the new interval is between the max and min interval
