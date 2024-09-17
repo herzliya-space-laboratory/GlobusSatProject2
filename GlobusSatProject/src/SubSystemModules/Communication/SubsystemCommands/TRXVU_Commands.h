@@ -5,7 +5,7 @@
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/Communication/AckHandler.h"
 #include "SubSystemModules/Communication/SatCommandHandler.h"
-
+#include "SubSystemModules/Communication/AckErrors.h"
 #include <hal/Drivers/I2C.h>
 #include <string.h>
 
