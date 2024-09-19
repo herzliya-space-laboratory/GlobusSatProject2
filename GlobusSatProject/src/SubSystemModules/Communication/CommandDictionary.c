@@ -43,6 +43,8 @@ int trxvu_command_router(sat_packet_t *cmd)
 			return CMD_MuteTRXVU(cmd);
 		case SET_BEACON_INTERVAL_DEFAULT:
 			return CMD_GetBeacon_Interval_DEFAULT(cmd);
+		case SET_RSSI_TRANSPONDER_DEFAULT:
+				return CMD_SetRSSI_Transponder_DEFAULT(cmd);
 		default:
 		{
 			unsigned char unknownSubtype_msg[] = "TRXVU - unknown subtype";
