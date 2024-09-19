@@ -83,8 +83,8 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 * */
 int CMD_GetBeacon_Interval_DEFAULT(sat_packet_t *cmd)
 {
-	cmd->data = (unsigned char*)DEFAULT_BEACON_INTERVAL_TIME;
 	cmd->length = 4;
+	memcpy(cmd->data, (unsigned char*)DEFAULT_BEACON_INTERVAL_TIME, cmd->length);
 	return CMD_SetBeacon_Interval(cmd);
 }
 
@@ -178,7 +178,7 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 int CMD_SetRSSI_Transponder_DEFAULT(sat_packet_t *cmd)
 {
 	cmd->length = 2;
-	cmd->data = (unsigned char*)DEFAULT_RSSI_VALUE;
+	memcpy(cmd->data, (unsigned char*)DEFAULT_RSSI_VALUE, cmd->length);
 	return CMD_SetRSSI_Transponder(cmd);
 }
 /*
