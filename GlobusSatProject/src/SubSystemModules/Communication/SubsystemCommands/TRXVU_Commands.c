@@ -150,8 +150,7 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 	if(cmd->length != 2)
 	{
 		//unsigned char error_msg[] = "CMD_SetRSSI_Transponder - the length isn't in size";
-		int error = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)error, sizeof(error)); // Send ack error that says what written in error_msg (wrong length)
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRONG_LENGTH_DATA, sizeof(ERROR_WRONG_LENGTH_DATA)); // Send ack error that says what written in error_msg (wrong length)
 		return -2;
 	}
 	memcpy(&new_rssi_val, &cmd->data, cmd->length);
