@@ -65,13 +65,13 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRITE_TO_FRAM, sizeof(ERROR_WRITE_TO_FRAM)); // Send ack error that says what written in error_msg (couldn't read from FRAM)
 		return error;
 	}
-	setNewBeaconIntervalToPeriod(); //TODO: to check if this needs to be after the next error
 	if(check != new_interval) // Check if what we wrote and what have been written is the same
 	{
 		//unsigned char error_msg[] = "CMD_SetBeacon_Interval - didn't write the right number in FRAM. To check what is the number that written use the command CMD_GetBeacon_Interval";
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRITTEN_IN_FRAM_WRONG, sizeof(ERROR_WRITTEN_IN_FRAM_WRONG)); // Send ack error that says what written in error_msg (written the wrong number)
 		return error;
 	}
+	setNewBeaconIntervalToPeriod();
 
 	return logError(SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)&new_interval, sizeof(new_interval)), "CMD_SetBeacon_Interval - SendAckPacket"); // // Send ack with the new_interval with subtype of ACK_UPDATE_BEACON_INTERVAL
 }
@@ -83,32 +83,9 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 * */
 int CMD_GetBeacon_Interval_DEFAULT(sat_packet_t *cmd)
 {
-	time_unix new_interval = DEFAULT_BEACON_INTERVAL_TIME;
-	int error = logError(FRAM_write((unsigned char*)&new_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_write"); // Write the new interval to FRAM
-	if(error)
-	{
-		//unsigned char error_msg[] = "CMD_GetBeacon_Interval_DEFAULT - Can't write to FRAM";
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRITE_TO_FRAM, sizeof(ERROR_WRITE_TO_FRAM)); // Send ack error that says what written in error_msg (couldn't write to FRAM)
-		return error;
-	}
-	time_unix check;
-	error = logError(FRAM_read((unsigned char*)&check, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read"); // Read from FRAM in the place we wrote to for check
-	if(error)
-	{
-		//unsigned char error_msg[] = "CMD_GetBeacon_Interval_DEFAULT - Can't read from FRAM";
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRITE_TO_FRAM, sizeof(ERROR_WRITE_TO_FRAM)); // Send ack error that says what written in error_msg (couldn't read from FRAM)
-		return error;
-	}
-	setNewBeaconIntervalToPeriod(); //TODO: to check if this needs to be after the next error
-	if(check != new_interval) // Check if what we wrote and what have been written is the same
-	{
-		//unsigned char error_msg[] = "CMD_GetBeacon_Interval_DEFAULT - didn't write the right number in FRAM. To check what is the number that written use the command CMD_GetBeacon_Interval";
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRITTEN_IN_FRAM_WRONG, sizeof(ERROR_WRITTEN_IN_FRAM_WRONG)); // Send ack error that says what written in error_msg (written the wrong number)
-		return error;
-	}
-
-	return logError(SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)&new_interval, sizeof(new_interval)), "CMD_GetBeacon_Interval_DEFAULT - SendAckPacket"); // // Send ack with the new_interval with subtype of ACK_UPDATE_BEACON_INTERVAL
-
+	cmd->data = (unsigned char*)DEFAULT_BEACON_INTERVAL_TIME;
+	cmd->length = 4;
+	return CMD_SetBeacon_Interval(cmd);
 }
 
 /*
@@ -194,6 +171,17 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 }
 
 /*
+* The command change the rssi value in the FRAM to default and check it change correctly.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information and set the data to default rssi val (the headers we add)
+* @return type=int; return type of error and if the parameter is NULL return -1 and on error in setTransponderRSSIinFRAM, -2 if length isn't in size.
+ * */
+int CMD_SetRSSI_Transponder_DEFAULT(sat_packet_t *cmd)
+{
+	cmd->length = 2;
+	cmd->data = (unsigned char*)DEFAULT_RSSI_VALUE;
+	return CMD_SetRSSI_Transponder(cmd);
+}
+/*
  * Send ack ping
 * @param[in] name=cmd; type=sat_packet_t*; Not needed can be NULL
 * @return type=int; according to errors <hal/errors.h>
@@ -218,7 +206,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		//unsigned char error_msg[] = "CMD_MuteTRXVU - the length isn't in size";
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRONG_LENGTH_DATA, sizeof((unsigned char*)ERROR_WRONG_LENGTH_DATA)); // Send ack error that says what written in error_msg (wrong length)
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRONG_LENGTH_DATA, sizeof(ERROR_WRONG_LENGTH_DATA)); // Send ack error that says what written in error_msg (wrong length)
 		return -3;
 	}
 	time_unix muteEndTime;
