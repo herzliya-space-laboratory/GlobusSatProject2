@@ -25,26 +25,28 @@ int trxvu_command_router(sat_packet_t *cmd)
 	// Go to each subtype known and according to trxvu_subtypes_t struct and check if it's equal to the subtype in the cmd. if equal go the function of the command
 	switch(cmd->cmd_subtype)
 	{
-		case GET_BEACON_INTERVAL:
-			return CMD_GetBeacon_Interval(cmd);
-		case SET_BEACON_INTERVAL:
-			return CMD_SetBeacon_Interval(cmd);
-		case SET_OFF_TRANSPONDER:
-			return CMD_SetOff_Transponder(cmd);
 		case SET_ON_TRANSPONDER:
 			return CMD_SetOn_Transponder(cmd);
-		case UNMUTE_TRXVU:
-			return CMD_UnMuteTRXVU(cmd);
+		case SET_OFF_TRANSPONDER:
+			return CMD_SetOff_Transponder(cmd);
 		case SET_RSSI_TRANSPONDER:
 			return CMD_SetRSSI_Transponder(cmd);
-		case PING:
-			return CMD_Ping(cmd);
+		case SET_RSSI_TRANSPONDER_DEFAULT:
+			return CMD_SetRSSI_Transponder_DEFAULT(cmd);
+		case GET_RSSI_TRANSPONDER:
+			return CMD_GetRSSI_Transponder();
 		case MUTE_TRXVU:
 			return CMD_MuteTRXVU(cmd);
+		case UNMUTE_TRXVU:
+			return CMD_UnMuteTRXVU(cmd);
+		case SET_BEACON_INTERVAL:
+			return CMD_SetBeacon_Interval(cmd);
 		case SET_BEACON_INTERVAL_DEFAULT:
-			return CMD_GetBeacon_Interval_DEFAULT(cmd);
-		case SET_RSSI_TRANSPONDER_DEFAULT:
-				return CMD_SetRSSI_Transponder_DEFAULT(cmd);
+			return CMD_SetBeacon_Interval_DEFAULT(cmd);
+		case GET_BEACON_INTERVAL:
+			return CMD_GetBeacon_Interval(cmd);
+		case PING:
+			return CMD_Ping(cmd);
 		default:
 		{
 			unsigned char unknownSubtype_msg[] = "TRXVU - unknown subtype";

@@ -16,14 +16,6 @@
 
 #define ANTENNA_DEPLOYMENT_TIMEOUT 10 //<! in seconds
 
-/*
- * Set transmitter to mute for the time written in the data in cmd
- * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the mute duration and the headers we add)
- * @return type=int; -1 on cmd NULL
- * 					 -3 on incorrect length
- * 					 errors according to setMuteEndTime
- * */
-int CMD_MuteTRXVU(sat_packet_t *cmd);
 /**
  * set trxvu idle state
  * cmd data should include 0x01 (On) or 0x00 (Off). if sent ON than also pass the duration (4 bytes int)
@@ -57,8 +49,18 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd);
  * */
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd);
 
+/*
+* The command change the rssi value in the FRAM to default and check it change correctly.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information and set the data to default rssi val (the headers we add)
+* @return type=int; return type of error and if the parameter is NULL return -1 and on error in setTransponderRSSIinFRAM, -2 if length isn't in size.
+ * */
 int CMD_SetRSSI_Transponder_DEFAULT(sat_packet_t *cmd);
 
+/*
+* The command get the rssi value from the FRAM and send it back.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+* @return type=int; return type of error 0 on success and if the parameter (cmd) is NULL return -2, if cant read from fram return -1.
+* */
 int CMD_GetRSSI_Transponder(sat_packet_t *cmd);
 
 /*
@@ -69,18 +71,20 @@ int CMD_GetRSSI_Transponder(sat_packet_t *cmd);
 int CMD_UnMuteTRXVU(sat_packet_t *cmd);
 
 /*
-* The command get the beacon interval from the FRAM and send it back.
-* @param[in and out] name=cmd; type=sat_packet_t; The packet the sat got and use to find all the required information (like the headers we add)
-* @return type=int; return type of error and if the parameter (cmd) is NULL return -1.
-* */
-int CMD_GetBeacon_Interval(sat_packet_t *cmd);
+ * Set transmitter to mute for the time written in the data in cmd
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the mute duration and the headers we add)
+ * @return type=int; -1 on cmd NULL
+ * 					 -3 on incorrect length
+ * 					 errors according to setMuteEndTime
+ * */
+int CMD_MuteTRXVU(sat_packet_t *cmd);
 
 /*
 * The command change the beacon interval in the FRAM to default interval
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
 * @return type=int; return type of error.
 * */
-int CMD_GetBeacon_Interval_DEFAULT(sat_packet_t *cmd);
+int CMD_SetBeacon_Interval_DEFAULT(sat_packet_t *cmd);
 
 /*
 * The command change the beacon interval in the FRAM and check it change correctly. also check the new interval is between the max and min interval
@@ -89,6 +93,12 @@ int CMD_GetBeacon_Interval_DEFAULT(sat_packet_t *cmd);
 * */
 int CMD_SetBeacon_Interval(sat_packet_t *cmd);
 
+/*
+* The command get the beacon interval from the FRAM and send it back.
+* @param[in and out] name=cmd; type=sat_packet_t; The packet the sat got and use to find all the required information (like the headers we add)
+* @return type=int; return type of error and if the parameter (cmd) is NULL return -1.
+* */
+int CMD_GetBeacon_Interval(sat_packet_t *cmd);
 
 //int CMD_Trasmit_Beacon(sat_packet_t *cmd);
 
