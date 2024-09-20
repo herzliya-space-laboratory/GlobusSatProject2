@@ -34,7 +34,7 @@ int trxvu_command_router(sat_packet_t *cmd)
 		case SET_RSSI_TRANSPONDER_DEFAULT:
 			return CMD_SetRSSI_Transponder_DEFAULT(cmd);
 		case GET_RSSI_TRANSPONDER:
-			return CMD_GetRSSI_Transponder();
+			return CMD_GetRSSI_Transponder(cmd);
 		case MUTE_TRXVU:
 			return CMD_MuteTRXVU(cmd);
 		case UNMUTE_TRXVU:
