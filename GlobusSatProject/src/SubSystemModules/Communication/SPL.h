@@ -37,6 +37,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_UPDATE_EPS_VOLTAGES = 0x15,
 	ACK_UPDATE_EPS_HEATER_VALUES = 0x16,
 	ACK_UPDATE_EPS_ALPHA = 0x17,
+	ACK_UPDATE_EPS_MODE = 0x018,
+	ACK_UPDATE_THRESHOLD = 0x019,
 
 	ACK_MUTE = 0x8D,
 	ACK_UNMUTE = 0x8E,

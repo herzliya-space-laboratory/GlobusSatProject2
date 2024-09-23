@@ -29,6 +29,8 @@ int eps_command_router(sat_packet_t *cmd)
 		return -1;
 	}
 	int error = 0;
+	//the main switch case for the EPS
+
 	switch (cmd->cmd_subtype) {
 		case (UPDATE_ALPHA): {
 			 error = CMD_UpdateSmoothingFactor(cmd);
