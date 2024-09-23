@@ -49,9 +49,10 @@ int InitTrxvuAndAnts(){
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
-// TODO: delete the 2 lines below
-	time_unix param = 1;
+// TODO: delete the 3 lines below
+	time_unix param = 0;
 	FRAM_write((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
+	FRAM_write((unsigned char*)&param, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE);
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
@@ -79,7 +80,7 @@ int InitTrxvuAndAnts(){
 int setTransponderOn()
 {
 	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOn_Transponder - I2C_write"); // Set transponder on
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on
 }
 
 /*

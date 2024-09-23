@@ -45,8 +45,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 		return -2;
 	}
 	logError(SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)), "CMD_SetOn_Transponder - SendAckPacket"); // Send ack of success in turn on transponder and to how much time
-	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
-	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOn_Transponder - I2C_write"); // Set transponder on
+	int error = setTransponderOn(); // Set transponder on
 	if(error)
 	{
 		//unsigned char error_msg[] = "CMD_SetOn_Transponder - can't turn on transponder. Probably a fault in I2C write";
