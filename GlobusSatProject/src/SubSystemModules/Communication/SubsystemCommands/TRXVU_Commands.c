@@ -163,7 +163,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (wrong length)
 		return -3;
 	}
-	time_unix muteEndTime;
+	time_unix muteEndTime = 0;
 	memcpy(&muteEndTime, cmd->data, cmd->length);
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
@@ -195,16 +195,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 {
 	int error_ack;
-	time_unix timeNow;
-	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch"); //get time now
-	if(error)
-	{
-		//unsigned char error_msg[] = "CMD_UnMuteTRXVU - can't get the time";
-		error_ack = ERROR_CANT_GET_TIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (couldn't get time)
-		return error;
-	}
-	error = setMuteEndTime(timeNow); // set new end time to time now
+	int error = setMuteEndTime(0); // set new end time to time now
 	if(error == -2)
 	{
 		//unsigned char error_msg[] = "CMD_UnMuteTRXVU - written the wrong number in FRAM";

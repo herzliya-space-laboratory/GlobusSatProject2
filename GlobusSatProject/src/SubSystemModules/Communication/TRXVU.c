@@ -142,7 +142,7 @@ int setMuteEndTime(time_unix endTime)
  */
 time_unix getMuteEndTime()
 {
-	time_unix muteEndTime;
+	time_unix muteEndTime = 0;
 	if(logError(FRAM_read((unsigned char*)&muteEndTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "getMuteEndTime - FRAM_read"))
 		return 0;
 	return muteEndTime;
