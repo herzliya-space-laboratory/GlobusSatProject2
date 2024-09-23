@@ -64,14 +64,32 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 * */
 int CMD_SetOff_Transponder(sat_packet_t *cmd)
 {
+	int error_ack;
 	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
 	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
 	if(error)
 	{
 		//unsigned char error_msg[] = "CMD_SetOff_Transponder - can't turn off transponder. Probably a fault in I2C write";
-		int error_ack = ERROR_WRITE_TO_I2C;
+		error_ack = ERROR_WRITE_TO_I2C;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (couldn't turn off)
 		return error;
+	}
+	int timeNow = 1;
+	error = logError(FRAM_write((unsigned char*)&timeNow, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOn_Transponder - FRAM_write");
+	if(error)
+	{
+		//unsigned char error_msg[] = "CMD_SetOff_Transponder - can't turn off transponder. Probably a fault in write to fram";
+		int error_ack = ERROR_WRITE_TO_FRAM;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (couldn't turn off)
+		return error;
+	}
+	time_unix check = getTransponderEndTime(); //TODO: need explanation for what to do if can't read
+	if(check != timeNow)
+	{
+		//unsigned char error_msg[] = "CMD_SetOn_Transponder - Not written what needed to be in FRAM";
+		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (write to FRAM wrong)
+		return -2;
 	}
 	return logError(SendAckPacket(ACK_TRANSPONDER_OFF, cmd, NULL, 0), "CMD_SetOff_Transponder - SendAckPacket"); // Send ack of success in turn off transponder
 }
