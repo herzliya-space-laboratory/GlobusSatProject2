@@ -16,17 +16,26 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 	if(GetcurrentMode() != AutmaticMode) {
 		return E_Manual_Override;
 	}
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+
 	EpsThreshVolt_t threshHolds;
-	memcpy(&threshHolds.fields.Vup_operational, cmd->data, sizeof(voltage_t));
-	memcpy(&threshHolds.fields.Vup_cruise, cmd->data + sizeof(voltage_t), sizeof(voltage_t));
-	memcpy(&threshHolds.fields.Vdown_operational, cmd->data + sizeof(voltage_t) * 2, sizeof(voltage_t));
-	memcpy(&threshHolds.fields.Vdown_cruise, cmd->data + sizeof(voltage_t) * 3, sizeof(voltage_t));
+	unsigned int offset = 0;
+	memcpy(&threshHolds.fields.Vup_operational, cmd->data + offset, sizeof(voltage_t));
+	offset += sizeof(voltage_t);
+
+	memcpy(&threshHolds.fields.Vup_cruise, cmd->data + offset, sizeof(voltage_t));
+	offset += sizeof(voltage_t);
+
+	memcpy(&threshHolds.fields.Vdown_operational, cmd->data + offset, sizeof(voltage_t));
+	offset += sizeof(voltage_t);
+
+	memcpy(&threshHolds.fields.Vdown_cruise, cmd->data + offset, sizeof(voltage_t));
+
 	SendAckPacket(ACK_UPDATE_EPS_ALPHA, &cmd, NULL, 0);
 	int error = SetEPSThreshold(&threshHolds);
 	return error;
 
 }
+
 int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	if (cmd == NULL)
 		return E_INPUT_POINTER_NULL;
@@ -35,32 +44,34 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	//if(GetcurrentMode() != AutmaticMode) {
 	//	return E_Manual_Override;
 	//}
-	float newalpha;
+	float newalpha = 0;
 	memcpy(&newalpha, cmd->data, cmd->length);
 
 	int error = UpdateAlpha(newalpha);
 	if (error == E_PARAM_OUTOFBOUNDS) {
-		unsigned char errmsg[] = "alpha is outofbound";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg , sizeof(errmsg));
+		 unsigned char errmsg[] = "alpha is outofbound";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 	}
+
 	SendAckPacket(ACK_UPDATE_THRESHOLD, &cmd, NULL, 0);
 	return error;
 
 }
+
 int CMD_RestoreDefaultThresholdVoltages() {
-	int error = RestoreDefaultThresholdVoltages();
-	return error;
+	return RestoreDefaultThresholdVoltages();
 }
+
 int CMD_RestoreDefaultAlpha() {
-	int error = RestoreDefaultAlpha();
-	return error;
+	return RestoreDefaultAlpha();
 }
+
 int CMD_EPSSetMode(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
 	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
-	char State;
-	EpsState_t State_t;
-	char mode;
+	char State = 0;
+	EpsState_t State_t = OperationalMode;
+	char mode = 0;
 	memcpy(&mode, cmd->data, sizeof(char));
 	if(mode == 0) {
 		EnterAutomaticMode();
@@ -88,14 +99,16 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 	int error = EnterManualMode(State_t);
 	return error;
 }
+
 int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
-	float alpha;
+	float alpha = 0;
 	unsigned short size = sizeof(alpha);
 	GetAlpha(&alpha);
 	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&alpha, size);
 	return 0;
 }
+
 int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
 	EpsThreshVolt_t Threshold;
@@ -104,18 +117,18 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&Threshold, size);
 	return 0;
 }
+
 int CMD_GetCurrentMode(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
 	EpsMode_t mode = GetcurrentMode();
 	EpsState_t state = GetSystemState();
 	if (mode == ManualMode) {
-		unsigned char data;
+		unsigned char data = 0;
 		memcpy(&data, &mode, 1);
 		memcpy(&data + 1, &state, 1);
 		TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, 2);
-	}
-
-	else {
+	}	else {
 		TransmitDataAsSPL_Packet(cmd, (unsigned char *)&mode, 2);
 	}
 	return 0;
