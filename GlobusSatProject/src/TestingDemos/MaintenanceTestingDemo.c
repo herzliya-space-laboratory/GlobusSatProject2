@@ -15,7 +15,8 @@ Boolean CheckExecutionTimeFiveTimes()
 	unsigned int time;
 	int error;
 	time_unix prev_time;
-	for(int i = 0; i < 5; i++)
+	int i;
+	for(i = 0; i < 5; i++)
 	{
 		error = logError(Time_getUnixEpoch(&time), "Maintenance - Time_getUnixEpoch");
 		if(error)

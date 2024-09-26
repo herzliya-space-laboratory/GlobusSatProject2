@@ -49,7 +49,7 @@ void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 	InitSubsystems();
-
+	UpdateAlpha(0.75);
 #ifdef WE_HAVE_EPS
 	while (TRUE) {
 		EPS_Conditioning();
@@ -64,6 +64,7 @@ void taskMain()
 #else
 	while(TRUE)
 	{
+		EPS_Loop();
 		TRX_Logic();
 	}
 #endif

@@ -10,6 +10,7 @@
 #include "GlobalStandards.h"
 #include "EPSOperationModes.h"
 #include "SubSystemModules/Communication/SatCommandHandler.h"
+#include <hal/Storage/FRAM.h>
 #include <stdint.h>
 #include <Time.h>
 

@@ -108,7 +108,7 @@ int GetAlpha(float *alpha) {
 		logError(E_INPUT_POINTER_NULL, "GetAlpha, alpha is null");
 		return E_INPUT_POINTER_NULL;
 	}
-	int error = logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
+	int error = logError(FRAM_read((unsigned char *)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 	if (error == 0) Alpha = *alpha;
 	return error;
 }
