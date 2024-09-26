@@ -19,4 +19,7 @@
 #define ERROR_WRONG_LENGTH_DATA			17 //the packet sent wrong length of the data field in data
 
 #define ERROR_CANT_SET_END_TIME			20
+
+#define ERROR_CANT_DO					30 //can't do what we want it to
+
 #endif /* ACKERRORS_H_ */

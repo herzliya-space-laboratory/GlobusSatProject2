@@ -17,13 +17,20 @@
 #define ANTENNA_DEPLOYMENT_TIMEOUT 10 //<! in seconds
 
 /**
- * set trxvu idle state
- * cmd data should include 0x01 (On) or 0x00 (Off). if sent ON than also pass the duration (4 bytes int)
+ * set trxvu idle on with time end
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the idle duration and the headers we add)
+ * @return type=int; -6 on cmd null
+ * 					 other according to SetIdleState error list.
+ * 					 or SendAckPacket
  */
-int CMD_SetOn_dleState(sat_packet_t *cmd);
+int CMD_SetOn_IdleState(sat_packet_t *cmd);
 
-
-int CMD_SetOff_dleState(sat_packet_t *cmd);
+/* set trxvu idle off
+* @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+* @return type=int; according to SetIdleState error list.
+* 					 or SendAckPacket if we don't have error in the SetIdleState
+*/
+int CMD_SetOff_IdleState(sat_packet_t *cmd);
 
 /*
  * Set transmitter to transponder state for the time written in the data in cmd
@@ -31,6 +38,8 @@ int CMD_SetOff_dleState(sat_packet_t *cmd);
  * @return type=int; -1 on cmd NULL
  * 					 -2 on written wrong number to FRAM
  * 					 -3 on incorrect length
+ * 					 -4 can't read from FRAM
+ * 					 -5 can't write to FRAM
  * 					 errors according to I2C_write
  * */
 int CMD_SetOn_Transponder(sat_packet_t *cmd);

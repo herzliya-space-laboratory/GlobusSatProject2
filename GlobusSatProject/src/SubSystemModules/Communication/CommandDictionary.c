@@ -25,6 +25,10 @@ int trxvu_command_router(sat_packet_t *cmd)
 	// Go to each subtype known and according to trxvu_subtypes_t struct and check if it's equal to the subtype in the cmd. if equal go the function of the command
 	switch(cmd->cmd_subtype)
 	{
+		case ON_IDLE:
+			return CMD_SetOn_IdleState(cmd);
+		case OFF_IDLE:
+			return CMD_SetOff_IdleState(cmd);
 		case SET_ON_TRANSPONDER:
 			return CMD_SetOn_Transponder(cmd);
 		case SET_OFF_TRANSPONDER:

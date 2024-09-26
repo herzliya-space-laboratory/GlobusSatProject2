@@ -221,6 +221,56 @@ int setNewBeaconIntervalToPeriod()
 }
 
 /*
+ * @brief set the idle state of the trxvu
+ * @param[in] state ON/OFF
+ * @param[in] duration for how long will the satellite be in idle state, if state is OFF than this value is ignored
+ * @return	0 in successful
+ * 			-1 in failure
+ * 			-2 FRAM read problem
+ * 			-3 FRAM write problem
+ * 			-4 wrong time set
+ * 			-5 time problem
+ * 			-6 not on or off
+ */
+int SetIdleState(ISIStrxvuIdleState state, time_unix duration)
+{
+	if(state == trxvu_idle_state_on)
+	{
+		if(logError(IsisTrxvu_tcSetIdlestate(ISIS_TRXVU_I2C_BUS_INDEX, trxvu_idle_state_on), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
+			return -1;
+		if(duration > MAX_IDLE_TIME)
+			duration = MAX_IDLE_TIME;
+		time_unix timeNow = 0;
+		if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch"))
+			return -5;
+		duration += timeNow;
+		if(logError(FRAM_write((unsigned char*)&duration, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_write"))
+			return -3;
+		time_unix check = 0;
+		if(logError(FRAM_read((unsigned char*)&check, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_read"))
+			return -2;
+		if(check != duration)
+			return logError(-4, "SetIdleState - Not written what needed to be");
+	}
+
+	if(state == trxvu_idle_state_off)
+	{
+		if(logError(IsisTrxvu_tcSetIdlestate(ISIS_TRXVU_I2C_BUS_INDEX, trxvu_idle_state_off), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
+				return -1;
+		duration = 0;
+		if(logError(FRAM_write((unsigned char*)&duration, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_write"))
+			return -3;
+		time_unix check = 0;
+		if(logError(FRAM_read((unsigned char*)&check, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_read"))
+			return -2;
+		if(check != duration)
+			return logError(-4, "SetIdleState - Not written what needed to be");
+	}
+
+	return -6;
+}
+
+/*
  * Gets number of packets in waiting.
  * @return type=int; -1 on error
  * 					 number of packets on success
