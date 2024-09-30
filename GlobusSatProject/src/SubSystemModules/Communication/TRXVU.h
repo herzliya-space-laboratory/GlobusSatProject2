@@ -41,22 +41,54 @@ typedef enum __attribute__ ((__packed__)) _ISIStrxvuTransponderMode
     trxvu_transponder_on = 0x02
 } ISIStrxvutransponderMode;
 
+/*
+ * Gets Idle end time value from FRAM
+ * @return type=time_unix; 0 on fail
+ * 						   mute end time on success
+ */
+time_unix getIdleEndTime();
 
+/*
+ * Sets Mute time end value in FRAM and check
+ * @return type=int;	-1 on error
+ * 						-2 on wrong set
+ * 						0 on success
+ */
 int setMuteEndTime(time_unix endTime);
 
+/*
+ * Gets Mute time end value from FRAM
+ * @return type=time_unix; 0 on fail
+ * 						   mute end time on success
+ */
 time_unix getMuteEndTime();
 
+/*
+ * Sets the new beacon interval in period.
+ * return type=int; error according to <hal/errors.h>
+ * */
 int setNewBeaconIntervalToPeriod();
 
+/*
+ * Gets transponder end time value from FRAM
+ * @return type=time_unix; 0 on fail
+ * 						   Transponder end time on success
+ */
 time_unix getTransponderEndTime();
 
 /**
- * Sets transponder RSSI value in FRAM
+ * Sets transponder RSSI value in FRAM and check
+ * @return type=int;	-1 on error
+ * 						-2 on wrong set
+ * 						-3 on I2C_write error
+ * 						0 on success
+ *
  */
 int setTransponderRSSIinFRAM(short val);
 
 /**
  * Gets transponder RSSI value from FRAM
+ * @return type=short; RSSI value from FRAM, -1 on error
  */
 short getTransponderRSSIFromFRAM();
 
@@ -77,12 +109,10 @@ void checkTransponderFinish();
 
 int CMD_SetBeaconInterval(sat_packet_t *cmd);
 
-/*!
- * @brief The TRXVU logic according to the sub-system flowchart
- * @return	command_succsess on success
- * 			errors according to CMD_ERR enumeration
- * @see "SatCommandHandler.h"
- */
+/*
+ * Have the TRXVU logic. (Beacon send, check if have packets, read packet etc.)
+ *@return type=int; return error if have and command_succsess if not
+ **/
 int TRX_Logic();
 
 /**
@@ -97,6 +127,8 @@ int SetRSSITransponder(short rssiValue);
  * 					error according to <hal/errors.h>
  * */
 int turnOffTransponder();
+
+int turnOffIdle();
 
 /*
  * set transponder on
@@ -119,19 +151,21 @@ int setTransponderEndTime(time_unix transponderEndTime);
 
 Boolean CheckDumpAbort();
 
-/*!
- * @brief checks if transmission is possible on grounds of low voltage and TX mute
- * @return	TRUE if transmission is allowed
- * 			FALSE if transmission is denied
+/*
+ * Check if we can transmit. (according to mute and EPS condition)
+ * @return type=Boolean; TRUE if we can transmit
+ * 						 FALSE if we can't
  */
 Boolean CheckTransmitionAllowed();
 
-/*!
- * @brief 	Transmits a packet according to the SPL protocol
- * @param[in] packet packet to be transmitted
- * @param[out] avalFrames Number of the available slots in the transmission buffer of the VU_TC after the frame has been added. Set NULL to skip available slot count read-back.
- * @return    Error code according to <hal/errors.h>
- */
+/*
+ * Send Ax25 packet
+ * @param name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @param name=avalFrames; type=int*; availed frames
+ * @return type=int; return -1 on cmd NULL
+ * 							-2 if we can't transmmit
+ * 							Error code according to <hal/errors.h>
+ * */
 int TransmitSplPacket(sat_packet_t *packet, int *avalFrames);
 
 /*!
@@ -148,7 +182,7 @@ void AbortDump(sat_packet_t *cmd);
 void FinishDump(sat_packet_t *cmd,unsigned char *buffer, ack_subtype_t acktype,
 		unsigned char *err, unsigned int size) ;
 
-/*!
+/*
  * @brief transmits beacon according to beacon logic
  * @ return 0 if everything is fine
  * 			-1 if we not suppose to send beacon now
@@ -162,6 +196,11 @@ int BeaconLogic();
  * @param[in] duration for how long will the satellite be in idle state, if state is OFF than this value is ignored
  * @return	0 in successful
  * 			-1 in failure
+ * 			-2 FRAM read problem
+ * 			-3 FRAM write problem
+ * 			-4 wrong time set
+ * 			-5 time problem
+ * 			-6 not on or off
  */
 int SetIdleState(ISIStrxvuIdleState state, time_unix duration);
 
@@ -173,29 +212,32 @@ int SetIdleState(ISIStrxvuIdleState state, time_unix duration);
  */
 /*Boolean CheckForMuteEnd();*/
 
-/*!
- * @brief returns number of online frames are in the TRX frame buffer
- * @return	#number number of packets available
- * 			-1 in case of failure
- */
+/*
+ * Gets number of packets in waiting.
+ * @return type=int; -1 on error
+ * 					 number of packets on success
+ **/
 int GetNumberOfFramesInBuffer();
 
-/*!
- * @brief returns an online(immediate) command to be executed if there is one in the command buffer
- * @param[out] cmd pointer to parsed command from online TRXVU frame buffer
- * @note cmd is set
- * @return	errors according to CMD_ERR
- */
+/*
+ * Get commend from the buffer and divide the info according to sat_packet_t headers
+ * @param[out] name=cmd; type=sat_packet_t *; Put here the info from packet according to the sat_packet_t struct.
+ * @return type=CMD_ERR; return command_success on success
+ * 								and error according to CMD_ERR
+ * */
 CMD_ERR GetOnlineCommand(sat_packet_t *cmd);
 
 
-/*!
- * @brief transmits data as SPL packet
- * @param[in] cmd the given command.
- * @param[in] data the out data.
- * @param[in] length number of bytes in 'data' fields.
- * @return errors according to <hal/errors.h>
- */
+/*
+ * Send Ax25 packet with output data
+ * @param name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @param name=data; type=unsigned char*; The data we want to send
+ * @param name=length; type=unsigned short; length of data
+ * @return type=int; return -1 on cmd NULL
+ * 							-2 on fail in Assemble commend
+ *	 						-3 if we can't transmmit
+ * 							Error code according to <hal/errors.h>
+ * */
 int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length);
 
 #endif

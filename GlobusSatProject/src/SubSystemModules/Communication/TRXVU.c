@@ -115,6 +115,24 @@ int turnOffTransponder()
 }
 
 /*
+ * Check if we pass the time of the idle and if so get out of this state.
+ * return type=int; -1 on error in getIdleEndTime
+ * 					0 on success
+ * 					error according to SetIdleState errors
+ * */
+int turnOffIdle()
+{
+	time_unix timeNow;
+	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
+	if(error) return error;
+	time_unix timeEnd = getIdleEndTime();
+	if(timeEnd == 0) return -1;
+	if(timeEnd > timeNow)
+		return 0;
+	return SetIdleState(trxvu_idle_state_off, 0);
+}
+
+/*
  * Sets Mute time end value in FRAM and check
  * @return type=int;	-1 on error
  * 						-2 on wrong set
@@ -177,6 +195,19 @@ time_unix getTransponderEndTime()
 	return transponderEndTime;
 }
 
+/*
+ * Gets Idle end time value from FRAM
+ * @return type=time_unix; 0 on fail
+ * 						   mute end time on success
+ */
+time_unix getIdleEndTime()
+{
+	time_unix IdleEndTime;
+	if(logError(FRAM_read((unsigned char*)&IdleEndTime, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "getIdleEndTime - FRAM_read"))
+		return 0;
+	return IdleEndTime;
+}
+
 /**
  * Sets transponder RSSI value in FRAM and check
  * @return type=int;	-1 on error
@@ -215,6 +246,10 @@ short getTransponderRSSIFromFRAM()
 	return rssi_val;
 }
 
+/*
+ * Sets the new beacon interval in period.
+ * return type=int; error according to <hal/errors.h>
+ * */
 int setNewBeaconIntervalToPeriod()
 {
 	return logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
@@ -329,7 +364,7 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
  * @param name=length; type=unsigned short; length of data
  * @return type=int; return -1 on cmd NULL
  * 							-2 on fail in Assemble commend
-  * 						-3 if we can't transmmit
+ *	 						-3 if we can't transmmit
  * 							Error code according to <hal/errors.h>
  * */
 int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length)
@@ -391,6 +426,7 @@ int TRX_Logic()
 	sat_packet_t cmd;
 	int error = 0;
 	turnOffTransponder();
+	turnOffIdle();
 	BeaconLogic(); // do the beacon logic
 	if(GetNumberOfFramesInBuffer() > 0) // Check if we have packets waiting
 	{ // if so
