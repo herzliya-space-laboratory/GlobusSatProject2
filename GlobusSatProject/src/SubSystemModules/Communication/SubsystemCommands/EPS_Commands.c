@@ -30,7 +30,7 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 
 	memcpy(&threshHolds.fields.Vdown_cruise, cmd->data + offset, sizeof(voltage_t));
 
-	SendAckPacket(ACK_UPDATE_EPS_ALPHA, &cmd, NULL, 0);
+	SendAckPacket(ACK_UPDATE_EPS_ALPHA, cmd, NULL, 0);
 	int error = SetEPSThreshold(&threshHolds);
 	return error;
 
@@ -53,7 +53,7 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 	}
 
-	SendAckPacket(ACK_UPDATE_THRESHOLD, &cmd, NULL, 0);
+	SendAckPacket(ACK_UPDATE_THRESHOLD, cmd, NULL, 0);
 	return error;
 
 }
@@ -95,7 +95,7 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 		logError(1, "No valid State");
 		break;
 	}
-	SendAckPacket(ACK_UPDATE_EPS_MODE, &cmd, NULL, 0);
+	SendAckPacket(ACK_UPDATE_EPS_MODE, cmd, NULL, 0);
 	int error = EnterManualMode(State_t);
 	return error;
 }
