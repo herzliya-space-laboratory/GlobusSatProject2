@@ -2,7 +2,13 @@
 #ifndef TRXVUTESTINGDEMO_H_
 #define TRXVUTESTINGDEMO_H_
 
+#include <hal/Utility/util.h>
+
 #include "GlobalStandards.h"
+#include "SubSystemModules/Communication/TRXVU.h"
+#include "SubSystemModules/Communication/SatCommandHandler.h"
+
+Boolean SelectAndExecuteTrxvu();
 
 void MainTrxvuTestBench();
 

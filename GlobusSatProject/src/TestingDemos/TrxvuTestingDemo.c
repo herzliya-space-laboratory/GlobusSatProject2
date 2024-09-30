@@ -6,8 +6,6 @@
  */
 
 #include "TrxvuTestingDemo.h"
-#include "SubSystemModules/Communication/TRXVU.h"
-#include "SubSystemModules/Communication/SatCommandHandler.h"
 
 void AssembleCommandNullCmd_test()
 {
@@ -116,4 +114,58 @@ void MainTrxvuTestBench()
 	ParseDataToCommandWrongSatId();
 	ParseDataToCommandDontHaveLength();
 	ParseDataToCommandLengthEqualZero();
+}
+
+Boolean SelectAndExecuteTrxvu()
+{
+	int selection = 0;
+	printf( "\n\r Select a test to perform: \n\r");
+	printf("\t0) Go back to menu\n\r");
+	printf("\t1) AssembleCommand null cmd test\n\r");
+	printf("\t2) AssembleCommand null data and length zero test\n\r");
+	printf("\t3) AssembleCommand null data and length bigger then zero test\n\r");
+	printf("\t4) AssembleCommand have data and length bigger then zero test\n\r");
+	printf("\t5) AssembleCommand have data and length bigger then max length test\n\r");
+	printf("\t6) ParseDataToCommand work test\n\r");
+	printf("\t7) ParseDataToCommend wrong sat id\n\r");
+	printf("\t8) ParseDataToCommand don't have length\n\r");
+	printf("\t9) ParseDataToCommand length equal to zero\n\r");
+
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 9) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+
+	switch(selection)
+	{
+		case 0:
+			return FALSE;
+		case 1:
+			AssembleCommandNullCmd_test();
+			break;
+		case 2:
+			AssembleCommandNullDataAndLengthZero_test();
+			break;
+		case 3:
+			AssembleCommandNullDataAndLengthBiggerThenZero_test();
+			break;
+		case 4:
+			AssembleCommandHaveDataAndLengthBiggerThenZero_test();
+			break;
+		case 5:
+			AssembleCommandHaveDataAndLengthBiggerThenMaxLength_test();
+			break;
+		case 6:
+			ParseDataToCommandWorkNormal();
+			break;
+		case 7:
+			ParseDataToCommandWrongSatId();
+			break;
+		case 8:
+			ParseDataToCommandDontHaveLength();
+			break;
+		case 9:
+			ParseDataToCommandLengthEqualZero();
+			break;
+		default:
+			break;
+	}
+	return TRUE;
 }

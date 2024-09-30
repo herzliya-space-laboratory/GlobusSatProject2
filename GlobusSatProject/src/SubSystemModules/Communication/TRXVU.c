@@ -259,13 +259,13 @@ int setNewBeaconIntervalToPeriod()
  * @brief set the idle state of the trxvu
  * @param[in] state ON/OFF
  * @param[in] duration for how long will the satellite be in idle state, if state is OFF than this value is ignored
- * @return	0 in successful
- * 			-1 in failure
- * 			-2 FRAM read problem
- * 			-3 FRAM write problem
- * 			-4 wrong time set
- * 			-5 time problem
- * 			-6 not on or off
+ * @return type=int;	0 in successful
+ * 						-1 in failure
+ * 						-2 FRAM read problem
+ * 						-3 FRAM write problem
+ * 						-4 wrong time set
+ * 						-5 time problem
+ * 						-6 not on or off
  */
 int SetIdleState(ISIStrxvuIdleState state, time_unix duration)
 {

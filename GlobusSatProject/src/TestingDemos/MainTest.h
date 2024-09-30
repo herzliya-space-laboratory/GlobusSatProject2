@@ -9,7 +9,7 @@
 #include "TestingDemos/CommandsTestingDemo.h"
 #include "TestingDemos/TelemetryTestingDemo.h"
 
-Boolean selectAndExecuteTest();
+Boolean SelectAndExecuteTest();
 
 void taskTesting();
 
