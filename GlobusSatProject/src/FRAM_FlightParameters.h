@@ -77,7 +77,7 @@
 #define TRANS_ABORT_FLAG_SIZE			1			//<! size of mute flag in bytes
 
 
-#define EPS_ALPHA_FILTER_VALUE_ADDR 0x550			//<! filtering value in the LPF formula
+#define EPS_ALPHA_FILTER_VALUE_ADDR 0x5A0			//<! filtering value in the LPF formula
 #define EPS_ALPHA_FILTER_VALUE_SIZE sizeof(float)	//<! size of double (alpha)
 
 #define EPS_MODE_FLAG_ADDR 0x554 //stating address of the eps mode search in EPSOperationModes. EpsMode_t
