@@ -49,7 +49,11 @@ void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 	InitSubsystems();
-	UpdateAlpha(0.75);
+	float alps;
+	GetAlpha(&alps);
+	alps = 0.75;
+	UpdateAlpha(alps);
+	GetAlpha(&alps);
 #ifdef WE_HAVE_EPS
 	while (TRUE) {
 		EPS_Conditioning();

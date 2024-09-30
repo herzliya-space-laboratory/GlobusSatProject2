@@ -108,7 +108,7 @@ int GetAlpha(float *alpha) {
 		logError(E_INPUT_POINTER_NULL, "GetAlpha, alpha is null");
 		return E_INPUT_POINTER_NULL;
 	}
-	int error = logError(FRAM_read((unsigned char *)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
+	int error = logError(FRAM_read((unsigned char *)alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha, FRAM_read ");
 	if (error == 0) Alpha = *alpha;
 	return error;
 }
@@ -120,8 +120,8 @@ int UpdateAlpha(float newalpha) {
 		return E_PARAM_OUTOFBOUNDS;
 	}
 	Alpha = alpha2;
-	unsigned char convalpha = (unsigned char )alpha2;
-	int error = logError(FRAM_write(&convalpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
+	float convalpha = alpha2;
+	int error = logError(FRAM_write((unsigned char*)&convalpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "SetAlpha, FRAM_write");
 	return error;
 
 }
