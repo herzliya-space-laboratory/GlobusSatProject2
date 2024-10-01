@@ -6,8 +6,10 @@
  */
 
 #include "MainTest.h"
+#include "InitSystem.h"
 #include <hal/Utility/util.h>
 #include <hal/Drivers/I2C.h>
+#include <hal/Timing/WatchDogTimer.h>
 
 Boolean SelectAndExecuteTest()
 {
@@ -29,11 +31,24 @@ Boolean SelectAndExecuteTest()
 	switch(selection)
 	{
 		case 1:
-			SelectAndExecuteTrxvu();
+			IsisTRXVUTestingLoop();
 			offerMoreTests = TRUE;
 			break;
 		default:
 			break;
 	}
 	return offerMoreTests;
+}
+
+void taskTesting()
+{
+	Boolean offerMoreTests;
+
+	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
+	InitSubsystems();
+	do
+	{
+		offerMoreTests = SelectAndExecuteTest();
+	}
+	while(offerMoreTests);
 }

@@ -169,3 +169,12 @@ Boolean SelectAndExecuteTrxvu()
 	}
 	return TRUE;
 }
+
+void IsisTRXVUTestingLoop(void)
+{
+	Boolean offerMoreTests = TRUE;
+	while(offerMoreTests)
+	{
+		offerMoreTests = SelectAndExecuteTrxvu();
+	}
+}

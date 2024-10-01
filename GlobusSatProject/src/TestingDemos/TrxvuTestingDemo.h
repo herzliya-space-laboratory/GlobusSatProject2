@@ -10,6 +10,8 @@
 
 Boolean SelectAndExecuteTrxvu();
 
+void IsisTRXVUTestingLoop();
+
 void MainTrxvuTestBench();
 
 void AssembleCommandNullCmd_test();
