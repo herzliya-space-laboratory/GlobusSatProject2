@@ -38,9 +38,9 @@
 #include "TestingDemos/TrxvuTestingDemo.h"
 #include "TestingDemos/MaintenanceTestingDemo.h"
 
-//#ifdef TESTING
+#ifdef TESTING
 	#include "TestingDemos/MainTest.h"
-//#else
+#else
 
 //#define Testing_TRXVU 1
 //#define Testing_Maintenance 1
@@ -67,7 +67,7 @@ void taskMain()
 	}
 #endif
 }
-//#endif
+#endif
 
 // main operation function. will be called upon software boot.
 int main()
@@ -82,14 +82,14 @@ int main()
 	WDT_start();
 
 	// create the main operation task of the satellite
-//	#ifdef TESTING
+	#ifdef TESTING
 		xTaskGenericCreate(taskTesting, (const signed char*) "taskTesting", 4096,
 				NULL,
 				configMAX_PRIORITIES - 2, &taskMainHandle, NULL, NULL);
-//	#else
+	#else
 		xTaskGenericCreate(taskMain, (const signed char*) "taskMain", 4096, NULL,
 				configMAX_PRIORITIES - 2, &taskMainHandle, NULL, NULL);
-//	#endif
+	#endif
 
 
 
