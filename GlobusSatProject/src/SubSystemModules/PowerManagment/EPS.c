@@ -176,15 +176,8 @@ int SetEPSThreshold(EpsThreshVolt_t *Threshold) {
 }
 
 int GetBatteryVoltage(voltage_t *vbat) {
-#ifdef GOMEPS_H_
-	gom_eps_hk_t myEpsStatus_hk;
-	int error = logError(GomEpsGetHkData_general(0, &myEpsStatus_hk), "GetBatteryVoltage, GomEpsGetHkData_general");
-	*vbat = (voltage_t)myEpsStatus_hk.fields.vbatt;
-#else
 	imepsv2_piu__gethousekeepingeng__from_t houseKeeping;
-	imepsv2_piu__gethousekeepingeng(EPS_INDEX, &houseKeeping);
-	*vbat = (voltage_t)houseKeeping.fields.volt_brdsup;
-#endif
-
+	int error = imepsv2_piu__gethousekeepingeng(EPS_INDEX, &houseKeeping);
+	*vbat = (voltage_t)houseKeeping.fields.batt_input.fields.volt;
 	return error;
 }
