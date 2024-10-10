@@ -7,6 +7,7 @@
 #include "SubsystemModules/PowerManagment/EPSOperationModes.h"
 #include "GlobalStandards.h"
 #include "utils.h"
+#include "SubsystemModules/Communication/AckErrors.h"
 #include "SubsystemModules/Communication/TRXVU.h"
 Time TimeSinceLastChangeReset;
 
@@ -49,14 +50,10 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 
 int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	if (cmd == NULL){
-		unsigned char errmsg[] = "cmd is null";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 	}
 
 	if (cmd->data == NULL){
-		unsigned char errmsg[] = "data is null";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 	}
 	//if(GetcurrentMode() != AutmaticMode) {
@@ -67,14 +64,14 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	float convalpha = (float)(newalpha / 100);
 	int error = UpdateAlpha(convalpha);
 	if (error == E_PARAM_OUTOFBOUNDS) {
-		 SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&"alpha is outofbound", sizeof("alpha is outofbound"));
+		 unsigned char errmsg = ERROR_OUT_OF_BOUND;
+		 SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg , sizeof(errmsg));
 	}
-
-	SendAckPacket(ACK_UPDATE_THRESHOLD, cmd, NULL, 0);
 	if(error != 0) {
-		unsigned char errmsg[] = "f";
+		unsigned char errmsg[] = "";
 		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 	}
+	SendAckPacket(ACK_UPDATE_THRESHOLD, cmd, NULL, 0);
 	return error;
 
 }
