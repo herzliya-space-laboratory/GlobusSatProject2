@@ -120,7 +120,7 @@ int GetEPSThreshold(EpsThreshVolt_t *Threshold);
  * 			-2 on FRAM read errors
  */
 int GetAlpha(float *alpha);
-//float GetAlpha();
+//float GetAl			pha();
 
 /*!
  * @brief setting the new voltage smoothing factor (alpha) on the FRAM.

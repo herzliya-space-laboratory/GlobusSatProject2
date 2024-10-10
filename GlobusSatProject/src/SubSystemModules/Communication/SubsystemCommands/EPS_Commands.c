@@ -44,13 +44,13 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	//if(GetcurrentMode() != AutmaticMode) {
 	//	return E_Manual_Override;
 	//}
-	float newalpha = 0;
+	int newalpha = 0;
 	memcpy(&newalpha, cmd->data, cmd->length);
-
-	int error = UpdateAlpha(newalpha);
+	float convalpha = (float)(newalpha / 100);
+	int error = UpdateAlpha(convalpha);
 	if (error == E_PARAM_OUTOFBOUNDS) {
 		 unsigned char errmsg[] = "alpha is outofbound";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 	}
 
 	SendAckPacket(ACK_UPDATE_THRESHOLD, cmd, NULL, 0);
@@ -93,6 +93,8 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 	}
 	default:
 		logError(1, "No valid State");
+		unsigned char errmsg[] = "alpha is out of bounds";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		break;
 	}
 	SendAckPacket(ACK_UPDATE_EPS_MODE, cmd, NULL, 0);
@@ -103,9 +105,10 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
 	if (cmd == NULL) return E_INPUT_POINTER_NULL;
 	float alpha = 0;
-	unsigned short size = sizeof(alpha);
 	GetAlpha(&alpha);
-	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&alpha, size);
+	int transalpha = (int)(alpha * 100);
+
+	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&transalpha, sizeof(int));
 	return 0;
 }
 
