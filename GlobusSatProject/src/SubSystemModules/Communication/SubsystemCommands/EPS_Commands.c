@@ -11,9 +11,20 @@
 Time TimeSinceLastChangeReset;
 
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
-	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd == NULL){
+		unsigned char errmsg[] = "cmd is null";
+	SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+	return E_INPUT_POINTER_NULL;
+
+	}
+	if (cmd->data == NULL){
+		unsigned char errmsg[] = "cmd is null";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		return E_INPUT_POINTER_NULL;
+	}
 	if(GetcurrentMode() != AutmaticMode) {
+		unsigned char errmsg[] = "cannot get threshold in manual mode";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_Manual_Override;
 	}
 
@@ -37,10 +48,17 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 }
 
 int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
-	if (cmd == NULL)
+	if (cmd == NULL){
+		unsigned char errmsg[] = "cmd is null";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
+	}
 
-	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd->data == NULL){
+		unsigned char errmsg[] = "data is null";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		return E_INPUT_POINTER_NULL;
+	}
 	//if(GetcurrentMode() != AutmaticMode) {
 	//	return E_Manual_Override;
 	//}
@@ -49,11 +67,14 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	float convalpha = (float)(newalpha / 100);
 	int error = UpdateAlpha(convalpha);
 	if (error == E_PARAM_OUTOFBOUNDS) {
-		 unsigned char errmsg[] = "alpha is outofbound";
-		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		 SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&"alpha is outofbound", sizeof("alpha is outofbound"));
 	}
 
 	SendAckPacket(ACK_UPDATE_THRESHOLD, cmd, NULL, 0);
+	if(error != 0) {
+		unsigned char errmsg[] = "f";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+	}
 	return error;
 
 }
@@ -103,7 +124,11 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 }
 
 int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd == NULL){
+		unsigned char errmsg[] = "cmd is null";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		return E_INPUT_POINTER_NULL;
+	}
 	float alpha = 0;
 	GetAlpha(&alpha);
 	int transalpha = (int)(alpha * 100);
@@ -113,7 +138,11 @@ int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
 }
 
 int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd == NULL) {
+		unsigned char errmsg[] = "cmd is null";
+		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		return E_INPUT_POINTER_NULL;
+	}
 	EpsThreshVolt_t Threshold;
 	unsigned short size = sizeof(Threshold);
 	GetEPSThreshold(&Threshold);
@@ -122,8 +151,17 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 }
 
 int CMD_GetCurrentMode(sat_packet_t *cmd) {
-	if (cmd == NULL) return E_INPUT_POINTER_NULL;
-	if (cmd->data == NULL) return E_INPUT_POINTER_NULL;
+	if (cmd == NULL) {
+		 unsigned char errmsg[] = "cmd is NULL";
+		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		return E_INPUT_POINTER_NULL;
+
+	}
+	if (cmd->data == NULL) {
+		 unsigned char errmsg[] = "data is NULL";
+		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		return E_INPUT_POINTER_NULL;
+	}
 	EpsMode_t mode = GetcurrentMode();
 	EpsState_t state = GetSystemState();
 	if (mode == ManualMode) {
@@ -146,6 +184,9 @@ int CMD_GET_STATE_CHANGES(sat_packet_t *cmd) {
 	memcpy(data+sizeof(int), (unsigned char *)&CHANGES_POWERSAFE, sizeof(int));
 	memcpy(data+sizeof(int)*2, (unsigned char *)&TimeSinceLastChangeReset, sizeof(Time));
 	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, sizeof(int)+sizeof(int)+sizeof(Time));
-
+	if(error!=0) {
+		 unsigned char errmsg[] = "failure in the fram READ";
+		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+	}
 	return error;
 }
