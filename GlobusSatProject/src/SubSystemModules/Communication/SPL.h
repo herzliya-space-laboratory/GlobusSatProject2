@@ -99,6 +99,8 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
     SET_MODE     	           = 0x08,
     GET_MODE    	           = 0x09,
     GET_STATE_CHANGES_OVERTIME = 0x0A,
+    Get_State                  = 0x0D,
+    chang_heater_temp          = 0x0E,
 
 
 
