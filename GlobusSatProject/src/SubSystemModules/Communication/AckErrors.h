@@ -8,6 +8,8 @@
 #ifndef ACKERRORS_H_
 #define ACKERRORS_H_
 
+#define ERROR_UNKOWN 421;
+
 #define ERROR_READ_FROM_FRAM			1
 #define ERROR_WRITE_TO_FRAM				2
 #define ERROR_WRITTEN_IN_FRAM_WRONG 	3
@@ -23,4 +25,6 @@
 #define ERROR_CANT_DO					30 //can't do what we want it to
 
 #define ERROR_OUT_OF_BOUND 				31
+
+
 #endif /* ACKERRORS_H_ */

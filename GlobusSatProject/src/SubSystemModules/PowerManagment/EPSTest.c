@@ -1,5 +1,6 @@
 #include "EPSTest.h"
 #include "EPS.h"
+#include <stdio.h>
 #define ERR_FRAM_WRITE -2;
 #define ERR_OUT_BOUND -3;
 int batteryTest() {
@@ -71,5 +72,6 @@ Error_List EPSTest() {
 	errors.fields.alphaError = alphaTest();
 	errors.fields.battError = batteryTest();
 	errors.fields.TresholdError = thresholdTest();
+	printf("alpha error, %d, battError %d, threshold %d, ",	errors.fields.alphaError, 	errors.fields.battError, errors.fields.TresholdError);
 	return errors;
 }

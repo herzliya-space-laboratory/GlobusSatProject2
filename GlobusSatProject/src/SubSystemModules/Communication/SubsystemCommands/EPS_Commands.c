@@ -13,24 +13,20 @@ Time TimeSinceLastChangeReset;
 
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 	if (cmd == NULL){
-		unsigned char errmsg[] = "cmd is null";
-	SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 	return E_INPUT_POINTER_NULL;
 
 	}
 	if (cmd->data == NULL){
-		unsigned char errmsg[] = "cmd is null";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 	}
 	if(GetcurrentMode() != AutmaticMode) {
-		unsigned char errmsg[] = "cannot get threshold in manual mode";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		int errmsg = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg, sizeof(errmsg));
 		return E_Manual_Override;
 	}
 
 	EpsThreshVolt_t threshHolds;
-	unsigned int offset = 0;
+	unsigned int offset = 0; //offset in reading the offset value.
 	memcpy(&threshHolds.fields.Vup_operational, cmd->data + offset, sizeof(voltage_t));
 	offset += sizeof(voltage_t);
 
@@ -49,6 +45,7 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd) {
 }
 
 int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
+//Cmd check
 	if (cmd == NULL){
 		return E_INPUT_POINTER_NULL;
 	}
@@ -56,20 +53,26 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 	if (cmd->data == NULL){
 		return E_INPUT_POINTER_NULL;
 	}
-	//if(GetcurrentMode() != AutmaticMode) {
-	//	return E_Manual_Override;
-	//}
+	if(GetcurrentMode() != AutmaticMode) {
+		int errmsg = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg, sizeof(errmsg));
+		return E_Manual_Override;
+	}
+//copy alpha
 	int newalpha = 0;
 	memcpy(&newalpha, cmd->data, cmd->length);
+	//#todo del later
+
 	float convalpha = (float)(newalpha / 100);
 	int error = UpdateAlpha(convalpha);
+//update alpha
 	if (error == E_PARAM_OUTOFBOUNDS) {
-		 unsigned char errmsg = ERROR_OUT_OF_BOUND;
+		 int errmsg = ERROR_OUT_OF_BOUND;
 		 SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg , sizeof(errmsg));
 	}
 	if(error != 0) {
-		unsigned char errmsg[] = "";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		 int errmsg = ERROR_UNKOWN;
+		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg, sizeof(errmsg));
 	}
 	SendAckPacket(ACK_UPDATE_THRESHOLD, cmd, NULL, 0);
 	return error;
@@ -111,8 +114,8 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 	}
 	default:
 		logError(1, "No valid State");
-		unsigned char errmsg[] = "alpha is out of bounds";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		int errmsg = ERROR_OUT_OF_BOUND;
+		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg, sizeof(errmsg));
 		break;
 	}
 	SendAckPacket(ACK_UPDATE_EPS_MODE, cmd, NULL, 0);
@@ -122,8 +125,6 @@ int CMD_EPSSetMode(sat_packet_t *cmd) {
 
 int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
 	if (cmd == NULL){
-		unsigned char errmsg[] = "cmd is null";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 	}
 	float alpha = 0;
@@ -136,8 +137,6 @@ int CMD_GetSmoothingFactor(sat_packet_t *cmd) {
 
 int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 	if (cmd == NULL) {
-		unsigned char errmsg[] = "cmd is null";
-		SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 	}
 	EpsThreshVolt_t Threshold;
@@ -149,14 +148,10 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd) {
 
 int CMD_GetCurrentMode(sat_packet_t *cmd) {
 	if (cmd == NULL) {
-		 unsigned char errmsg[] = "cmd is NULL";
-		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 
 	}
 	if (cmd->data == NULL) {
-		 unsigned char errmsg[] = "data is NULL";
-		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
 		return E_INPUT_POINTER_NULL;
 	}
 	EpsMode_t mode = GetcurrentMode();
@@ -182,8 +177,8 @@ int CMD_GET_STATE_CHANGES(sat_packet_t *cmd) {
 	memcpy(data+sizeof(int)*2, (unsigned char *)&TimeSinceLastChangeReset, sizeof(Time));
 	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, sizeof(int)+sizeof(int)+sizeof(Time));
 	if(error!=0) {
-		 unsigned char errmsg[] = "failure in the fram READ";
-		 SendAckPacket(ACK_ERROR_MSG, cmd, errmsg, sizeof(errmsg));
+		int errmsg = ERROR_READ_FROM_FRAM;
+		 SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg, sizeof(errmsg));
 	}
 	return error;
 }
