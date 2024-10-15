@@ -28,8 +28,6 @@ int StartFRAM(){
 	return logError(FRAM_start(), "FRAM - FRAM_start");
 }
 
-//TODO: void WriteDefaultValuesToFRAM() {} // need to use FRAM_writeAndVerify or FRAM_write
-
 int StartI2C(){
 	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "I2C - I2C_start");
 }
@@ -48,6 +46,34 @@ int InitSupervisor()
 	uint8_t po = SUPERVISOR_SPI_INDEX;
 	int error = Supervisor_start(&po, 0);
 	return logError(error, "Supervisor - Supervisor_start");
+}
+
+int WriteDefaultValuesToFRAM()
+{
+	time_unix param = 0;
+	int error = 0;
+	if(FRAM_writeAndVerify((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE)) error = -1;
+	if(FRAM_writeAndVerify((unsigned char*)&param, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE)) error = -1;
+	if(FRAM_writeAndVerify((unsigned char*)&param, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE)) error = -1;
+
+	int beacon_interval = DEFAULT_BEACON_INTERVAL_TIME;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&beacon_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "default to FRAM - beacon")) error = -1;
+
+	int rssi = DEFAULT_RSSI_VALUE;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&rssi, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "default to FRAM - rssi")) error = -1;
+
+	float alpha = DEFAULT_ALPHA_VALUE;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error = -1;
+
+
+	return error;
+}
+
+int FirstActivition()
+{
+	int error = 0;
+	if(WriteDefaultValuesToFRAM()) error = -1;
+	return error;
 }
 
 int InitSubsystems(){

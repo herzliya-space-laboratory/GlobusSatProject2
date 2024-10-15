@@ -21,7 +21,7 @@ int StartFRAM();
  * @brief	writes the default flight parameters to the corresponding FRAM addresses
  * @see FRAM_FlightParameters.h
  */
-void WriteDefaultValuesToFRAM();
+int WriteDefaultValuesToFRAM();
 
 /*!
  * @brief	Starts the I2C using drivers, and checks for errors.
@@ -60,6 +60,6 @@ int InitSubsystems();
  * @return	0 successful deployment
  * 			-1 failed to deploy
  */
-int DeploySystem();
+int FirstActivition();
 
 #endif /* INITSYSTEM_H_ */
