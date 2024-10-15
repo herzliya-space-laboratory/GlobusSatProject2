@@ -7,12 +7,14 @@
 #include "GlobalStandards.h"
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/Communication/SatCommandHandler.h"
+#include "SubSystemModules/Communication/SubsystemCommands/TRXVU_Commands.h"
 
 Boolean SelectAndExecuteTrxvu();
 
 void IsisTRXVUTestingLoop();
 
 void MainTrxvuTestBench();
+
 
 void AssembleCommandNullCmd_test();
 
@@ -31,5 +33,16 @@ void ParseDataToCommandWrongSatId();
 void ParseDataToCommandDontHaveLength();
 
 void ParseDataToCommandLengthEqualZero();
+
+
+void GetAntsSide_SideA();
+
+void GetAntsSide_SideB();
+
+void GetAntsSide_SideEqualC();
+
+void GetAntsSide_SideNotExist();
+
+void GetAntsSide_SideNotExistButHaveLength();
 
 #endif /* TRXVUTESTINGDEMO_H_ */

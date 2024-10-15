@@ -111,19 +111,44 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd);
 
 //int CMD_Trasmit_Beacon(sat_packet_t *cmd);
 
-
+/*
+ * Get transmitter uptime and send to ground
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error according to <hal/errors.h>
+ * */
 int CMD_GetTxUptime(sat_packet_t *cmd);
 
+/*
+ * Get receiver uptime and send to ground
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error according to <hal/errors.h>
+ * */
 int CMD_GetRxUptime(sat_packet_t *cmd);
-
-//int CMD_DeleteDelayedCmdByID(sat_packet_t *cmd);
 
 //int CMD_DeleteAllDelayedBuffer(sat_packet_t *cmd);
 
 int CMD_AntGetArmStatus(sat_packet_t *cmd);
 
+/*
+ * Gets Ant uptime according to side.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
+ * @return type=int; return type of error according to this
+ * 																-1 cmd NULL
+ * 																-2 if length isn't in size.
+ * 																-3 got wrong side (not exist one)
+ * 																else from <hal/errors.h>
+ * */
 int CMD_AntGetUptime(sat_packet_t *cmd);
 
+/*
+ * cancel deployment according to side.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
+ * @return type=int; return type of error according to this
+ * 																-1 cmd NULL
+ * 																-2 if length isn't in size.
+ * 																-3 got wrong side (not exist one)
+ * 																else from <hal/errors.h>
+ * */
 int CMD_AntCancelDeployment(sat_packet_t *cmd);
 
 int CMD_AntDeploy(sat_packet_t *cmd);

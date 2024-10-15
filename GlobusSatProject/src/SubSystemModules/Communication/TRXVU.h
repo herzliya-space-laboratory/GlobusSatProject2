@@ -6,6 +6,8 @@
 #include <freertos/task.h>
 
 #include <satellite-subsystems/IsisTRXVU.h>
+#include "satellite-subsystems/IsisAntS.h"
+
 #include "FRAM_FlightParameters.h"
 #include "GlobalStandards.h"
 #include "AckHandler.h"

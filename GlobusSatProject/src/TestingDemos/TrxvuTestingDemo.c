@@ -103,6 +103,76 @@ void ParseDataToCommandLengthEqualZero()
 	}
 }
 
+void GetAntsSide_SideA()
+{
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x41};
+	sat_packet_t cmd;
+	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
+	{
+		char side;
+		int error = GetAntSide(&cmd, &side);
+		if(error)
+			printf("something is wrong - test 10 (not side but in the function)\n\r");
+		if(side != 'A')
+			printf("something is wrong - test 10\n\r");
+	}
+}
+
+void GetAntsSide_SideB()
+{
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x42};
+	sat_packet_t cmd;
+	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
+	{
+		char side;
+		int error = GetAntSide(&cmd, &side);
+		if(error)
+			printf("something is wrong - test 11 (not side but in the function)\n\r");
+		if(side != 'B')
+			printf("something is wrong - test 11\n\r");
+	}
+}
+
+void GetAntsSide_SideEqualC()
+{
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x43};
+	sat_packet_t cmd;
+	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
+	{
+		char side;
+		int error = GetAntSide(&cmd, &side);
+		if(error != -3)
+			printf("something is wrong - test 12 (not side but in the function)\n\r");
+	}
+}
+
+void GetAntsSide_SideNotExist()
+{
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x00, 0x00 };
+	sat_packet_t cmd;
+	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
+	{
+		char side;
+		int error = GetAntSide(&cmd, &side);
+		if(error != -2)
+			printf("something is wrong - test 13 (not side but in the function)\n\r");
+	}
+}
+
+void GetAntsSide_SideNotExistButHaveLength()
+{
+	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00};
+	sat_packet_t cmd;
+	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
+	{
+		char side;
+		int error = GetAntSide(&cmd, &side);
+		if(!error)
+			printf("something is wrong - test 14 (not side but in the function)\n\r");
+	}
+}
+
+
 void MainTrxvuTestBench()
 {
 	AssembleCommandNullCmd_test();
@@ -114,6 +184,12 @@ void MainTrxvuTestBench()
 	ParseDataToCommandWrongSatId();
 	ParseDataToCommandDontHaveLength();
 	ParseDataToCommandLengthEqualZero();
+
+	GetAntsSide_SideA();
+	GetAntsSide_SideB();
+	GetAntsSide_SideEqualC();
+	GetAntsSide_SideNotExist();
+	GetAntsSide_SideNotExistButHaveLength();
 }
 
 Boolean SelectAndExecuteTrxvu()
@@ -121,17 +197,22 @@ Boolean SelectAndExecuteTrxvu()
 	int selection = 0;
 	printf( "\n\r Select a test to perform: \n\r");
 	printf("\t0) Go back to menu\n\r");
-	printf("\t1) AssembleCommand null cmd test\n\r");
-	printf("\t2) AssembleCommand null data and length zero test\n\r");
-	printf("\t3) AssembleCommand null data and length bigger then zero test\n\r");
-	printf("\t4) AssembleCommand have data and length bigger then zero test\n\r");
-	printf("\t5) AssembleCommand have data and length bigger then max length test\n\r");
-	printf("\t6) ParseDataToCommand work test\n\r");
-	printf("\t7) ParseDataToCommend wrong sat id\n\r");
-	printf("\t8) ParseDataToCommand don't have length\n\r");
-	printf("\t9) ParseDataToCommand length equal to zero\n\r");
+	printf("\t1)  AssembleCommand null cmd test\n\r");
+	printf("\t2)  AssembleCommand null data and length zero test\n\r");
+	printf("\t3)  AssembleCommand null data and length bigger then zero test\n\r");
+	printf("\t4)  AssembleCommand have data and length bigger then zero test\n\r");
+	printf("\t5)  AssembleCommand have data and length bigger then max length test\n\r");
+	printf("\t6)  ParseDataToCommand work test\n\r");
+	printf("\t7)  ParseDataToCommend wrong sat id\n\r");
+	printf("\t8)  ParseDataToCommand don't have length\n\r");
+	printf("\t9)  ParseDataToCommand length equal to zero\n\r");
+	printf("\t10) GetAntSide in data have A\n\r");
+	printf("\t11) GetAntSide in data have B\n\r");
+	printf("\t12) GetAntSide in data have C (a not exist side)\n\r");
+	printf("\t13) GetAntSide doesn't have length\n\r");
+	printf("\t14) GetAntSide in data have length but no data\n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 9) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
@@ -163,6 +244,21 @@ Boolean SelectAndExecuteTrxvu()
 			break;
 		case 9:
 			ParseDataToCommandLengthEqualZero();
+			break;
+		case 10:
+			GetAntsSide_SideA();
+			break;
+		case 11:
+			GetAntsSide_SideB();
+			break;
+		case 12:
+			GetAntsSide_SideEqualC();
+			break;
+		case 13:
+			GetAntsSide_SideNotExist();
+			break;
+		case 14:
+			GetAntsSide_SideNotExistButHaveLength();
 			break;
 		default:
 			break;

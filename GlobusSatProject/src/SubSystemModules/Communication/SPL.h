@@ -55,6 +55,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_REDEPLOY = 0x95,
 	ACK_RESET_DELAYED_CMD = 0x9E,			//maybe we dont need
 	ACK_FRAM_RESET = 0xA0,
+	ACK_ANT_CANCEL_DEPLOY = 0xA3,
 
 	ACK_DELETE_TLM = 0xC0,					// after deleting TLM file(s)
 

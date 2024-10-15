@@ -9,8 +9,6 @@
 #include <string.h>
 #include <hal/Drivers/I2C.h>
 #include "SubSystemModules/Housekeeping/TelemetryCollector.h"
-#include "satellite-subsystems/IsisTRXVU.h"
-#include "satellite-subsystems/IsisAntS.h"
 
 #include "SatCommandHandler.h"
 #include "TRXVU.h"

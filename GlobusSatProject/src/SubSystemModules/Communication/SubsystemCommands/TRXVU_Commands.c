@@ -365,8 +365,8 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		return -1;
 	if(cmd->length != 4)
 	{
-		//unsigned char error_msg[] = "CMD_SetBeacon_Interval - the length isn't in size";
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)ERROR_WRONG_LENGTH_DATA, sizeof(ERROR_WRONG_LENGTH_DATA)); // Send ack error that says what written in error_msg (wrong length)
+		error_ack = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
 	time_unix new_interval;
@@ -437,6 +437,136 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 	if(cmd == NULL)
 		return -1;
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&period, BEACON_INTERVAL_TIME_SIZE), "CMD_GetBeacon_Interval - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+}
+
+/*
+ * Get transmitter uptime and send to ground
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error according to <hal/errors.h>
+ * */
+int CMD_GetTxUptime(sat_packet_t *cmd)
+{
+	unsigned int uptime;
+	int error = IsisTrxvu_tcGetUptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
+	if(error)
+	{
+		int error_ack = ERROR_GET_UPTIME;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
+}
+
+/*
+ * Get receiver uptime and send to ground
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error according to <hal/errors.h>
+ * */
+int CMD_GetRxUptime(sat_packet_t *cmd)
+{
+	unsigned int uptime;
+	int error = IsisTrxvu_rcGetUptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
+	if(error)
+	{
+		int error_ack = ERROR_GET_UPTIME;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
+}
+
+/*
+ * Helper function to get side of ants.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
+ * @param[out] name=side; type=char*; here we left the side for further use.
+ * */
+int GetAntSide(sat_packet_t *cmd, char *side)
+{
+	int error_ack;
+	if(cmd == NULL) return -1;
+	if(cmd->length != 1)
+	{
+		error_ack = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -2;
+	}
+	*side = cmd->data[0];
+	return 0;
+}
+
+//int CMD_AntGetArmStatus(sat_packet_t *cmd);
+
+/*
+ * Gets Ant uptime according to side.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
+ * @return type=int; return type of error according to this
+ * 																-1 cmd NULL
+ * 																-2 if length isn't in size.
+ * 																-3 got wrong side (not exist one)
+ * 																else from <hal/errors.h>
+ * */
+int CMD_AntGetUptime(sat_packet_t *cmd)
+{
+	int error_ack;
+	if(cmd == NULL) return -1;
+	int error = 0;
+	char side;
+	error = GetAntSide(cmd, &side);
+	if(error) return error;
+	unsigned int uptime;
+	if(side == 'A')
+		error = IsisAntS_getUptime(0, isisants_sideA, &uptime);
+	else if(side == 'B')
+		error = IsisAntS_getUptime(0, isisants_sideB, &uptime);
+	else
+	{
+		error_ack = ERROR_SIDE_ANTS_NOT_A_OR_B;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -3;
+	}
+	if(error)
+	{
+		error_ack = ERROR_GET_UPTIME;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_AntGetUptime - TransmitDataAsSPL_Packet");
+}
+
+/*
+ * cancel deployment according to side.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
+ * @return type=int; return type of error according to this
+ * 																-1 cmd NULL
+ * 																-2 if length isn't in size.
+ * 																-3 got wrong side (not exist one)
+ * 																else from <hal/errors.h>
+ * */
+int CMD_AntCancelDeployment(sat_packet_t *cmd)
+{
+	int error_ack;
+	if(cmd == NULL) return -1;
+	int error;
+	char side;
+	error = GetAntSide(cmd, &side);
+	if(error) return error;
+	if(side == 'A')
+		error = IsisAntS_cancelDeployment(0, isisants_sideA);
+	else if(side == 'B')
+		error = IsisAntS_cancelDeployment(0, isisants_sideB);
+	else
+	{
+		error_ack = ERROR_SIDE_ANTS_NOT_A_OR_B;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -3;
+	}
+	if(error)
+	{
+		error_ack = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error;
+	}
+	return logError(SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0), "CMD_AntCancelDeployment - SendAckPacket");
 }
 
 /*

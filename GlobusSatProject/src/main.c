@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include "TestingDemos/TrxvuTestingDemo.h"
 #include "TestingDemos/MaintenanceTestingDemo.h"
+#include "TestingDemos/MainTest.h"
 
 #ifdef TESTING
 	#include "TestingDemos/MainTest.h"
@@ -82,14 +83,14 @@ int main()
 	WDT_start();
 
 	// create the main operation task of the satellite
-	#ifdef TESTING
+	//#ifdef TESTING
 		xTaskGenericCreate(taskTesting, (const signed char*) "taskTesting", 4096,
 				NULL,
 				configMAX_PRIORITIES - 2, &taskMainHandle, NULL, NULL);
-	#else
+	//#else
 		xTaskGenericCreate(taskMain, (const signed char*) "taskMain", 4096, NULL,
 				configMAX_PRIORITIES - 2, &taskMainHandle, NULL, NULL);
-	#endif
+	//#endif
 
 
 

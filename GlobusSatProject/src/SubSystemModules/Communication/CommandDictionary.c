@@ -49,6 +49,14 @@ int trxvu_command_router(sat_packet_t *cmd)
 			return CMD_SetBeacon_Interval_DEFAULT(cmd);
 		case GET_BEACON_INTERVAL:
 			return CMD_GetBeacon_Interval(cmd);
+		case GET_TX_UPTIME:
+			return CMD_GetTxUptime(cmd);
+		case GET_RX_UPTIME:
+			return CMD_GetRxUptime(cmd);
+		case ANT_GET_UPTIME:
+			return CMD_AntGetUptime(cmd);
+		case ANT_CANCEL_DEPLOY:
+			return CMD_AntCancelDeployment(cmd);
 		case PING:
 			return CMD_Ping(cmd);
 		default:
