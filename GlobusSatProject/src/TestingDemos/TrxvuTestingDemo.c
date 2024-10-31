@@ -165,9 +165,6 @@ Boolean SelectAndExecuteTrxvu()
 	printf("\t9)  ParseDataToCommand length equal to zero\n\r");
 	printf("\t10) GetAntSide in data have A\n\r");
 	printf("\t11) GetAntSide in data have B\n\r");
-	printf("\t12) GetAntSide in data have C (a not exist side)\n\r");
-	printf("\t13) GetAntSide doesn't have length\n\r");
-	printf("\t14) GetAntSide in data have length but no data\n\r");
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
