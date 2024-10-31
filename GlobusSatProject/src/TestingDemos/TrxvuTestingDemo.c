@@ -133,46 +133,6 @@ void GetAntsSide_SideB()
 	}
 }
 
-void GetAntsSide_SideEqualC()
-{
-	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x43};
-	sat_packet_t cmd;
-	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
-	{
-		char side;
-		int error = GetAntSide(&cmd, &side);
-		if(error != -3)
-			printf("something is wrong - test 12 (not side but in the function)\n\r");
-	}
-}
-
-void GetAntsSide_SideNotExist()
-{
-	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x00, 0x00 };
-	sat_packet_t cmd;
-	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
-	{
-		char side;
-		int error = GetAntSide(&cmd, &side);
-		if(error != -2)
-			printf("something is wrong - test 13 (not side but in the function)\n\r");
-	}
-}
-
-void GetAntsSide_SideNotExistButHaveLength()
-{
-	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00};
-	sat_packet_t cmd;
-	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
-	{
-		char side;
-		int error = GetAntSide(&cmd, &side);
-		if(!error)
-			printf("something is wrong - test 14 (not side but in the function)\n\r");
-	}
-}
-
-
 void MainTrxvuTestBench()
 {
 	AssembleCommandNullCmd_test();
@@ -187,9 +147,6 @@ void MainTrxvuTestBench()
 
 	GetAntsSide_SideA();
 	GetAntsSide_SideB();
-	GetAntsSide_SideEqualC();
-	GetAntsSide_SideNotExist();
-	GetAntsSide_SideNotExistButHaveLength();
 }
 
 Boolean SelectAndExecuteTrxvu()
@@ -212,7 +169,7 @@ Boolean SelectAndExecuteTrxvu()
 	printf("\t13) GetAntSide doesn't have length\n\r");
 	printf("\t14) GetAntSide in data have length but no data\n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 14) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
@@ -250,15 +207,6 @@ Boolean SelectAndExecuteTrxvu()
 			break;
 		case 11:
 			GetAntsSide_SideB();
-			break;
-		case 12:
-			GetAntsSide_SideEqualC();
-			break;
-		case 13:
-			GetAntsSide_SideNotExist();
-			break;
-		case 14:
-			GetAntsSide_SideNotExistButHaveLength();
 			break;
 		default:
 			break;

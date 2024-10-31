@@ -7,7 +7,6 @@
 
 #include "TRXVU_Commands.h"
 
-
 /**
  * set trxvu idle on with time end
  * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the idle duration and the headers we add)
@@ -22,7 +21,6 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 		return -6;
 	if(cmd->length != 4)
 	{
-		//unsigned char error_msg[] = "CMD_SetOn_dleState - the length isn't in size";
 		error_ack = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
@@ -64,7 +62,10 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 			return error;
 		}
 		default:
-			break;
+		{
+			SendAckPacket(ACK_ERROR_MSG , cmd, NULL, 0);
+			return error;
+		}
 	}
 	return logError(SendAckPacket(ACK_IDLE_ON , cmd, (unsigned char*)&duration, sizeof(duration)), "CMD_SetOn_dleState - SendAckPacket");
 }
@@ -105,7 +106,10 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
 			return error;
 		}
 		default:
-			break;
+		{
+			SendAckPacket(ACK_ERROR_MSG , cmd, NULL, 0);
+			return error;
+		}
 	}
 	return logError(SendAckPacket(ACK_IDLE_OFF , cmd, NULL, 0), "CMD_SetOff_dleState - SendAckPacket");
 
@@ -128,7 +132,6 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 		return -1;
 	if(cmd->length != 4)
 	{
-		//unsigned char error_msg[] = "CMD_SetOn_Transponder - the length isn't in size";
 		error_ack = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
@@ -155,7 +158,6 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	}
 	if(check != duration)
 	{
-		//unsigned char error_msg[] = "CMD_SetOn_Transponder - Not written what needed to be in FRAM";
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
@@ -164,7 +166,6 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	int error = setTransponderOn(); // Set transponder on
 	if(error)
 	{
-		//unsigned char error_msg[] = "CMD_SetOn_Transponder - can't turn on transponder. Probably a fault in I2C write";
 		error_ack = ERROR_WRITE_TO_I2C;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
@@ -185,7 +186,6 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
 	if(error)
 	{
-		//unsigned char error_msg[] = "CMD_SetOff_Transponder - can't turn off transponder. Probably a fault in I2C write";
 		error_ack = ERROR_WRITE_TO_I2C;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
@@ -194,7 +194,6 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 	error = logError(FRAM_write((unsigned char*)&timeNow, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOn_Transponder - FRAM_write");
 	if(error)
 	{
-		//unsigned char error_msg[] = "CMD_SetOff_Transponder - can't turn off transponder. Probably a fault in write to fram";
 		int error_ack = ERROR_WRITE_TO_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack));	// Send ack error according to "AckErrors.h"
 		return error;
@@ -208,7 +207,6 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 	}
 	if(check != timeNow)
 	{
-		//unsigned char error_msg[] = "CMD_SetOn_Transponder - Not written what needed to be in FRAM";
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack));	// Send ack error according to "AckErrors.h"
 		return -2;
@@ -229,7 +227,6 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 	short new_rssi_val = -1;
 	if(cmd->length != 2)
 	{
-		//unsigned char error_msg[] = "CMD_SetRSSI_Transponder - the length isn't in size";
 		error_ack = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
@@ -238,15 +235,14 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 	int error = setTransponderRSSIinFRAM(new_rssi_val);
 	if(error == -2)
 	{
-		//unsigned char error_msg[] = "CMD_SetRSSI_Transponder - written the wrong number in FRAM";
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	else if(error)
 	{
-		unsigned char error_msg[] = "CMD_SetRSSI_Transponder - can't set new rssi";
-		SendAckPacket(ACK_ERROR_MSG , cmd, error_msg, sizeof(error_msg)); // Send ack error according to "AckErrors.h"
+		error_ack = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)), "CMD_SetRSSI_Transponder - SendAckPacket"); // Send ack of success in change rssi and to what
@@ -298,7 +294,6 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 		return -1;
 	if(cmd->length != 4)
 	{
-		//unsigned char error_msg[] = "CMD_MuteTRXVU - the length isn't in size";
 		error_ack = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
@@ -312,14 +307,12 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	setTransponderOff();
 	if(error == -2)
 	{
-		//unsigned char error_msg[] = "CMD_MuteTRXVU - written the wrong number in FRAM";
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack));	// Send ack error according to "AckErrors.h"
 		return error;
 	}
 	else if(error)
 	{
-		//unsigned char error_msg[] = "CMD_MuteTRXVU - can't set end time";
 		error_ack = ERROR_CANT_SET_END_TIME;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
@@ -338,14 +331,12 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 	int error = setMuteEndTime(0); // set new end time to time now
 	if(error == -2)
 	{
-		//unsigned char error_msg[] = "CMD_UnMuteTRXVU - written the wrong number in FRAM";
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	else if(error)
 	{
-		//unsigned char error_msg[] = "CMD_UnMuteTRXVU - can't set new end time";
 		error_ack = ERROR_CANT_SET_END_TIME;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (couldn't set new end time)
 		return error;
@@ -379,7 +370,6 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	error = logError(FRAM_write((unsigned char*)&new_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_write"); // Write the new interval to FRAM
 	if(error)
 	{
-		//unsigned char error_msg[] = "CMD_SetBeacon_Interval - Can't write to FRAM";
 		error_ack = ERROR_WRITE_TO_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
@@ -388,14 +378,12 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	error = logError(FRAM_read((unsigned char*)&check, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read"); // Read from FRAM in the place we wrote to for check
 	if(error)
 	{
-		//unsigned char error_msg[] = "CMD_SetBeacon_Interval - Can't read from FRAM";
 		error_ack = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	if(check != new_interval) // Check if what we wrote and what have been written is the same
 	{
-		//unsigned char error_msg[] = "CMD_SetBeacon_Interval - didn't write the right number in FRAM. To check what is the number that written use the command CMD_GetBeacon_Interval";
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
@@ -429,7 +417,6 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 	int error = logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read"); // Read the beacon interval from FRAM
 	if(error)
 	{
-		//unsigned char error_msg[] = "CMD_GetBeacon_Interval - Can't read from FRAM";
 		int error_ack = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
@@ -493,8 +480,6 @@ int GetAntSide(sat_packet_t *cmd, char *side)
 	*side = cmd->data[0];
 	return 0;
 }
-
-//int CMD_AntGetArmStatus(sat_packet_t *cmd);
 
 /*
  * Gets Ant uptime according to side.

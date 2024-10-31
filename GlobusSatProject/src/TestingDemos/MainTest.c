@@ -42,7 +42,7 @@ Boolean SelectAndExecuteTest()
 
 void taskTesting()
 {
-	Boolean offerMoreTests;
+	Boolean offerMoreTests = TRUE;
 
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 	InitSubsystems();

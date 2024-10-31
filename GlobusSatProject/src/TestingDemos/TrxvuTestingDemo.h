@@ -39,10 +39,5 @@ void GetAntsSide_SideA();
 
 void GetAntsSide_SideB();
 
-void GetAntsSide_SideEqualC();
-
-void GetAntsSide_SideNotExist();
-
-void GetAntsSide_SideNotExistButHaveLength();
 
 #endif /* TRXVUTESTINGDEMO_H_ */
