@@ -61,11 +61,11 @@ int CMD_UpdateSmoothingFactor(sat_packet_t *cmd) {
 //copy alpha
 	int newalpha = 0;
 	memcpy(&newalpha, cmd->data, cmd->length);
-	//#todo del later
 
-	float convalpha = (float)(newalpha / 100);
+	float convalpha = (float)(newalpha / 100.0f);
 	int error = UpdateAlpha(convalpha);
 //update alpha
+	CMD_GetSmoothingFactor(cmd);
 	if (error == E_PARAM_OUTOFBOUNDS) {
 		 int errmsg = ERROR_OUT_OF_BOUND;
 		 SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char *)&errmsg , sizeof(errmsg));
@@ -150,9 +150,6 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 	if (cmd == NULL) {
 		return E_INPUT_POINTER_NULL;
 
-	}
-	if (cmd->data == NULL) {
-		return E_INPUT_POINTER_NULL;
 	}
 	EpsMode_t mode = GetcurrentMode();
 	EpsState_t state = GetSystemState();
