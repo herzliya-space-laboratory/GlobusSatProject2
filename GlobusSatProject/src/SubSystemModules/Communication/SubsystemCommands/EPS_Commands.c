@@ -153,14 +153,10 @@ int CMD_GetCurrentMode(sat_packet_t *cmd) {
 	}
 	EpsMode_t mode = GetcurrentMode();
 	EpsState_t state = GetSystemState();
-	if (mode == ManualMode) {
-		unsigned char data = 0;
-		memcpy(&data, &mode, 1);
-		memcpy(&data + 1, &state, 1);
-		TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, 2);
-	}	else {
-		TransmitDataAsSPL_Packet(cmd, (unsigned char *)&mode, 2);
-	}
+	unsigned char data = 0;
+	memcpy(&data, &mode, 1);
+	memcpy(&data + 1, &state, 1);
+	TransmitDataAsSPL_Packet(cmd, (unsigned char *)&data, 2);
 	return 0;
 }
 
