@@ -22,7 +22,7 @@
  * 00 00 13 01 04 00 get alpha
  *
  * 00 00 13 01 07 00 get threshold
- * 00 00 13 01 05 08 0x1D 0x4C 0x1B 0x58 0x1C 0xE8 0x1A 0xF4 UPDATE THRESHOLD
+ * 00 00 13 01 05 08 1D 4C 1B 58 1C E8 1A F4 UPDATE THRESHOLD
  * 00 00 13 01 06 00 reset threshold
  *
  * 00 00 13 01 08 01 00 set mode automatic
