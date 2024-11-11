@@ -16,7 +16,6 @@
 #include "AckHandler.h"
 #include "SPL.h"
 
-/*#define WE_HAVE_ANTS 0*/
 
 time_unix lastTimeSendingBeacon;
 time_unix period;

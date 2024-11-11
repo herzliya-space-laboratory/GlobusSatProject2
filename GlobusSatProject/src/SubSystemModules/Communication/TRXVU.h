@@ -16,6 +16,7 @@
 #include <hal/Timing/Time.h>
 #include "SubSystemModules/Maintenance/Maintenance.h"
 
+/*#define WE_HAVE_ANTS 0*/
 
 #define MAX_MUTE_TIME 		(60*60*24*3) 	///< max mute duration will be 3 days = 60*60*24*3 [sec]
 #define MAX_IDLE_TIME 		(2400) 	///< max IDLE duration will be 40 minutes = 120 *20 [sec]

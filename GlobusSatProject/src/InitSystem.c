@@ -12,6 +12,8 @@
 #include <hal/Utility/util.h>
 #include <hal/supervisor.h>
 
+#include <hcc/api_fat.h>
+
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
 #include "TLM_management.h"
@@ -50,6 +52,7 @@ int InitSupervisor()
 
 int WriteDefaultValuesToFRAM()
 {
+	int zero = 0;
 	time_unix param = 0;
 	int error = 0;
 	if(FRAM_writeAndVerify((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE)) error = -1;
@@ -65,14 +68,75 @@ int WriteDefaultValuesToFRAM()
 	float alpha = DEFAULT_ALPHA_VALUE;
 	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error = -1;
 
+	int timeDeploy = 120*60;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error = -1;
 
+	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
+//Need to be written with the firstActivetion that will become 1.
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of cmd resets")) error = -1;
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
+
+	int arrPeriod[4] = {5, 5, 5, 5};
+	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error = -1;
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
+
+	//TODO: EPS_THRESH_VOLTAGES_ADDR
+	//TODO: LAST_COMM_TIME_ADDR
 	return error;
+}
+int AntArm()
+{
+	int rv = IsisAntS_setArmStatus(0, isisants_sideA, isisants_arm);
+	int rv2 = IsisAntS_setArmStatus(0, isisants_sideB, isisants_arm);
+	if(rv || rv2)
+	{
+		printf("Ants not armed");
+		return -1;
+	}
+	return 0;
+}
+int AntDeployment()
+{
+	int rv = IsisAntS_autoDeployment(0, isisants_sideA, 10);
+	int rv2 = IsisAntS_autoDeployment(0, isisants_sideB, 10);
+	if(rv || rv2)
+	{
+		printf("Ants not deployed");
+		return -1;
+	}
+	return 0;
 }
 
 int FirstActivition()
 {
+	int zero = 0;
+	int firstActiveFlag;
+	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
+	if(!firstActiveFlag)
+		return 0;
 	int error = 0;
+	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
+	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1;
 	if(WriteDefaultValuesToFRAM()) error = -1;
+#ifdef WE_HAVE_ANTS
+	int max;
+	int time = 0;
+	FRAM_read((unsigned char*)&max, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE);
+	do
+	{
+		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
+		vTaskDelay(15000 / portTICK_RATE_MS);
+		time += 15;
+		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
+	}
+	while(max <= time);
+	while(AntArm() == -1);
+	while(AntDeployment() == -1);
+#endif
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "default to FRAM - first activation flag")) error = -1;
 	return error;
 }
 
@@ -86,12 +150,18 @@ int InitSubsystems(){
 	StartTIME();
 
 	InitializeFS();
+	//TODO: DELETE THE LINES OF THE FRAM WRITE BELOW. ONLY TO CHECK FIRST ACTIVETION!!!!!
+	int one = 1;
+	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
+
 
 	InitSupervisor();
 
 	EPS_And_SP_Init();
 
 	InitTrxvuAndAnts();
+
+	FirstActivition();
 
 	printf("Did init\r\n");
 	return 0;
