@@ -45,9 +45,9 @@ FileSystemResult InitializeFS(){
 	if (err != E_NO_SS_ERR){
 	// error init SD 0 so de-itnit and init SD 1
 	//printf("f_initvolume primary error:%d\n",err);
-		hcc_mem_init();
-		fs_init();
-		f_enterFS();
+		logError(hcc_mem_init(), "FS - hcc_mem_init - 2");
+		logError(fs_init(), "FS - fs_init - 2");
+		logError(f_enterFS(), "FS - fs_enterFS - 2");
 		err = f_initvolume( 0, atmel_mcipdc_initfunc, 1 );
 		if (err != E_NO_SS_ERR){
 				//printf("f_initvolume secondary error:%d\n",err);
