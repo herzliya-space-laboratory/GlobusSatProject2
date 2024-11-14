@@ -28,10 +28,10 @@
 #define I2CTransferTimeout 10
 #define TIME_SYNCINTERVAL  60
 
-int antSizeAOn = FALSE;
-int antSizeBOn = FALSE;
-int deployA = FALSE;
-int deployB = FALSE;
+int antSizeAOn = TRUE;
+int antSizeBOn = TRUE;
+int deployA = TRUE;
+int deployB = TRUE;
 
 int StartFRAM(){
 	return logError(FRAM_start(), "FRAM - FRAM_start");
@@ -101,21 +101,21 @@ int WriteDefaultValuesToFRAM()
 int AntArm()
 {
 #ifdef TESTING
-	antSizeAOn = TRUE;
-	antSizeBOn = TRUE;
+	antSizeAOn = FALSE;
+	antSizeBOn = FALSE;
 	if(antSizeAOn || antSizeAOn)
 	{
-		printf("Ants not armed");
+		printf("Ants not armed\r\n");
 		return -1;
 	}
-	printf("A: %d, B: %d", antSizeAOn, antSizeBOn);
+	printf("A: %d, B: %d\r\n", antSizeAOn, antSizeBOn);
 #else
 	int rv = IsisAntS_setArmStatus(0, isisants_sideA, isisants_arm);
 	int rv2 = IsisAntS_setArmStatus(0, isisants_sideB, isisants_arm);
 
 	if(rv || rv2)
 	{
-		printf("Ants not armed");
+		printf("Ants not armed\r\n");
 		return -1;
 	}
 #endif
@@ -124,20 +124,20 @@ int AntArm()
 int AntDeployment()
 {
 #ifdef TESTING
-	deployA = TRUE;
-	deployB = TRUE;
+	deployA = FALSE;
+	deployB = FALSE;
 	if(deployA || deployB)
 	{
-		printf("Ants not deployed");
+		printf("Ants not deployed\r\n");
 		return -1;
 	}
-	printf("A: %d, B: %d", antSizeAOn, antSizeBOn);
+	printf("A: %d, B: %d\r\n", antSizeAOn, antSizeBOn);
 #else
 	int rv = IsisAntS_autoDeployment(0, isisants_sideA, 10);
 	int rv2 = IsisAntS_autoDeployment(0, isisants_sideB, 10);
 	if(rv || rv2)
 	{
-		printf("Ants not deployed");
+		printf("Ants not deployed\r\n");
 		return -1;
 	}
 #endif
