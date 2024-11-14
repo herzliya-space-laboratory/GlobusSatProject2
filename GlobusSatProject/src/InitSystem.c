@@ -28,10 +28,10 @@
 #define I2CTransferTimeout 10
 #define TIME_SYNCINTERVAL  60
 
-int antSizeAOn = TRUE;
-int antSizeBOn = TRUE;
-int deployA = TRUE;
-int deployB = TRUE;
+int antSizeAOn = 1;
+int antSizeBOn = 1;
+int deployA = 1;
+int deployB = 1;
 
 int StartFRAM(){
 	return logError(FRAM_start(), "FRAM - FRAM_start");
@@ -76,7 +76,7 @@ int WriteDefaultValuesToFRAM()
 	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error = -1;
 
 #ifdef TESTING
-	int timeDeploy = 30;
+	int timeDeploy = 120;
 #else
 	int timeDeploy = 120*60;
 #endif
@@ -101,8 +101,8 @@ int WriteDefaultValuesToFRAM()
 int AntArm()
 {
 #ifdef TESTING
-	antSizeAOn = FALSE;
-	antSizeBOn = FALSE;
+	antSizeAOn = 0;
+	antSizeBOn = 0;
 	if(antSizeAOn || antSizeAOn)
 	{
 		printf("Ants not armed\r\n");
@@ -124,8 +124,8 @@ int AntArm()
 int AntDeployment()
 {
 #ifdef TESTING
-	deployA = FALSE;
-	deployB = FALSE;
+	deployA = 0;
+	deployB = 0;
 	if(deployA || deployB)
 	{
 		printf("Ants not deployed\r\n");
@@ -166,6 +166,8 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
+		if(time == 60)
+			gracefulReset();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 	}
 	while(max > time);
