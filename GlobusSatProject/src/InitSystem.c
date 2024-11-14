@@ -157,7 +157,8 @@ int FirstActivition()
 	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
 	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1;
 	if(WriteDefaultValuesToFRAM()) error = -1;
-//#ifdef WE_HAVE_ANTS
+
+#ifdef WE_HAVE_ANTS
 	int max;
 	int time = 0;
 	FRAM_read((unsigned char*)&max, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE);
@@ -166,7 +167,7 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-
+		//TODO: add check telemntry
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
@@ -175,7 +176,7 @@ int FirstActivition()
 	while(max > time);
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
-//#endif
+#endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "default to FRAM - first activation flag")) error = -1;
 	return error;
 }
