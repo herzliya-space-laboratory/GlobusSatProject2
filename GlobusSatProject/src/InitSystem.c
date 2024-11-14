@@ -108,7 +108,7 @@ int AntArm()
 		printf("Ants not armed\r\n");
 		return -1;
 	}
-	printf("A: %d, B: %d\r\n", antSizeAOn, antSizeBOn);
+	printf("A: %d, B: %d\r\n", !antSizeAOn, !antSizeBOn);
 #else
 	int rv = IsisAntS_setArmStatus(0, isisants_sideA, isisants_arm);
 	int rv2 = IsisAntS_setArmStatus(0, isisants_sideB, isisants_arm);
@@ -131,7 +131,7 @@ int AntDeployment()
 		printf("Ants not deployed\r\n");
 		return -1;
 	}
-	printf("A: %d, B: %d\r\n", antSizeAOn, antSizeBOn);
+	printf("A: %d, B: %d\r\n", !deployA, !deployB);
 #else
 	int rv = IsisAntS_autoDeployment(0, isisants_sideA, 10);
 	int rv2 = IsisAntS_autoDeployment(0, isisants_sideB, 10);
@@ -150,7 +150,7 @@ int FirstActivition()
 	int zero = 0;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy"));
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy");
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
@@ -164,8 +164,8 @@ int FirstActivition()
 	do
 	{
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
-		vTaskDelay(15000 / portTICK_RATE_MS);
-		time += 15;
+		vTaskDelay(5000 / portTICK_RATE_MS);
+		time += 5;
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 	}
 	while(max <= time);
