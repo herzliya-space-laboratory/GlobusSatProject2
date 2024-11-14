@@ -166,9 +166,11 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-		if(time == 60)
-			gracefulReset();
+
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
+#ifdef TESTING
+		if(time == 60) gracefulReset();
+#endif
 	}
 	while(max > time);
 	while(AntArm() == -1);
