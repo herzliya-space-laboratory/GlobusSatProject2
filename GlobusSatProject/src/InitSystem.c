@@ -168,7 +168,7 @@ int FirstActivition()
 		time += 5;
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 	}
-	while(max <= time);
+	while(max > time);
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
 //#endif
