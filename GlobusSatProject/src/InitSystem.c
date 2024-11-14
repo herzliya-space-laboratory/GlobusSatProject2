@@ -22,9 +22,16 @@
 #include "InitSystem.h"
 #include "utils.h"
 
+#define TESTING
+
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
 #define TIME_SYNCINTERVAL  60
+
+int antSizeAOn = FALSE;
+int antSizeBOn = FALSE;
+int deployA = FALSE;
+int deployB = FALSE;
 
 int StartFRAM(){
 	return logError(FRAM_start(), "FRAM - FRAM_start");
@@ -68,7 +75,11 @@ int WriteDefaultValuesToFRAM()
 	float alpha = DEFAULT_ALPHA_VALUE;
 	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error = -1;
 
+#ifdef TESTING
+	int timeDeploy = 30;
+#else
 	int timeDeploy = 120*60;
+#endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error = -1;
 
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
@@ -89,17 +100,39 @@ int WriteDefaultValuesToFRAM()
 }
 int AntArm()
 {
+#ifdef TESTING
+	antSizeAOn = TRUE;
+	antSizeBOn = TRUE;
+	if(antSizeAOn || antSizeAOn)
+	{
+		printf("Ants not armed");
+		return -1;
+	}
+	printf("A: %d, B: %d", antSizeAOn, antSizeBOn);
+#else
 	int rv = IsisAntS_setArmStatus(0, isisants_sideA, isisants_arm);
 	int rv2 = IsisAntS_setArmStatus(0, isisants_sideB, isisants_arm);
+
 	if(rv || rv2)
 	{
 		printf("Ants not armed");
 		return -1;
 	}
+#endif
 	return 0;
 }
 int AntDeployment()
 {
+#ifdef TESTING
+	deployA = TRUE;
+	deployB = TRUE;
+	if(deployA || deployB)
+	{
+		printf("Ants not deployed");
+		return -1;
+	}
+	printf("A: %d, B: %d", antSizeAOn, antSizeBOn);
+#else
 	int rv = IsisAntS_autoDeployment(0, isisants_sideA, 10);
 	int rv2 = IsisAntS_autoDeployment(0, isisants_sideB, 10);
 	if(rv || rv2)
@@ -107,6 +140,8 @@ int AntDeployment()
 		printf("Ants not deployed");
 		return -1;
 	}
+#endif
+
 	return 0;
 }
 
@@ -115,13 +150,14 @@ int FirstActivition()
 	int zero = 0;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy"));
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
 	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
 	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1;
 	if(WriteDefaultValuesToFRAM()) error = -1;
-#ifdef WE_HAVE_ANTS
+//#ifdef WE_HAVE_ANTS
 	int max;
 	int time = 0;
 	FRAM_read((unsigned char*)&max, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE);
@@ -135,7 +171,7 @@ int FirstActivition()
 	while(max <= time);
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
-#endif
+//#endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "default to FRAM - first activation flag")) error = -1;
 	return error;
 }
