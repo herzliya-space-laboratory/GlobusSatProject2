@@ -25,10 +25,10 @@
  * 00 00 13 01 05 08 1D 4C 1B 58 1C E8 1A F4 UPDATE THRESHOLD
  * 00 00 13 01 06 00 reset threshold
  *
- * 00 00 13 01 08 01 00 set mode automatic
- * 00 00 13 01 08 02 01 00 set mode operational
- * 00 00 13 01 08 02 01 01 set mode cruise
- * 00 00 13 01 08 02 01 02 set mode powersafe
+ * 00 00 13 01 08 01  set state automatic
+ * 00 00 13 01 08 02 00 set mode operational
+ * 00 00 13 01 08 02 01 set mode cruise
+ * 00 00 13 01 08 02 02 set mode powersafe
  * 00 00 13 01 09 00 get mode
  * 00 00 13 01 0A 00 GET_STATE_CHANGES_OVERTIME
  */
