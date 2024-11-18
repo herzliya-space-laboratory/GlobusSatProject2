@@ -10,8 +10,6 @@
 
 #include <hal/boolean.h>
 
-Boolean SolarPanelv2test();
-
-Boolean InitSolarPanels();
+Boolean SolarPanelv2test(void);
 
 #endif /* ISISSPTEST_H_ */

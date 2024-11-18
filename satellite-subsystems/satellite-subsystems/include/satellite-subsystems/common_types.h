@@ -19,6 +19,11 @@ typedef enum _driver_error_t
     driver_error_reinit = 6, /*!< The driver has already been initialized */
     driver_error_param_length = 7, /*!< One of the provided input parameters was too big or too small */
     driver_error_reply_crc = 8, /*!< The CRC in the subsystem's reply did not match the data */
+    driver_error_mutex = 9, /*!< Acquisition of mutex failed */
+    driver_error_remote_processing = 10, /*!< Subsystem processing of the command failed */
+    driver_error_uninit = 11, /*!< Driver has not been initialized */
+    driver_error_busy = 12, /*!< Driver is unable to process action at this moment */
+    driver_error_other = 255, /*!< An unknown error occurred */
 }
 driver_error_t;
 

@@ -1,10 +1,8 @@
 /*
- * isis_ants2_demo.c
+ * trxuv_operations.c
  *
  *  Created on: Jul 4, 2012
  *      Author: marcoalfer
- *  Updated: Oct 2023
- *  	Author: OBAR
  */
 
 #include "isis_ants2_demo.h"
@@ -26,7 +24,7 @@
 #include <hal/boolean.h>
 #include <hal/errors.h>
 
-#include <satellite-subsystems/isis_ants_rev2.h>
+#include <satellite-subsystems/isis_ants2.h>
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -37,23 +35,13 @@
 #define	AUTO_DEPLOYMENT_TIME	10
 #define MANUAL_DEPLOYMENT_TIME  10
 
-
-static char *updatedFlagToString(const uint8_t updated_flag)
-{
-	switch(updated_flag){
-	case 0:   return "Updated: no";
-	case 255: return "Updated: yes";
-	default:  return "Updated: corrupt value";
-	}
-}
-
 // Function calls to reset both sides of the AntS
 static Boolean resetAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
 
 	printf("\r\n Resetting \r\n");
-	print_error(isis_ants_rev2__reset(antennaSystemsIndex));
+	print_error(isis_ants2__reset(antennaSystemsIndex));
 
 	return TRUE;
 }
@@ -75,9 +63,9 @@ static void printDeploymentStatus(unsigned char antenna_id, unsigned char status
 // Function calls to get the current status of both sides of the AntS
 static void getStatusAntSTest(unsigned char index)
 {
-    isis_ants_rev2__deploymenttelemetry_t currentStatus;
+    isis_ants2__deploymenttelemetry_t currentStatus;
 
-	print_error(isis_ants_rev2__get_status(index, &currentStatus));
+	print_error(isis_ants2__get_status(index, &currentStatus));
 
 	printf("\r\nAntS current deployment status 0x%x 0x%x (raw value) \r\n", currentStatus.raw[0], currentStatus.raw[1]);
 	printf("Arm status: %s \r\n", currentStatus.fields.arm_state==0?"disarmed":"armed");
@@ -90,12 +78,12 @@ static void getStatusAntSTest(unsigned char index)
 static Boolean tempAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
-	isis_ants_rev2__get_temperature__from_t currTemp;
+	isis_ants2__get_temperature__from_t currTemp;
 	float eng_value = 0;
 
-	print_error(isis_ants_rev2__get_temperature(antennaSystemsIndex, &currTemp));
+	print_error(isis_ants2__get_temperature(antennaSystemsIndex, &currTemp));
 	eng_value = ((float)currTemp.fields.temperature * -0.2922) + 190.65;
-	printf("\r\n AntS temperature: %f deg. C (%s)\r\n", eng_value, updatedFlagToString(currTemp.fields.update_flag));
+	printf("\r\n AntS temperature %f deg. C\r\n", eng_value);
 
 	return TRUE;
 }
@@ -106,8 +94,8 @@ static Boolean uptimeAntSTest(unsigned char index)
 	unsigned char antennaSystemsIndex = index;
 	uint32_t uptime = 0;
 
-	print_error(isis_ants_rev2__get_uptime(antennaSystemsIndex, &uptime));
-	printf("\r\n AntS uptime: %d sec. \r\n", (unsigned int)uptime);
+	print_error(isis_ants2__get_uptime(antennaSystemsIndex, &uptime));
+	printf("\r\n AntS uptime %d sec. \r\n", (unsigned int)uptime);
 
 	return TRUE;
 }
@@ -116,23 +104,22 @@ static Boolean uptimeAntSTest(unsigned char index)
 static Boolean telemAntSTest(unsigned char index)
 {
 	unsigned char antennaSystemsIndex = index;
-	isis_ants_rev2__get_all_telemetry__from_t allTelem;
+	isis_ants2__get_all_telemetry__from_t allTelem;
 	float eng_value = 0;
 
 	printf("\r\nAntS\n\r");
 
-	print_error(isis_ants_rev2__get_all_telemetry(antennaSystemsIndex, &allTelem));
+	print_error(isis_ants2__get_all_telemetry(antennaSystemsIndex, &allTelem));
 
 	printf("Current deployment status 0x%x 0x%x (raw value) \r\n", allTelem.fields.deployment_status.raw[0], allTelem.fields.deployment_status.raw[1]);
 	printDeploymentStatus(1, allTelem.fields.deployment_status.fields.antenna1_undeployed);
 	printDeploymentStatus(2, allTelem.fields.deployment_status.fields.antenna2_undeployed);
 
 	eng_value = ((float)allTelem.fields.temperature * -0.2922) + 190.65;
-	printf("\r\n AntS temperature: %f deg. C\r\n", eng_value);
+	printf("\r\n AntS temperature %f deg. C\r\n", eng_value);
 	eng_value = ((float)allTelem.fields.voltage * 0.01965444793);
-	printf("\r\n AntS voltage: %.2f V\r\n", eng_value);
-	printf("\r\n AntS uptime: %d sec. \r\n", (unsigned int)allTelem.fields.uptime);
-	printf("\r\n %s \r\n", updatedFlagToString(allTelem.fields.update_flag));
+	printf("\r\n AntS voltage %.2f V\r\n", eng_value);
+	printf("\r\n AntS uptime %d sec. \r\n", (unsigned int)allTelem.fields.uptime);
 
 	return TRUE;
 }
@@ -141,7 +128,7 @@ static Boolean setARMStatus(unsigned char index, Boolean arm)
 {
     printf( "DISARMING antenna system\n\r");
 
-    print_error(isis_ants_rev2__disarm(index));
+    print_error(isis_ants2__disarm(index));
 
 	vTaskDelay(5 / portTICK_RATE_MS);
 
@@ -157,7 +144,7 @@ static Boolean setARMStatus(unsigned char index, Boolean arm)
 	    {
 	    	int stat;
 
-		    stat = isis_ants_rev2__arm(index);
+		    stat = isis_ants2__arm(index);
 
 		    print_error(stat);
 
@@ -196,8 +183,8 @@ static Boolean autoDeploymentAntSTest(unsigned char index, Boolean redundant)
 	}
 
 	{	// check ARM status; if not ARMed no actual deployment will result
-	    isis_ants_rev2__deploymenttelemetry_t status;
-		rv = isis_ants_rev2__get_status(index, &status);
+	    isis_ants2__deploymenttelemetry_t status;
+		rv = isis_ants2__get_status(index, &status);
 
 		if(rv)
 		{
@@ -218,11 +205,11 @@ static Boolean autoDeploymentAntSTest(unsigned char index, Boolean redundant)
 
 	if (redundant)
 	{
-	    rv = isis_ants_rev2__start_auto_deploy(antennaSystemsIndex, AUTO_DEPLOYMENT_TIME);
+	    rv = isis_ants2__start_auto_deploy(antennaSystemsIndex, AUTO_DEPLOYMENT_TIME);
 	}
 	else
 	{
-	    rv = isis_ants_rev2__start_auto_deploy_redundant(antennaSystemsIndex, AUTO_DEPLOYMENT_TIME);
+	    rv = isis_ants2__start_auto_deploy_redundant(antennaSystemsIndex, AUTO_DEPLOYMENT_TIME);
 	}
 	if(rv)
 	{
@@ -253,8 +240,8 @@ static Boolean manualDeploymentAntSTest(unsigned char index, Boolean redundant)
 	}
 
 	{	// check ARM status; if not ARMed no actual deployment will result
-	    isis_ants_rev2__deploymenttelemetry_t status;
-		rv = isis_ants_rev2__get_status(index, &status);
+	    isis_ants2__deploymenttelemetry_t status;
+		rv = isis_ants2__get_status(index, &status);
 
 		if(rv)
 		{
@@ -282,22 +269,22 @@ static Boolean manualDeploymentAntSTest(unsigned char index, Boolean redundant)
         {
             if (antennaSelection == 1)
             {
-                print_error(isis_ants_rev2__deploy1_redundant(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
+                print_error(isis_ants2__deploy1_redundant(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
             }
             else
             {
-                print_error(isis_ants_rev2__deploy2_redundant(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
+                print_error(isis_ants2__deploy2_redundant(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
             }
         }
         else
         {
             if (antennaSelection == 1)
             {
-                print_error(isis_ants_rev2__deploy1(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
+                print_error(isis_ants2__deploy1(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
             }
             else
             {
-                print_error(isis_ants_rev2__deploy2(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
+                print_error(isis_ants2__deploy2(antennaSystemsIndex, MANUAL_DEPLOYMENT_TIME));
             }
         }
     }
@@ -378,7 +365,7 @@ static void initmain(void)
 {
     int retValInt = 0;
 
-	ISIS_ANTS_REV2_t myAntennaAddress;
+	ISIS_ANTS2_t myAntennaAddress;
 	myAntennaAddress.i2cAddr = 0x31;
 
 	//Initialize the I2C
@@ -390,7 +377,7 @@ static void initmain(void)
 	}
 
 	//Initialize the AntS system
-	print_error(ISIS_ANTS_REV2_Init(&myAntennaAddress, 1));
+	print_error(ISIS_ANTS2_Init(&myAntennaAddress, 1));
 }
 
 static void Ants2_mainDemo(void)
