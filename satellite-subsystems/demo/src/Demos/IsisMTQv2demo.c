@@ -14,6 +14,7 @@
 #include <at91/commons.h>
 #include <at91/utility/trace.h>
 #include <at91/peripherals/cp15/cp15.h>
+#include <at91/peripherals/dbgu/dbgu.h>
 
 #include <hal/Utility/util.h>
 #include <hal/Timing/WatchDogTimer.h>
@@ -22,7 +23,7 @@
 #include <hal/boolean.h>
 #include <hal/errors.h>
 
-#include <satellite-subsystems/IsisMTQv2.h>
+#include <satellite-subsystems/isis_mtq_v2.h>
 
 #include <Demos/common.h>
 
@@ -58,9 +59,10 @@
 ///***************************************************************************************************************************
 ///
 /// Notes on the parameter system:
-/// the parameter system requires an unsigned short parameter_index
-/// and a pointer to the location of the data to be get/set/reset
-/// the void pointer can be pointing to an array or directly to a strongly typed variable
+/// For getting and resetting a parameter an unsigned short param_id_in is required, while
+/// for setting a parameter, a pointer to a structure with a param_id and param_value is expected.
+/// All three operations require a pointer to an output structure, in which the reply_header, the
+/// param_id, and the actual param_value will be received.
 ///
 /// note that the parameter index consists of: param-type in the highest nibble (4 bits), and the ordinal index in the
 /// lower 3 nibbles (12 bits). Optionally the fifth to highest bit of the 16 bits is used to indicate read/only
@@ -68,32 +70,23 @@
 ///
 /// example 1: getting param 0x1000 (which is the first int8):
 ///		unsigned short param_id = 0x1000;
-///		char param_val;										// value that receives the gotten variable information
+///		isis_mtq_v2__get_parameter__from_t rsp;
 ///
-///		rv = IsisMTQv2_getParameter(0, param_id, &param_val, &rsp_stat);
+///		rv = isis_mtq_v2__get_parameter(0, param_id, &rsp);
 ///
 /// example 2: setting param 0xA000 (which is the first 8 byte double):
 ///		unsigned short param_id = 0xA000;
-///		double param_inp = 12.01;							// value that is set
-///		double param_outp;									// value that is read back after update for verification purposes
+///     isis_mtq_v2__set_parameter__to_t par_data = { .fields = { .param_id = param_id } }; // byte array for storing the parameter data we want to set; our maximum size is 8 bytes (e.g. double, long ...)
+///     isis_mtq_v2__set_parameter__from_t par_data_out;                                    // byte array for storing the parameter data that was actually set; our maximum size is 8 bytes (e.g. double, long ...)
 ///
-///		rv = IsisMTQv2_setParameter(0, param_id, &param_inp, &param_outp &rsp_stat);
+///		rv = isis_mtq_v2__set_parameter(0, &par_data, &par_data_out);
 ///
 /// example 3: setting param 0x7003 (which is the fourth 4 byte float) using a (little endian) byte array as input:
-///		unsigned short param_id = 0x7003;
-///		unsigned char barr_inp[4] = {0x10,0x32,0x54,0x76};	// 4 byte values making up the 4 byte float variable
-///		float param_outp;									// value that is read back after update for verification purposes
+///     isis_mtq_v2__set_parameter__to_t par_data = { .fields = { .param_id = 0x7003, .param_value = { 0x10, 0x32, 0x54, 0x76 } } };
+///     isis_mtq_v2__set_parameter__from_t par_data_out;
 ///
-///		rv = IsisMTQv2_setParameter(0, param_id, barr_inp, &param_outp, &rsp_stat);
+///		rv = isis_mtq_v2__set_parameter(0, &par_data, &par_data_out);
 ///
-///	Generally usage within the I2C master falls in either of two categories: direct-use and pass-through
-/// *direct-use 	This entails having the I2C master changing the configuration parameters autonomously.
-///					Use of pointers to typed variables is most convenient in this case. The system will only see a void
-///					pointer, hence the user must ensure a pointer to a variable with the correct parameter type (i.e. size!)
-///					is supplied with any param-id.
-/// *pass-through 	This entails having the ground station provide a byte stream to be passed to the subsystem.
-///					Use of pointers to byte arrays is most convenient in this case. The system automatically derives the
-///  				amount of bytes that needs to be read from the pointer location.
 ///***************************************************************************************************************************
 
 
@@ -106,7 +99,7 @@
 ///
 ///***************************************************************************************************************************
 
-static void _parse_resp(imtq_statcmd_t* p_rsp_code)
+static void _parse_resp(isis_mtq_v2__replyheader_t* p_rsp_code)
 {
 	// this function parses the response that is provided as the result of
 	// issuing a command to the subsystem. It provides information on whether the response
@@ -123,105 +116,121 @@ static void _parse_resp(imtq_statcmd_t* p_rsp_code)
 		return;
 	}
 
-	if(p_rsp_code->fields.new)																	// is the new flag set?
+	if(p_rsp_code->fields.new_flag)																// is the new flag set?
 	{
-		printf(" \t new = %d (new response/data)\r\n", p_rsp_code->fields.new);					// indicate its a never before retrieved response
+		printf("   - new_flag = %d (new response/data)\r\n", p_rsp_code->fields.new_flag);			// indicate its a never before retrieved response
 	}
 	else
 	{
-		printf(" \t new = %d (old response/data)\r\n", p_rsp_code->fields.new);					// indicate we've read this response before
+		printf("   - new_flag = %d (old response/data)\r\n", p_rsp_code->fields.new_flag);			// indicate we've read this response before
 	}
 
-	printf(" \t IVA x,y,z = %d, %d, %d \r\n", p_rsp_code->fields.iva_x, p_rsp_code->fields.iva_y,
+	printf("   - IVA x,y,z = %d, %d, %d \r\n", p_rsp_code->fields.iva_x, p_rsp_code->fields.iva_y,
 				p_rsp_code->fields.iva_z); // parse axis invalid markers
 
 	switch(p_rsp_code->fields.cmd_error)
 	{
-	case imtq_cmd_accepted: 		///< Accepted
-		printf(" \t cmd_err = %d (command accepted) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__accepted: 		///< Accepted
+		printf("   - cmd_error = %d (isis_mtq_v2__errorcode__accepted) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_rejected: 		///< Rejected: no reason indicated
-		printf(" \t cmd_err = %d (!REJECTED! command rejected) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__rejected: 		///< Rejected: no reason indicated
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__rejected) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_rejected_invalid: ///< Rejected: invalid command code
-		printf(" \t cmd_err = %d (!REJECTED! command code invalid) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__invalid: ///< Rejected: invalid command code
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__invalid) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_rejected_parmiss: ///< Rejected: parameter missing
-		printf(" \t cmd_err = %d (!REJECTED! command parameter missing) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__parmetermissing: ///< Rejected: parameter missing
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__parmetermissing) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_rejected_parinv: ///< Rejected: parameter invalid
-		printf(" \t cmd_err = %d (!REJECTED! command parameter invalid) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__parameterinvalid: ///< Rejected: parameter invalid
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__parameterinvalid) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_rejected_ccunav: ///< Rejected: CC unavailable in current mode
-		printf(" \t cmd_err = %d (!REJECTED! command unavailable in current mode) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__cc_unavailable: ///< Rejected: CC unavailable in current mode
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__cc_unavailable) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_reserved: 	   ///< Reserved value
-		printf(" \t cmd_err = %d (!REJECTED! command caused return of reserved response code) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__reserved: 	   ///< Reserved value
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__reserved) \r\n", p_rsp_code->fields.cmd_error);
 		break;
-	case imtq_cmd_internal_error: ///< Internal error occurred during processing
-		printf(" \t cmd_err = %d (!REJECTED! command caused internal error) \r\n", p_rsp_code->fields.cmd_error);
+	case isis_mtq_v2__errorcode__internalerror: ///< Internal error occurred during processing
+		printf("   - cmd_error = %d (!REJECTED! isis_mtq_v2__errorcode__internalerror) \r\n", p_rsp_code->fields.cmd_error);
 		break;
 	}
 }
 
-static void _parse_selftest_step(imtq_seldata_step_t *p_step)
+static void _parse_selftest_step(isis_mtq_v2__selftestdata_t *p_step)
 {
 	// this function shows the self-test result information for a self-test-step to the user.
 
 	if(p_step == NULL)										// if no valid step pointer is provided we'll only print out generic information
 	{
 		// only print info on the step data
-		printf(" \t error = %s \r\n", "error bitflag indicating any problems that the IMTQv2 encountered while performing the self-test-step.");
-		printf(" \t step = %s \r\n", "self-test-step indicating the coil operation that was being performed at the time the measurements were taken");
-		printf(" \t raw_magf = %s \r\n", "magnetometer field strength in raw counts");
-		printf(" \t cal_magf = %s \r\n", "magnetometer field strength in nano-tesla [10E-9 T]");
-		printf(" \t coilcurr = %s \r\n", "coil current in [10E-4 A]");
-		printf(" \t coiltemp = %s \r\n", "coil temperature in degrees C");
+		printf("   - error = %s \r\n", "error bitflag indicating any problems that the IMTQv2 encountered while performing the self-test-step.");
+		printf("   - step = %s \r\n", "self-test-step indicating the coil operation that was being performed at the time the measurements were taken");
+		printf("   - raw_mag_(x,y,z) = %s \r\n", "magnetometer field strength in raw counts for x, y, and z");
+		printf("   - calibrated_mag_(x,y,z) = %s \r\n", "magnetometer field strength for x, y, and z [nT / 10E-9 T]");
+		printf("   - coil_current_(x,y,z) = %s \r\n", "coil current for x, y, and z [10E-4 A]");
+		printf("   - coil_temp_(x,y,z) = %s \r\n", "coil temperature for x, y, and z [deg. C]");
 
 		return;
 	}
 
-	_parse_resp(&p_step->fields.rsp_code);																		// step response information
+	_parse_resp(&p_step->fields.reply_header);																		// step response information
 
-	printf(" \t error = %04x", p_step->fields.error);																// error field information (this is a bitflag field which can have multiple flags set at the same time)
-	if(p_step->fields.error == imtq_sel_error_none) printf(" ( none ) \r\n");
+	printf("   - error = %04x", p_step->fields.error);																// error field information (this is a bitflag field which can have multiple flags set at the same time)
+	if(p_step->fields.error == isis_mtq_v2__selftesterror__noerror) printf(" ( none ) \r\n");
 	else
 	{
 		printf(" ( ");
-		if(p_step->fields.error & imtq_sel_error_i2c_failure) printf("imtq_sel_error_i2c_failure ");
-		if(p_step->fields.error & imtq_sel_error_spi_failure) printf("imtq_sel_error_spi_failure ");
-		if(p_step->fields.error & imtq_sel_error_adc_failure) printf("imtq_sel_error_adc_failure ");
-		if(p_step->fields.error & imtq_sel_error_pwm_failure) printf("imtq_sel_error_pwm_failure ");
-		if(p_step->fields.error & imtq_sel_error_tc_failure) printf("imtq_sel_error_tc_failure ");
-		if(p_step->fields.error & imtq_sel_error_mtm_outofrange) printf("imtq_sel_error_mtm_outofrange ");
-		if(p_step->fields.error & imtq_sel_error_coilcurr_outofrange) printf("imtq_sel_error_coilcurr_outofrange ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__i2c_failure) printf("isis_mtq_v2__selftesterror__i2c_failure ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__spi_failure) printf("isis_mtq_v2__selftesterror__spi_failure ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__adc_failure) printf("isis_mtq_v2__selftesterror__adc_failure ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__pwm_failure) printf("isis_mtq_v2__selftesterror__pwm_failure ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__tc_failure) printf("isis_mtq_v2__selftesterror__tc_failure ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__mtm_outofrange) printf("isis_mtq_v2__selftesterror__mtm_outofrange ");
+		if(p_step->fields.error & isis_mtq_v2__selftesterror__coil_outofrange) printf("isis_mtq_v2__selftesterror__coil_outofrange ");
 		if(p_step->fields.error & 0x80) printf("!UNKNOWN! ");
 		printf(")\r\n");
 	}
 
-	printf(" \t step = %04x", p_step->fields.step);
+	printf("   - step = %04x", p_step->fields.step);
 	switch(p_step->fields.step)
 	{
-	case imtq_sel_step_init: printf(" ( init ) \r\n"); break;
-	case imtq_sel_step_posx: printf(" ( +x ) \r\n"); break;
-	case imtq_sel_step_negx: printf(" ( -x ) \r\n"); break;
-	case imtq_sel_step_posy: printf(" ( +y ) \r\n"); break;
-	case imtq_sel_step_negy: printf(" ( -y ) \r\n"); break;
-	case imtq_sel_step_posz: printf(" ( +z ) \r\n"); break;
-	case imtq_sel_step_negz: printf(" ( -z ) \r\n"); break;
-	case imtq_sel_step_fina: printf(" ( fina ) \r\n"); break;
+	case isis_mtq_v2__step__init: printf(" ( init = isis_mtq_v2__step__init ) \r\n"); break;
+	case isis_mtq_v2__step__x_positive: printf(" ( +x = isis_mtq_v2__step__x_positive ) \r\n"); break;
+	case isis_mtq_v2__step__x_negative: printf(" ( -x = isis_mtq_v2__step__x_negative ) \r\n"); break;
+	case isis_mtq_v2__step__y_positive: printf(" ( +y = isis_mtq_v2__step__y_positive ) \r\n"); break;
+	case isis_mtq_v2__step__y_negative: printf(" ( -y = isis_mtq_v2__step__y_negative ) \r\n"); break;
+	case isis_mtq_v2__step__z_positive: printf(" ( +z = isis_mtq_v2__step__z_positive ) \r\n"); break;
+	case isis_mtq_v2__step__z_negative: printf(" ( -z = isis_mtq_v2__step__z_negative ) \r\n"); break;
+	case isis_mtq_v2__step__fina: printf(" ( fina = isis_mtq_v2__step__fina ) \r\n"); break;
 	default: printf(" ( !UNKNOWN! ) \r\n"); break;
 	}
 
-	printf(" \t raw_magf(x,y,z) = %d, %d, %d [-] \r\n", p_step->fields.raw_magf[0], p_step->fields.raw_magf[1], p_step->fields.raw_magf[2]);
-	printf(" \t cal_magf(x,y,z) = %d, %d, %d [10E-9 T] \r\n", p_step->fields.cal_magf[0], p_step->fields.cal_magf[1], p_step->fields.cal_magf[2]);
-	printf(" \t coilcurr(x,y,z) = %d, %d, %d [10E-4 mA] \r\n", p_step->fields.coilcurr[0], p_step->fields.coilcurr[1], p_step->fields.coilcurr[2]);
-	printf(" \t coiltemp(x,y,z) = %d, %d, %d [degC] \r\n", p_step->fields.coiltemp[0], p_step->fields.coiltemp[1], p_step->fields.coiltemp[2]);
+	printf("   - raw_mag_(x,y,z) = %ld, %ld, %ld [-] \r\n", p_step->fields.raw_mag_x, p_step->fields.raw_mag_y, p_step->fields.raw_mag_z);
+	printf("   - calibrated_mag_(x,y,z) = %ld, %ld, %ld [10E-9 T] \r\n", p_step->fields.calibrated_mag_x, p_step->fields.calibrated_mag_y, p_step->fields.calibrated_mag_z);
+	printf("   - coil_current_(x,y,z) = %d, %d, %d [10E-4 mA] \r\n", p_step->fields.coil_current_x, p_step->fields.coil_current_y, p_step->fields.coil_current_z);
+	printf("   - coil_temp_(x,y,z) = %d, %d, %d [degC] \r\n", p_step->fields.coil_temp_x, p_step->fields.coil_temp_y, p_step->fields.coil_temp_z);
 }
 
-static void _get_axis_inputs(imtq_inputs_t* p_inp)
+/*!
+ * Union for storing the common parameters.
+ */
+typedef union __attribute__((__packed__)) _mtq_general_axis_inputs
+{
+    unsigned char raw[8];
+    struct __attribute__ ((__packed__))
+    {
+        int16_t input_x; /*!< X-direction setting */
+        int16_t input_y; /*!< Y-direction setting */
+        int16_t input_z; /*!< Z-direction setting */
+        uint16_t duration; /*!< Actuation duration. 0 = infinite */
+    } fields;
+} mtq_general_axis_inputs;
+
+static void _get_axis_inputs(void* inp)
 {
 	// gets the axis information required for actuation
+	mtq_general_axis_inputs* p_inp = inp;
 
 	double value = 0;
 
@@ -234,7 +243,7 @@ static void _get_axis_inputs(imtq_inputs_t* p_inp)
 		return;
 	}
 
-	memset(p_inp, 0, sizeof(imtq_inputs_t));
+	memset(p_inp, 0, sizeof(mtq_general_axis_inputs));
 
 	if(ing(" x-axis value [0]: ", &value, -32768, 32767, 0))
 	{
@@ -242,7 +251,7 @@ static void _get_axis_inputs(imtq_inputs_t* p_inp)
 		return;
 	}
 	printf("\r\n");
-	p_inp->fields.input[0] = (signed short) value;
+	p_inp->fields.input_x = (signed short) value;
 
 	if(ing(" y-axis value [0]: ", &value, -32768, 32767, 0))
 	{
@@ -250,7 +259,7 @@ static void _get_axis_inputs(imtq_inputs_t* p_inp)
 		return;
 	}
 	printf("\r\n");
-	p_inp->fields.input[1] = (signed short) value;
+	p_inp->fields.input_y = (signed short) value;
 
 	if(ing(" z-axis value [0]: ", &value, -32768, 32767, 0))
 	{
@@ -258,7 +267,7 @@ static void _get_axis_inputs(imtq_inputs_t* p_inp)
 		return;
 	}
 	printf("\r\n");
-	p_inp->fields.input[2] = (signed short) value;
+	p_inp->fields.input_z = (signed short) value;
 
 	if(ing(" duration ms (0=inf) [0]: ", &value, 0, 65535, 0))
 	{
@@ -285,13 +294,14 @@ static void _get_axis_inputs(imtq_inputs_t* p_inp)
 
 static Boolean _softReset(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_RESET_SW_ID;
+    isis_mtq_v2__replyheader_t rsp_stat;
 	unsigned int rv;
 
 	if(info)
 	{
-		printf("\r\n *** Information IsisMTQv2_softReset *** \r\n");
-		printf(" Sends the softReset command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_RESET);
+		printf("\r\n *** Information isis_mtq_v2__reset_sw *** \r\n");
+		printf(" Sends the softReset command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Used to perform a software reset of the IMTQv2 restarting the system. \r\n");
 		printf(" Note: all information stored in volatile memory (e.g. configuration data) \r\n");
 		printf(" is reset to their startup defaults. \r\n");
@@ -300,9 +310,9 @@ static Boolean _softReset(Boolean info)
 	}
 
 
-	printf("\r\n Perform IsisMTQv2_softReset \r\n");
+	printf("\r\n Perform isis_mtq_v2__reset_sw \r\n");
 
-	rv = IsisMTQv2_softReset(0, &rsp_stat);				// reset the ISIS-EPS configuration to hardcoded defaults
+	rv = isis_mtq_v2__reset_sw(0, &rsp_stat);			// reset the ISIS-EPS configuration to hardcoded defaults
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -317,22 +327,23 @@ static Boolean _softReset(Boolean info)
 
 static Boolean _noOperation(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_NO_OP_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
 	unsigned int rv;
 
 	if(info)
 	{
-		printf("\r\n *** Information noOperation *** \r\n");
-		printf(" Sends the no-operation command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_NOP);
+		printf("\r\n *** Information no_op *** \r\n");
+		printf(" Sends the no-operation command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Does not affect the IMTQv2 other than providing a 'success' reply. \r\n");
 		printf(" Can be used to verify availability of the IMTQv2 in a non-intrusive manner. \r\n");
 
 		return TRUE;
 	}
 
-	printf("\r\n Perform noOperation \r\n");
+	printf("\r\n Perform no_op \r\n");
 
-	rv = IsisMTQv2_noOperation(0, &rsp_stat);
+	rv = isis_mtq_v2__no_op(0, &rsp_stat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -347,13 +358,14 @@ static Boolean _noOperation(Boolean info)
 
 static Boolean _cancelOperation(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_CANCEL_OP_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
 	unsigned int rv;
 
 	if(info)
 	{
-		printf("\r\n *** Information cancelOperation *** \r\n");
-		printf(" Sends the cancel-operation command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_CANCELOP);
+		printf("\r\n *** Information cancel_op *** \r\n");
+		printf(" Sends the cancel-operation command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Stops any actuation and returns to idle mode. \r\n");
 
 		return TRUE;
@@ -361,7 +373,7 @@ static Boolean _cancelOperation(Boolean info)
 
 	printf("\r\n Perform cancelOperation \r\n");
 
-	rv = IsisMTQv2_cancelOperation(0, &rsp_stat);
+	rv = isis_mtq_v2__cancel_op(0, &rsp_stat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -376,23 +388,26 @@ static Boolean _cancelOperation(Boolean info)
 
 static Boolean _startMTMMeasurement(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_MTM_ID;
+    uint8_t cmd_code_raw[] = ISIS_MTQ_V2_GET_RAW_MTM_DATA_ID;
+    uint8_t cmd_code_cal[] = ISIS_MTQ_V2_GET_CAL_MTM_DATA_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
 	unsigned int rv;
 
 	if(info)
 	{
-		printf("\r\n *** Information startMTMMeasurement *** \r\n");
-		printf(" Sends the mtm start command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_STARTMTM);
+		printf("\r\n *** Information start_mtm *** \r\n");
+		printf(" Sends the mtm start command %#04x to the IMTQv2 \r\n", cmd_code_start[0]);
 		printf(" Starts a magnetometer measurement. Only available in Idle mode \r\n");
-		printf(" Use getRawMTMData %#04x or getCalMTMData %#04x to get the result \r\n", ISIS_MTQ_I2CCMD_GET_MTM_RAWDATA, ISIS_MTQ_I2CCMD_GET_MTM_CALDATA);
+		printf(" Use getRawMTMData %#04x or getCalMTMData %#04x to get the result \r\n", cmd_code_raw[0], cmd_code_cal[0]);
 		printf(" once integration has completed. Integration duration can be configured.");
 
 		return TRUE;
 	}
 
-	printf("\r\n Perform startMTMMeasurement \r\n");
+	printf("\r\n Perform start_mtm \r\n");
 
-	rv = IsisMTQv2_startMTMMeasurement(0, &rsp_stat);
+	rv = isis_mtq_v2__start_mtm(0, &rsp_stat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -407,29 +422,31 @@ static Boolean _startMTMMeasurement(Boolean info)
 
 static Boolean _startMTQActuationCurrent(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_inputs_t input;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_ACTUATION_CURRENT_ID;
+    uint8_t cmd_code_cancel[] = ISIS_MTQ_V2_CANCEL_OP_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
+	isis_mtq_v2__start_actuation_current__to_t input;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information startMTQActuationCurrent *** \r\n");
-		printf(" Sends the actuation start current command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_STARTMTQ_ACTCURR);
+		printf(" Sends the actuation start current command %#04x to the IMTQv2 \r\n", cmd_code_start[0]);
 		printf(" Starts coil actuation providing actuation level in coil currents. Only available in Idle mode \r\n");
 		printf(" Provide positive values for positive dipoles in IMTQv2 frame, negative values for negative dipoles. \r\n");
 		printf(" An actuation duration in milliseconds needs to be provided. \r\n");
 		printf(" Provide 0 for duration to keep the coils on indefinitely. \r\n");
-		printf(" The cancel command %#04x can be used to stop actuation at any time. \r\n", ISIS_MTQ_I2CCMD_CANCELOP);
+		printf(" The cancel command %#04x can be used to stop actuation at any time. \r\n", cmd_code_cancel[0]);
 
 		return TRUE;
 	}
 
-	printf("\r\n Perform startMTQActuationCurrent \r\n");
+	printf("\r\n Perform start_actuation_current \r\n");
 
 	printf(" Provide actuation currents [10E-4 A] \r\n");
 	_get_axis_inputs(&input);
 
-	rv = IsisMTQv2_startMTQActuationCurrent(0, input, &rsp_stat);
+	rv = isis_mtq_v2__start_actuation_current(0, &input, &rsp_stat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -443,21 +460,24 @@ static Boolean _startMTQActuationCurrent(Boolean info)
 }
 static Boolean _startMTQActuationDipole(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_inputs_t input;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_ACTUATION_DIPOLE_ID;
+    uint8_t cmd_code_get[] = ISIS_MTQ_V2_GET_CMD_ACTUATION_DIPOLE_ID;
+    uint8_t cmd_code_cancel[] = ISIS_MTQ_V2_CANCEL_OP_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
+	isis_mtq_v2__start_actuation_dipole__to_t input;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information startMTQActuationDipole *** \r\n");
-		printf(" Sends the actuation start dipole command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_STARTMTQ_ACTDIP);
+		printf(" Sends the actuation start dipole command %#04x to the IMTQv2 \r\n", cmd_code_start[0]);
 		printf(" Starts coil actuation providing actuation level in coil dipole. Only available in Idle mode \r\n");
 		printf(" Provide positive values for positive dipoles in IMTQv2 frame, negative values for negative dipoles. \r\n");
 		printf(" The provided dipole is collinearly reduced if it is bigger than the torque that the IMTQ can produce. \r\n");
-		printf(" Use command getCmdActuationDipole %#04x to retrieve the dipole that is actually being used for torquing. \r\n", IMTQ_CMDACTDIP_SIZE);
+		printf(" Use command getCmdActuationDipole %#04x to retrieve the dipole that is actually being used for torquing. \r\n", cmd_code_get[0]);
 		printf(" An actuation duration in milliseconds needs to be provided, \r\n");
 		printf(" or 0 can be supplied to keep the coils on indefinitely. \r\n");
-		printf(" The cancel command %#04x can be used to stop actuation at any time. \r\n", ISIS_MTQ_I2CCMD_CANCELOP);
+		printf(" The cancel command %#04x can be used to stop actuation at any time. \r\n", cmd_code_cancel[0]);
 
 		return TRUE;
 	}
@@ -467,7 +487,7 @@ static Boolean _startMTQActuationDipole(Boolean info)
 	printf(" Provide actuation dipole [10E-4 Am2] \r\n");
 	_get_axis_inputs(&input);
 
-	rv = IsisMTQv2_startMTQActuationDipole(0, input, &rsp_stat);
+	rv = isis_mtq_v2__start_actuation_dipole(0, &input, &rsp_stat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -481,19 +501,21 @@ static Boolean _startMTQActuationDipole(Boolean info)
 }
 static Boolean _startMTQActuationPWM(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_inputs_t input;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_ACTUATION_PWM_ID;
+    uint8_t cmd_code_cancel[] = ISIS_MTQ_V2_CANCEL_OP_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
+	isis_mtq_v2__start_actuation_pwm__to_t input;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information startMTQActuationPWM *** \r\n");
-		printf(" Sends the actuation start pwm command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_STARTMTQ_ACTPWM);
+		printf(" Sends the actuation start pwm command %#04x to the IMTQv2 \r\n", cmd_code_start[0]);
 		printf(" Starts coil actuation providing actuation level in on-percentage. Only available in Idle mode \r\n");
 		printf(" Provide positive values for positive dipoles in IMTQv2 frame, negative values for negative dipoles. \r\n");
 		printf(" An actuation duration in milliseconds needs to be provided. \r\n");
 		printf(" Provide 0 for duration to keep the coils on indefinitely. \r\n");
-		printf(" The cancel command %#04x can be used to stop actuation at any time. \r\n", ISIS_MTQ_I2CCMD_CANCELOP);
+		printf(" The cancel command %#04x can be used to stop actuation at any time. \r\n", cmd_code_cancel[0]);
 
 		return TRUE;
 	}
@@ -503,7 +525,7 @@ static Boolean _startMTQActuationPWM(Boolean info)
 	printf(" Provide actuation [0.1%%] \r\n");
 	_get_axis_inputs(&input);
 
-	rv = IsisMTQv2_startMTQActuationPWM(0, input, &rsp_stat);
+	rv = isis_mtq_v2__start_actuation_pwm(0, &input, &rsp_stat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -518,19 +540,21 @@ static Boolean _startMTQActuationPWM(Boolean info)
 
 static Boolean _startSelfTest(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_sel_axdir_t axdir;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_SELF_TEST_ID;
+    uint8_t cmd_code_get[] = ISIS_MTQ_V2_GET_SELF_TEST_RESULT_ALL_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
+	isis_mtq_v2__axis_t axdir;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information startSelfTest *** \r\n");
-		printf(" Sends the startSelfTest command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_SWITCH_SELFMODE);
+		printf(" Sends the startSelfTest command %#04x to the IMTQv2 \r\n", cmd_code_start[0]);
 		printf(" Switches IMTQv2 into self-test mode, actuating axes and cross-checking with measured magnetic field. \r\n");
 		printf(" Can only be started from Idle mode and automatically switches back to Idle mode upon completion. \r\n");
-		printf(" Provide imtq_sel_axdir_all (%d) to actuate and verify all axes-directions (i.e. a positive and a negative dipole generated per axis) \r\n", imtq_sel_axdir_all);
+		printf(" Provide isis_mtq_v2__axis__all (%d) to actuate and verify all axes-directions (i.e. a positive and a negative dipole generated per axis) \r\n", isis_mtq_v2__axis__all);
 		printf(" sequentially using a single command. Otherwise a single axis can be verified per command. \r\n");
-		printf(" After completion the result of the self-test needs to be retrieved using command getSelftestData %#04x. \r\n", ISIS_MTQ_I2CCMD_GET_SELFTESTDATA);
+		printf(" After completion the result of the self-test needs to be retrieved using command getSelftestData %#04x. \r\n", cmd_code_get[0]);
 		printf(" NOTE: The STAT byte response is *not* the result of the self-test, it only indicates start command acceptance. \r\n");
 
 		return TRUE;
@@ -544,20 +568,20 @@ static Boolean _startSelfTest(Boolean info)
 		char tmp[255] = {0};
 
 		snprintf(tmp, sizeof(tmp), " Provide self-test axis (%d=all,%d=+x,%d=-x,%d=+y,%d=-y,%d=+z,%d=-z) [%d]: ",
-								imtq_sel_axdir_all, imtq_sel_axdir_posx, imtq_sel_axdir_negx, imtq_sel_axdir_posy, imtq_sel_axdir_negy, imtq_sel_axdir_posz, imtq_sel_axdir_negz,
-								imtq_sel_axdir_all);
+		        isis_mtq_v2__axis__all, isis_mtq_v2__axis__x_positive, isis_mtq_v2__axis__x_negative, isis_mtq_v2__axis__y_positive, isis_mtq_v2__axis__y_negative, isis_mtq_v2__axis__z_positive, isis_mtq_v2__axis__z_negative,
+		        isis_mtq_v2__axis__all);
 
 		while(1)
 		{
-			rv = ing(tmp, &value, imtq_sel_axdir_all, imtq_sel_axdir_negz, imtq_sel_axdir_all);	// request info from the user
+			rv = ing(tmp, &value, isis_mtq_v2__axis__all, isis_mtq_v2__axis__z_negative, isis_mtq_v2__axis__all);	// request info from the user
 			if(rv == INGRV_esc) {printf("<ESC> \r\n"); return TRUE;}								// esc? exit function
 			else if(rv == INGRV_val) {printf("\r\n"); break;}										// valid? continue
 		}
 
-		axdir = (imtq_sel_axdir_t) value;															// cast the supplied axis-direction value
+		axdir = (isis_mtq_v2__axis_t) value;															// cast the supplied axis-direction value
 	}
 
-	rv = IsisMTQv2_startSelfTest(0, axdir, &rsp_stat);	// issue the command
+	rv = isis_mtq_v2__start_self_test(0, axdir, &rsp_stat);	// issue the command
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -571,14 +595,15 @@ static Boolean _startSelfTest(Boolean info)
 }
 static Boolean _startDetumble(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_START_BDOT_ID;
+	isis_mtq_v2__replyheader_t rsp_stat;
 	unsigned short duration;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information startDetumble *** \r\n");
-		printf(" Sends the startDetumble command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_SWITCH_DETMODE);
+		printf(" Sends the startDetumble command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Switches IMTQv2 into detumble mode, providing autonomous detumble operation. \r\n");
 		printf(" Detumble mode implements the b-dot algorithm using magnetic measurements and coil actuation to reduce the spin of a satellite. \r\n");
 		printf(" Can only be started from Idle mode. Returns to Idle mode after duration expires. \r\n");
@@ -603,7 +628,7 @@ static Boolean _startDetumble(Boolean info)
 		duration = value;																			// cast the supplied axis-direction value
 	}
 
-	rv = IsisMTQv2_startDetumble(0, duration, &rsp_stat);											// issue the command
+	rv = isis_mtq_v2__start_bdot(0, duration, &rsp_stat);											// issue the command
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);													// non-zero return value means error!
@@ -618,27 +643,27 @@ static Boolean _startDetumble(Boolean info)
 
 static Boolean _getSystemState(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_systemstate_t system_state;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_STATE_ID;
+    isis_mtq_v2__get_state__from_t system_state;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getSystemState *** \r\n");
-		printf(" Sends the getMTQSystemState command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_SYSTEMSTATE);
+		printf(" Sends the getMTQSystemState command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Provides system state information on the IMTQv2. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" mode = %s \r\n", "current mode of the IMTQv2");
-		printf(" error = %s \r\n", "first internal error encountered during last control iteration");
-		printf(" conf = %s \r\n", "1 when the in-memory configuration been altered by the user since start-up");
-		printf(" uptime = %s \r\n", "uptime in seconds");
+		printf("   - mode = %s \r\n", "current mode of the IMTQv2");
+		printf("   - error = %s \r\n", "first internal error encountered during last control iteration");
+		printf("   - conf = %s \r\n", "1 when the in-memory configuration been altered by the user since start-up");
+		printf("   - uptime = %s \r\n", "uptime in seconds");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getSystemState \r\n");
 
-	rv = IsisMTQv2_getSystemState(0, &system_state, &rsp_stat);
+	rv = isis_mtq_v2__get_state(0, &system_state);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -646,46 +671,46 @@ static Boolean _getSystemState(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&system_state.fields.reply_header);
 
-	printf(" \t mode = %d ", system_state.fields.mode);
+	printf("   - mode = %d ", system_state.fields.mode);
 	switch(system_state.fields.mode)
 	{
-	case imtq_mode_idle: printf("( idle ) \r\n"); break;
-	case imtq_mode_selftest: printf("( selftest ) \r\n"); break;
-	case imtq_mode_detumble: printf("( detumble ) \r\n"); break;
+	case isis_mtq_v2__mode__idle: printf("( idle = isis_mtq_v2__mode__idle ) \r\n"); break;
+	case isis_mtq_v2__mode__selftest: printf("( selftest = isis_mtq_v2__mode__selftest ) \r\n"); break;
+	case isis_mtq_v2__mode__detumble: printf("( detumble = isis_mtq_v2__mode__detumble ) \r\n"); break;
 	default: printf("( !UNKNOWN! ) \r\n"); break;
 	}
 
-	printf(" \t error = %d \r\n", system_state.fields.err);
-	printf(" \t conf = %d ", system_state.fields.conf);
+	printf("   - error = %d \r\n", system_state.fields.err);
+	printf("   - conf = %d ", system_state.fields.conf);
 	if(system_state.fields.conf) printf("( config params were changed ) \r\n"); else printf("( no config param changes ) \r\n");
-	printf(" \t uptime = %d [s] \r\n", system_state.fields.uptime);
+	printf("   - uptime = %d [s] \r\n", system_state.fields.uptime);
 
 	return TRUE;
 }
 static Boolean _getRawMTMData(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_raw_magf_t field_raw;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_RAW_MTM_DATA_ID;
+	isis_mtq_v2__get_raw_mtm_data__from_t field_raw;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getRawMTMData *** \r\n");
-		printf(" Sends the getRawMTMData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_MTM_RAWDATA);
+		printf(" Sends the getRawMTMData command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns MTM measurement results from a previously started measurement using startMTMMeasurement. \r\n");
 		printf(" Measurement results become available after the configurable integration time completes. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" raw_magf = %s \r\n", "magnetometer field strength in raw counts");
-		printf(" coilact = %s \r\n", "coil actuation detected during measurement");
+		printf("   - raw_mag_(x,y,z) = %s \r\n", "magnetometer field strength in raw counts for x, y, and z.");
+		printf("   - coilact = %s \r\n", "coil actuation detected during measurement");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getRawMTMData \r\n");
 
-	rv = IsisMTQv2_getRawMTMData(0, &field_raw, &rsp_stat);
+	rv = isis_mtq_v2__get_raw_mtm_data(0, &field_raw);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -693,35 +718,35 @@ static Boolean _getRawMTMData(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&field_raw.fields.reply_header);
 
-	printf(" \t raw_magf(x,y,z) = %d, %d, %d [-] \r\n", field_raw.fields.raw_magf[0], field_raw.fields.raw_magf[1], field_raw.fields.raw_magf[2]);
-	printf(" \t coilact = %d \r\n", field_raw.fields.coilact);
+	printf("   - raw_mag_(x,y,z) = %ld, %ld, %ld [-] \r\n", field_raw.fields.raw_mag_x, field_raw.fields.raw_mag_y, field_raw.fields.raw_mag_z);
+	printf("   - coilact = %d \r\n", field_raw.fields.coilact);
 
 	return TRUE;
 }
 static Boolean _getCalMTMData(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_cal_magf_t field_cal;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_CAL_MTM_DATA_ID;
+	isis_mtq_v2__get_cal_mtm_data__from_t field_cal;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getCalMTMData *** \r\n");
-		printf(" Sends the getCalMTMData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_MTM_CALDATA);
+		printf(" Sends the getCalMTMData command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns MTM measurement results from a previously started measurement using startMTMMeasurement. \r\n");
 		printf(" Measurement results become available after the configurable integration time completes. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" cal_magf = %s \r\n", "magnetometer field strength in nano-tesla [10E-9 T]");
-		printf(" coilact = %s \r\n", "coil actuation detected during measurement");
+		printf("   - calibrated_mag_(x,y,z) = %s \r\n", "magnetometer field strength in nano-tesla for x, y, and z [10E-9 T]");
+		printf("   - coilact = %s \r\n", "coil actuation detected during measurement");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getCalMTMData \r\n");
 
-	rv = IsisMTQv2_getCalMTMData(0, &field_cal, &rsp_stat);
+	rv = isis_mtq_v2__get_cal_mtm_data(0, &field_cal);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -729,35 +754,35 @@ static Boolean _getCalMTMData(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&field_cal.fields.reply_header);
 
-	printf(" \t cal_magf(x,y,z) = %d, %d, %d [10E-9 T] \r\n", field_cal.fields.cal_magf[0], field_cal.fields.cal_magf[1], field_cal.fields.cal_magf[2]);
-	printf(" \t coilact = %d \r\n", field_cal.fields.coilact);
+	printf("   - calibrated_mag_(x,y,z) = %ld, %ld, %ld [10E-9 T] \r\n", field_cal.fields.calibrated_mag_x, field_cal.fields.calibrated_mag_y, field_cal.fields.calibrated_mag_z);
+	printf("   - coilact = %d \r\n", field_cal.fields.coilact);
 
 	return TRUE;
 }
 
 static Boolean _getCoilCurrent(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_coilcurr_t coilcurr;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_COIL_CURRENT_ID;
+    isis_mtq_v2__get_coil_current__from_t coilcurr;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getCoilCurrent *** \r\n");
-		printf(" Sends the getCoilCurrent command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_COIL_CURRMSR);
+		printf(" Sends the getCoilCurrent command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns the latest coil current measurement available. \r\n");
 		printf(" Measurement results become available automatically after each millisecond. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" coilcurr = %s \r\n", "coil current in [10E-4 A]");
+		printf("   - coil_current_(x,y,z) = %s \r\n", "coil current for x, y, and z [10E-4 A]");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getCoilCurrent \r\n");
 
-	rv = IsisMTQv2_getCoilCurrent(0, &coilcurr, &rsp_stat);
+	rv = isis_mtq_v2__get_coil_current(0, &coilcurr);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -765,34 +790,34 @@ static Boolean _getCoilCurrent(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&coilcurr.fields.reply_header);
 
-	printf(" \t coilcurr(x,y,z) = %d, %d, %d [10E-4 A] \r\n", coilcurr.fields.coilcurr[0], coilcurr.fields.coilcurr[1], coilcurr.fields.coilcurr[2]);
+	printf("   - coil_current_(x,y,z) = %d, %d, %d [10E-4 A] \r\n", coilcurr.fields.coil_current_x, coilcurr.fields.coil_current_y, coilcurr.fields.coil_current_z);
 
 	return TRUE;
 }
 
 static Boolean _getCoilTemperature(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_coiltemp_t coiltemp;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_COIL_TEMPS_ID;
+	isis_mtq_v2__get_coil_temps__from_t coiltemp;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getCoilTemperature *** \r\n");
-		printf(" Sends the getCoilTemperature command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_COIL_TEMPMSR);
+		printf(" Sends the getCoilTemperature command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns the latest coil temperature measurement available. \r\n");
 		printf(" Measurement results become available automatically after each millisecond. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" coiltemp = %s \r\n", "coil temperature in degrees C");
+		printf("   - coil_temp_(x,y,z) = %s \r\n", "coil temperature in for x, y, and z [deg. C]");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getCoilTemperature \r\n");
 
-	rv = IsisMTQv2_getCoilTemperature(0, &coiltemp, &rsp_stat);
+	rv = isis_mtq_v2__get_coil_temps(0, &coiltemp);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -800,34 +825,34 @@ static Boolean _getCoilTemperature(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&coiltemp.fields.reply_header);
 
-	printf(" \t coiltemp(x,y,z) = %d, %d, %d [degC] \r\n", coiltemp.fields.coiltemp[0], coiltemp.fields.coiltemp[1], coiltemp.fields.coiltemp[2]);
+	printf("   - coil_temp_(x,y,z) = %d, %d, %d [deg. C] \r\n", coiltemp.fields.coil_temp_x, coiltemp.fields.coil_temp_y, coiltemp.fields.coil_temp_z);
 
 	return TRUE;
 }
 static Boolean _getCmdActuationDipole(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_cmdactdip_t cmdact_dip;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_CMD_ACTUATION_DIPOLE_ID;
+    isis_mtq_v2__get_cmd_actuation_dipole__from_t cmdact_dip;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getCmdActuationDipole *** \r\n");
-		printf(" Sends the getCmdActuationDipole command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_CMDACT_DIPOLE);
+		printf(" Sends the getCmdActuationDipole command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns the dipole that is being actuated, which might be different from the one commanded by the IMTQv2 master. \r\n");
 		printf(" Differences occur due to automatic scaling of the dipole to fall within temperature dependent torque-able limits of the IMTQv2. \r\n");
 		printf(" NOTE: Only available after a torque command using dipole, or while in detumble mode.\r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" cmd_act_dip = %s \r\n", "commanded coil actuation dipole in [10E-4 Am2]");
+		printf("   - cmd_act_dip_(x,y,z) = %s \r\n", "commanded coil actuation dipole for x, y, and z [10E-4 Am2]");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getCmdActuationDipole \r\n");
 
-	rv = IsisMTQv2_getCmdActuationDipole(0, &cmdact_dip, &rsp_stat);
+	rv = isis_mtq_v2__get_cmd_actuation_dipole(0, &cmdact_dip);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -835,23 +860,25 @@ static Boolean _getCmdActuationDipole(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&cmdact_dip.fields.reply_header);
 
-	printf(" \t cmd_act_dip(x,y,z) = %d, %d, %d [10E-4 Am2] \r\n", cmdact_dip.fields.cmdactdip[0], cmdact_dip.fields.cmdactdip[1], cmdact_dip.fields.cmdactdip[2]);
+	printf("   - cmd_act_dip_(x,y,z) = %d, %d, %d [10E-4 Am2] \r\n", cmdact_dip.fields.cmd_act_dip_x, cmdact_dip.fields.cmd_act_dip_y, cmdact_dip.fields.cmd_act_dip_z);
 
 	return TRUE;
 }
 
 static Boolean _getSelftestDataSingleAxis(Boolean info)
 {
-	imtq_seldata_single_axdir_t seldata;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_SELF_TEST_RESULT_SINGLE_ID;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_SELF_TEST_ID;
+    isis_mtq_v2__get_self_test_result_single__from_t seldata;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getSelftestDataSingleAxis *** \r\n");
-		printf(" Sends the getSelftestData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_SELFTESTDATA);
-		printf(" Returns the result of the last completed self-test, started with the command startSelfTest %#04x. \r\n", ISIS_MTQ_I2CCMD_SWITCH_SELFMODE);
+		printf(" Sends the getSelftestData command %#04x to the IMTQv2 \r\n", cmd_code[0]);
+		printf(" Returns the result of the last completed self-test, started with the command startSelfTest %#04x. \r\n", cmd_code_start[0]);
 		printf(" The self-test is a mode which actuates the coils and measures the resulting field to verify hardware functionality. \r\n");
 		printf(" At the end of the self-test the IMTQv2 will diagnose the gathered measurement data and indicate whether problems are detected. \r\n");
 		printf(" The result data returned can be either a single-axis or all-axis data block, depending on the axis-direction parameter provided to startSelfTest(), \r\n");
@@ -864,7 +891,7 @@ static Boolean _getSelftestDataSingleAxis(Boolean info)
 
 	printf("\r\n Perform getSelftestDataSingleAxis \r\n");
 
-	rv = IsisMTQv2_getSelftestDataSingleAxis(0, &seldata);
+	rv = isis_mtq_v2__get_self_test_result_single(0, &seldata);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -885,14 +912,16 @@ static Boolean _getSelftestDataSingleAxis(Boolean info)
 
 static Boolean _getSelftestDataAllAxis(Boolean info)
 {
-	imtq_seldata_all_axdir_t seldata;
+    uint8_t cmd_code_get[] = ISIS_MTQ_V2_GET_SELF_TEST_RESULT_ALL_ID;
+    uint8_t cmd_code_start[] = ISIS_MTQ_V2_START_SELF_TEST_ID;
+    isis_mtq_v2__get_self_test_result_all__from_t seldata;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getSelftestDataSingleAxis *** \r\n");
-		printf(" Sends the getSelftestData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_SELFTESTDATA);
-		printf(" Returns the result of the last completed self-test, started with the command startSelfTest %#04x. \r\n", ISIS_MTQ_I2CCMD_SWITCH_SELFMODE);
+		printf(" Sends the getSelftestData command %#04x to the IMTQv2 \r\n", cmd_code_get[0]);
+		printf(" Returns the result of the last completed self-test, started with the command startSelfTest %#04x. \r\n", cmd_code_start[0]);
 		printf(" The self-test is a mode which actuates the coils and measures the resulting field to verify hardware functionality. \r\n");
 		printf(" At the end of the self-test the IMTQv2 will diagnose the gathered measurement data and indicate whether problems are detected. \r\n");
 		printf(" The result data returned can be either a single-axis or all-axis data block, depending on the axis-direction \r\n");
@@ -906,7 +935,7 @@ static Boolean _getSelftestDataAllAxis(Boolean info)
 
 	printf("\r\n Perform getSelftestDataSingleAxis \r\n");
 
-	rv = IsisMTQv2_getSelftestDataAllAxis(0, &seldata);
+	rv = isis_mtq_v2__get_self_test_result_all(0, &seldata);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -937,29 +966,29 @@ static Boolean _getSelftestDataAllAxis(Boolean info)
 
 static Boolean _getDetumbleData(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_detumble_data_t detdat;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_DETUMBLE_DATA_ID;
+	isis_mtq_v2__get_detumble_data__from_t detdat;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getDetumbleData *** \r\n");
-		printf(" Sends the getDetumbleData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_DETUMBLEDATA);
+		printf(" Sends the getDetumbleData command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns the latest measurement and control information produced by the autonomously operating detumble mode. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" cal_magf = %s \r\n", "magnetic field strength in nano-tesla [10E-9 T]");
-		printf(" filt_magf = %s \r\n", "filtered magnetic field strength in nano-tesla [10E-9 T]");
-		printf(" bdot = %s \r\n", "computed b-dot value in nano-tesla per second [10E-9 T/s]");
-		printf(" cmdactdip = %s \r\n", "commanded actuation dipole in [10E-4 Am2]");
-		printf(" cmd_coilcurr = %s \r\n", "commanded actuation current in [10E-4 A]");
-		printf(" meas_coilcurr = %s \r\n", "measured actuation current in [10E-4 A]");
+		printf("   - calibrated_mag_(x,y,z) = %s \r\n", "magnetic field strength for x, y, and z [nT / 10E-9 T]");
+		printf("   - filtered_mag_(x,y,z) = %s \r\n", "filtered magnetic field strength for x, y, and z [nT / 10E-9 T]");
+		printf("   - bdot_(x,y,z) = %s \r\n", "computed b-dot value in nano-tesla per second for x, y, and z [10E-9 T/s]");
+		printf("   - cmd_act_dip_(x,y,z) = %s \r\n", "commanded actuation dipole for x, y, and z [10E-4 Am2]");
+		printf("   - cmd_current_(x,y,z) = %s \r\n", "commanded actuation current for x, y, and z [10E-4 A]");
+		printf("   - meas_current_(x,y,z) = %s \r\n", "measured actuation current for x, y, and z [10E-4 A]");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform getDetumbleData \r\n");
 
-	rv = IsisMTQv2_getDetumbleData(0, &detdat, &rsp_stat);
+	rv = isis_mtq_v2__get_detumble_data(0, &detdat);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -967,43 +996,43 @@ static Boolean _getDetumbleData(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&detdat.fields.reply_header);
 
-	printf(" \t cal_magf(x,y,z) = %d, %d, %d [10E-9 T] \r\n", detdat.fields.cal_magf[0], detdat.fields.cal_magf[1], detdat.fields.cal_magf[2]);
-	printf(" \t filt_magf(x,y,z) = %d, %d, %d [10E-9 T] \r\n", detdat.fields.filt_magf[0], detdat.fields.filt_magf[1], detdat.fields.filt_magf[2]);
-	printf(" \t bdot(x,y,z) = %d, %d, %d [10E-9 T/s] \r\n", detdat.fields.bdot[0], detdat.fields.bdot[1], detdat.fields.bdot[2]);
-	printf(" \t cmdactdip(x,y,z) = %d, %d, %d [10E-4 Am2] \r\n", detdat.fields.cmdactdip[0], detdat.fields.cmdactdip[1], detdat.fields.cmdactdip[2]);
-	printf(" \t coilcurr_cmd(x,y,z) = %d, %d, %d [10E-4 A] \r\n", detdat.fields.coilcurr_cmd[0], detdat.fields.coilcurr_cmd[1], detdat.fields.coilcurr_cmd[2]);
-	printf(" \t coilcurr_meas(x,y,z) = %d, %d, %d [10E-4 A] \r\n", detdat.fields.coilcurr_meas[0], detdat.fields.coilcurr_meas[1], detdat.fields.coilcurr_meas[2]);
+	printf("   - calibrated_mag_(x,y,z) = %ld, %ld, %ld [10E-9 T] \r\n", detdat.fields.calibrated_mag_x, detdat.fields.calibrated_mag_y, detdat.fields.calibrated_mag_z);
+	printf("   - filtered_mag_(x,y,z) = %ld, %ld, %ld [10E-9 T] \r\n", detdat.fields.filtered_mag_x, detdat.fields.filtered_mag_y, detdat.fields.filtered_mag_z);
+	printf("   - bdot_(x,y,z) = %ld, %ld, %ld [10E-9 T/s] \r\n", detdat.fields.bdot_x, detdat.fields.bdot_y, detdat.fields.bdot_z);
+	printf("   - cmd_act_dip_(x,y,z) = %d, %d, %d [10E-4 Am2] \r\n", detdat.fields.cmd_act_dip_x, detdat.fields.cmd_act_dip_y, detdat.fields.cmd_act_dip_z);
+	printf("   - cmd_current_(x,y,z) = %d, %d, %d [10E-4 A] \r\n", detdat.fields.cmd_current_x, detdat.fields.cmd_current_y, detdat.fields.cmd_current_z);
+	printf("   - meas_current_(x,y,z) = %d, %d, %d [10E-4 A] \r\n", detdat.fields.meas_current_x, detdat.fields.meas_current_y, detdat.fields.meas_current_z);
 
 	return TRUE;
 }
 static Boolean _getRawHKData(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_rawhk_data_t rawhk;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_HOUSEKEEPING_ID;
+	isis_mtq_v2__get_housekeeping__from_t rawhk;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getRawHKData *** \r\n");
-		printf(" Sends the getRawHKData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_HK_RAWDATA);
+		printf(" Sends the getRawHKData command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns the latest house-keeping data in raw form from the IMTQv2. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" digit_volt = %s \r\n", "measured digital supply current in raw counts");
-		printf(" anl_volt = %s \r\n", "measured analog supply current in raw counts");
-		printf(" digit_curr = %s \r\n", "measured digital supply current in raw counts");
-		printf(" anl_curr = %s \r\n", "measured analog supply current in raw counts");
-		printf(" coilcurr = %s \r\n", "measured coil currents in raw counts");
-		printf(" coiltemp = %s \r\n", "measured coil temperature in raw counts");
-		printf(" mcu_temp = %s \r\n", "measured micro controller unit internal temperature in raw counts");
+		printf("   - digital_voltage = %s \r\n", "measured digital supply current in raw counts for x, y, and z");
+		printf("   - analog_voltage = %s \r\n", "measured analog supply current in raw counts for x, y, and z");
+		printf("   - digital_current = %s \r\n", "measured digital supply current in raw counts for x, y, and z");
+		printf("   - analog_current = %s \r\n", "measured analog supply current in raw counts for x, y, and z");
+		printf("   - meas_current_(x,y,z) = %s \r\n", "measured coil currents in raw counts for x, y, and z");
+		printf("   - coil_temp_(x,y,z) = %s \r\n", "measured coil temperature in raw counts for x, y, and z");
+		printf("   - mcu_temp = %s \r\n", "measured micro controller unit internal temperature in raw counts for x, y, and z");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform _getRawHKData \r\n");
 
-	rv = IsisMTQv2_getRawHKData(0, &rawhk, &rsp_stat);
+	rv = isis_mtq_v2__get_housekeeping(0, &rawhk);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -1011,45 +1040,45 @@ static Boolean _getRawHKData(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&rawhk.fields.reply_header);
 
-	printf(" \t digit_volt = %d [-] \r\n", rawhk.fields.digit_volt);
-	printf(" \t anl_volt = %d [-] \r\n", rawhk.fields.anl_volt);
-	printf(" \t digit_curr = %d [-] \r\n", rawhk.fields.digit_curr);
-	printf(" \t anl_curr = %d [-] \r\n", rawhk.fields.anl_curr);
-	printf(" \t coilcurr(x,y,z) = %d, %d, %d [-] \r\n", rawhk.fields.coilcurr[0] , rawhk.fields.coilcurr[1], rawhk.fields.coilcurr[2]);
-	printf(" \t coiltemp(x,y,z) = %d, %d, %d [-] \r\n", rawhk.fields.coiltemp[0] , rawhk.fields.coiltemp[1], rawhk.fields.coiltemp[2]);
-	printf(" \t mcu_temp = %d [-] \r\n", rawhk.fields.mcu_temp);
+	printf("   - digital_voltage = %d [-] \r\n", rawhk.fields.digital_voltage);
+	printf("   - analog_voltage = %d [-] \r\n", rawhk.fields.analog_voltage);
+	printf("   - digital_current = %d [-] \r\n", rawhk.fields.digital_current);
+	printf("   - analog_current = %d [-] \r\n", rawhk.fields.analog_current);
+	printf("   - meas_current_(x,y,z) = %d, %d, %d [-] \r\n", rawhk.fields.meas_current_x , rawhk.fields.meas_current_y, rawhk.fields.meas_current_z);
+	printf("   - coil_temp_(x,y,z) = %d, %d, %d [-] \r\n", rawhk.fields.coil_temp_x , rawhk.fields.coil_temp_y, rawhk.fields.coil_temp_z);
+	printf("   - mcu_temp = %d [-] \r\n", rawhk.fields.mcu_temp);
 
 	return TRUE;
 }
 
 static Boolean _getEngHKData(Boolean info)
 {
-	imtq_statcmd_t rsp_stat;
-	imtq_enghk_data_t enghk;
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_HOUSEKEEPING_ENGINEERING_ID;
+	isis_mtq_v2__get_housekeeping_engineering__from_t enghk;
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n *** Information getEngHKData *** \r\n");
-		printf(" Sends the getEngHKData command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_HK_ENGDATA);
+		printf(" Sends the getEngHKData command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Returns the latest house-keeping data as engineering values from the IMTQv2. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" digit_volt = %s \r\n", "measured digital supply current in [mV]");
-		printf(" anl_volt = %s \r\n", "measured analog supply current in [mV]");
-		printf(" digit_curr = %s \r\n", "measured digital supply current in [10E-4 A]");
-		printf(" anl_curr = %s \r\n", "measured analog supply current in [10E-4 A]");
-		printf(" coilcurr = %s \r\n", "measured coil currents in [10E-4 A]");
-		printf(" coiltemp = %s \r\n", "measured coil temperature in degrees Celcius");
-		printf(" mcu_temp = %s \r\n", "measured micro controller unit internal temperature in degrees Celcius");
+		printf("   - digital_voltage = %s \r\n", "measured digital supply current for x, y, and z [mV]");
+		printf("   - analog_voltage = %s \r\n", "measured analog supply current for x, y, and z [mV]");
+		printf("   - digital_current = %s \r\n", "measured digital supply current for x, y, and z [10E-4 A]");
+		printf("   - analog_current = %s \r\n", "measured analog supply current for x, y, and z [10E-4 A]");
+		printf("   - meas_current_(x,y,z) = %s \r\n", "measured coil currents for x, y, and z [10E-4 A]");
+		printf("   - coil_temp_(x,y,z) = %s \r\n", "measured coil temperature  for x, y, and z [deg. C]");
+		printf("   - mcu_temp = %s \r\n", "measured micro controller unit internal temperature [deg. C]");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform _getEngHKData \r\n");
 
-	rv = IsisMTQv2_getEngHKData(0, &enghk, &rsp_stat);
+	rv = isis_mtq_v2__get_housekeeping_engineering(0, &enghk);
 	if(rv)
 	{
 		TRACE_ERROR(" return value=%d \r\n", rv);		// non-zero return value means error!
@@ -1057,15 +1086,15 @@ static Boolean _getEngHKData(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);
+	_parse_resp(&enghk.fields.reply_header);
 
-	printf(" \t digit_volt = %d [mV] \r\n", enghk.fields.digit_volt);
-	printf(" \t anl_volt = %d [mV] \r\n", enghk.fields.anl_volt);
-	printf(" \t digit_curr = %d [10E-4 A] \r\n", enghk.fields.digit_curr);
-	printf(" \t anl_curr = %d [10E-4 A] \r\n", enghk.fields.anl_curr);
-	printf(" \t coilcurr(x,y,z) = %d, %d, %d [10E-4 A] \r\n", enghk.fields.coilcurr[0] , enghk.fields.coilcurr[1], enghk.fields.coilcurr[2]);
-	printf(" \t coiltemp(x,y,z) = %d, %d, %d [degC] \r\n", enghk.fields.coiltemp[0] , enghk.fields.coiltemp[1], enghk.fields.coiltemp[2]);
-	printf(" \t mcu_temp = %d [degC] \r\n", enghk.fields.mcu_temp);
+	printf("   - digital_voltage = %d [mV] \r\n", enghk.fields.digital_voltage);
+	printf("   - analog_voltage = %d [mV] \r\n", enghk.fields.analog_voltage);
+	printf("   - digital_current = %d [10E-4 A] \r\n", enghk.fields.digital_current);
+	printf("   - analog_current = %d [10E-4 A] \r\n", enghk.fields.analog_current);
+	printf("   - meas_current_(x,y,z) = %d, %d, %d [10E-4 A] \r\n", enghk.fields.meas_current_x , enghk.fields.meas_current_y, enghk.fields.meas_current_z);
+	printf("   - coil_temp_(x,y,z) = %d, %d, %d [degC] \r\n", enghk.fields.coil_temp_x , enghk.fields.coil_temp_y, enghk.fields.coil_temp_z);
+	printf("   - mcu_temp = %d [degC] \r\n", enghk.fields.mcu_temp);
 
 	return TRUE;
 }
@@ -1073,20 +1102,20 @@ static Boolean _getEngHKData(Boolean info)
 
 static Boolean _getParameter(Boolean info)
 {
+    uint8_t cmd_code[] = ISIS_MTQ_V2_GET_PARAMETER_ID;
 	unsigned short par_id;							// storage for the param-id
-	unsigned char par_data[8];						// byte array for storing our parameter data
-	imtq_statcmd_t rsp_stat;						// storage for the command response
+	isis_mtq_v2__get_parameter__from_t  rsp;	    // storage for the command response
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n Information getParameter \r\n");
-		printf(" Sends the getParameter command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_GET_PARAMETER);
+		printf(" Sends the getParameter command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Used to get configuration parameter values from the IMTQv2. \r\n");
 		printf(" Execution is performed and completed immediately. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" param-id = %s \r\n", "parameter-id of the parameter under consideration.");
-		printf(" param-value = %s \r\n", "value of the parameter under consideration. Between 1 and 8 bytes.");
+		printf("   - param-id = %s \r\n", "parameter-id of the parameter under consideration.");
+		printf("   - param-value = %s \r\n", "value of the parameter under consideration. Between 1 and 8 bytes.");
 
 		return TRUE;
 	}
@@ -1095,7 +1124,7 @@ static Boolean _getParameter(Boolean info)
 
 	if(!config_param_info(CONFIG_PARAM_OP_ask_parid, &par_id, NULL)) return TRUE;	// get the param-id from the user
 
-	rv = IsisMTQv2_getParameter(0, par_id, par_data, &rsp_stat);	// get the parameter from the IMTQv2
+	rv = isis_mtq_v2__get_parameter(0, par_id, &rsp);	// get the parameter from the IMTQv2
 	if(rv)
 	{
 		TRACE_ERROR("return value=%d \r\n", rv);		// non-zero return value means error!
@@ -1103,9 +1132,9 @@ static Boolean _getParameter(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);							// parse the command response and show that to the user
+	_parse_resp(&rsp.fields.reply_header);							// parse the command response and show that to the user
 
-	config_param_info(CONFIG_PARAM_OP_print, &par_id, &par_data);	// show the param-id and corresponding value that we received back
+	config_param_info(CONFIG_PARAM_OP_print, &par_id, &rsp.fields.param_value);	// show the param-id and corresponding value that we received back
 
 	return TRUE;
 }
@@ -1113,30 +1142,29 @@ static Boolean _getParameter(Boolean info)
 
 static Boolean _setParameter(Boolean info)
 {
-	unsigned short par_id;							// storage for the param-id
-	unsigned char par_data[8];						// byte array for storing the parameter data we want to set; our maximum size is 8 bytes (e.g. double, long ...)
-	unsigned char par_data_out[8];					// byte array for storing the parameter data that was actually set; our maximum size is 8 bytes (e.g. double, long ...)
-	imtq_statcmd_t rsp_stat;						// storage for the command response
+    uint8_t cmd_code[] = ISIS_MTQ_V2_SET_PARAMETER_ID;
+	isis_mtq_v2__set_parameter__to_t par_data;						// byte array for storing the parameter data we want to set; our maximum size is 8 bytes (e.g. double, long ...)
+	isis_mtq_v2__set_parameter__from_t par_data_out;			    // byte array for storing the parameter data that was actually set; our maximum size is 8 bytes (e.g. double, long ...)
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n Information setParameter \r\n");
-		printf("Sends the setParameter command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_SET_PARAMETER);
+		printf("Sends the setParameter command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf("Used to set configuration parameter values within the IMTQv2. \r\n");
 		printf("Execution is performed and completed immediately. \r\n");
 		printf("The following information is returned: \r\n");
-		printf("param-id = %s \r\n", "parameter-id of the parameter under consideration.");
-		printf("param-value = %s \r\n", "new value of the parameter under consideration. Between 1 and 8 bytes.");
+		printf("  - param-id = %s \r\n", "parameter-id of the parameter under consideration.");
+		printf("  - param-value = %s \r\n", "new value of the parameter under consideration. Between 1 and 8 bytes.");
 
 		return TRUE;
 	}
 
 	printf("\r\n Perform setParameter \r\n");
 
-	if(!config_param_info(CONFIG_PARAM_OP_ask_parid_and_data, &par_id, &par_data)) return TRUE;	// get the param-id and new value from the user
+	if(!config_param_info(CONFIG_PARAM_OP_ask_parid_and_data, &par_data.fields.param_id, &par_data.fields.param_value)) return TRUE;	// get the param-id and new value from the user
 
-	rv = IsisMTQv2_setParameter(0, par_id, par_data, par_data_out, &rsp_stat);		// send the new parameter data to the IMTQv2
+	rv = isis_mtq_v2__set_parameter(0, &par_data, &par_data_out);		// send the new parameter data to the IMTQv2
 	if(rv)
 	{
 		TRACE_ERROR("return value=%d \r\n", rv);		// non-zero return value means error!
@@ -1144,11 +1172,11 @@ static Boolean _setParameter(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);							// parse the command response and show that to the user
+	_parse_resp(&par_data_out.fields.reply_header);							// parse the command response and show that to the user
 
-	if(!config_param_info(CONFIG_PARAM_OP_print, &par_id, &par_data_out)) return TRUE;	// show the param-id and corresponding value that we received back
+	if(!config_param_info(CONFIG_PARAM_OP_print, &par_data.fields.param_id, &par_data_out.fields.param_value_new)) return TRUE;	// show the param-id and corresponding value that we received back
 
-	if(memcmp((char *) par_data, (char *) par_data_out, sizeof(par_data)) != 0)		// is the returned parameter value the same?
+	if(memcmp(&par_data.fields.param_value, &par_data_out.fields.param_value_new, sizeof(par_data.fields.param_value)) != 0)		// is the returned parameter value the same?
 	{
 		unsigned int i;
 
@@ -1158,16 +1186,16 @@ static Boolean _setParameter(Boolean info)
 		printf("I2C bus noise might be another possible culprit. \r\n");
 		printf("Consult the manual and test the I2C bus to determine the cause. \r\n");
 
-		printf("send     = %#04x",  par_data[0]);
+		printf("send     = %#04x",  par_data.fields.param_value[0]);
 		for(i = 1; i < sizeof(par_data); i++)
 		{
-			printf(", %#04x",  par_data[i]);
+			printf(", %#04x",  par_data.fields.param_value[i]);
 		}
 		printf("\r\n");
-		printf("received = %#04x",  par_data_out[0]);
+		printf("received = %#04x",  par_data_out.fields.param_value_new[0]);
 		for(i = 1; i < sizeof(par_data_out); i++)
 		{
-			printf(", %#04x",  par_data_out[i]);
+			printf(", %#04x",  par_data_out.fields.param_value_new[i]);
 		}
 		printf("\r\n");
 	}
@@ -1178,21 +1206,21 @@ static Boolean _setParameter(Boolean info)
 
 static Boolean _resetParameter(Boolean info)
 {
-	unsigned short par_id;							// storage for the param-id
-	unsigned char par_data[8];						// byte array for storing our parameter data
-	imtq_statcmd_t rsp_stat;						// storage for the command response
+    uint8_t cmd_code[] = ISIS_MTQ_V2_RESET_PARAMETER_ID;
+	unsigned short par_id;							            // storage for the param-id
+	isis_mtq_v2__reset_parameter__from_t par_data;		        // byte array for storing our parameter data
 	unsigned int rv;
 
 	if(info)
 	{
 		printf("\r\n Information resetParameter \r\n");
-		printf(" Sends the resetParameter command %#04x to the IMTQv2 \r\n", ISIS_MTQ_I2CCMD_RESET_PARAMETER);
+		printf(" Sends the resetParameter command %#04x to the IMTQv2 \r\n", cmd_code[0]);
 		printf(" Used to reset configuration parameter values back to its hard coded default within the IMTQv2. \r\n");
 		printf(" note: this is different from the value stored in non-volatile memory; if required use loadConfig instead. \r\n");
 		printf(" Execution is performed and completed immediately. \r\n");
 		printf(" The following information is returned: \r\n");
-		printf(" param-id = %s \r\n", "parameter-id of the parameter under consideration.");
-		printf(" param-value = %s \r\n", "value of the parameter under consideration. Between 1 and 8 bytes.");
+		printf("   - param-id = %s \r\n", "parameter-id of the parameter under consideration.");
+		printf("   - param-value = %s \r\n", "value of the parameter under consideration. Between 1 and 8 bytes.");
 
 		return TRUE;
 	}
@@ -1201,7 +1229,7 @@ static Boolean _resetParameter(Boolean info)
 
 	if(!config_param_info(CONFIG_PARAM_OP_ask_parid, &par_id, NULL)) return TRUE;	// get the param-id from the user
 
-	rv = IsisMTQv2_resetParameter(0, par_id, &par_data, &rsp_stat);	// command the ISIS-MTQv2 to reset the parameter, and receive the value that it was rest to
+	rv = isis_mtq_v2__reset_parameter(0, par_id, &par_data);	// command the ISIS-MTQv2 to reset the parameter, and receive the value that it was rest to
 	if(rv)
 	{
 		TRACE_ERROR("return value=%d \r\n", rv);		// non-zero return value means error!
@@ -1209,7 +1237,7 @@ static Boolean _resetParameter(Boolean info)
 	}
 
 	printf(" response: \r\n");
-	_parse_resp(&rsp_stat);							// parse the command response and show that to the user
+	_parse_resp(&par_data.fields.reply_header);							// parse the command response and show that to the user
 
 	config_param_info(CONFIG_PARAM_OP_print, &par_id, &par_data);	// show the param-id and corresponding value that we received back
 
@@ -1317,15 +1345,15 @@ static Boolean _selectAndExecuteDemoTest(void)
  */
 Boolean IsisMTQv2demoInit(void)
 {
-    unsigned char i2c_address = 0x10;
+    ISIS_MTQ_V2_t myIMTQ = {.i2cAddr = 0x77};
     int rv;
 
-	rv = IsisMTQv2_initialize(&i2c_address, 1);
+	rv = ISIS_MTQ_V2_Init(&myIMTQ, 1);
 	if(rv != E_NO_SS_ERR && rv != E_IS_INITIALIZED)				// rinse-repeat
 	{
 		// we have a problem. Indicate the error. But we'll gracefully exit to the higher menu instead of
 		// hanging the code
-		TRACE_ERROR("\n\r IsisMTQv2_initialize() failed; err=%d! Exiting ... \n\r", rv);
+		TRACE_ERROR("\n\r ISIS_MTQ_V2_Init() failed; err=%d! Exiting ... \n\r", rv);
 		return FALSE;
 	}
 

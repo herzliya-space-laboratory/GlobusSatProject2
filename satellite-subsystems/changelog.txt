@@ -3,6 +3,14 @@ Changelog for ISIS OBC Satellite Subsystems library
 Table of contents
 
 Changelog for:
+- Version 0.3.1 (25 Oct 2024)
+- Version 0.3.0 (27 Jun 2024)
+- Version 0.2.3 (29 Feb 2024)
+- Version 0.2.2 (02 Feb 2024)
+- Version 0.2.1 (24 Nov 2023)
+- Version 0.2.0 (03 Nov 2023)
+- Version 0.1.15 (28 Mar 2023)
+- Version 0.1.14 (29 Jun 2022)
 - Version 0.1.13 (05 Aug 2021)
 - Version 0.1.12 (08 Apr 2021)
 - Version 0.1.11 (15 Jan 2020)
@@ -17,6 +25,185 @@ Changelog for:
 - Version 0.1.2 (13 Jul 2015)
 - Version 0.1.1 (10 Jul 2015)
 - Version 0.1.0 (13 Mar 2015)
+
+Version 0.3.1
+=============
+
+Summary: naming clean-up, various demo code fixes
+Release date: 25th of October 2024
+Prepared By: Owain Barker, Nathan Prins, Gerard Aalbers
+
+General changes:
+
+* Fixed remaining header files so all are C++ compatible
+* Reviewed all telemetry conversions used in demo code, updated in many places
+* Introduced new telemetry retrieval function for EPS IVID5 PDU and PCU, other modules to follow
+
+Specific changes:
+
+common_types.h
+
+* Introduced additional error codes
+
+isis_hstxs_v2_spi.h
+
+* Corrected naming of functions and types to match module name
+* Removed possibility of sending frames without blocking
+
+Demos/IsisTRXVUrevDdemo.c & Demos/IsisTRXVUrevEdemo.c
+
+* Add menu option to start a background task to kick subsystem watchdogs
+* Fixed command packet retrieval code
+
+Demos/ISIS/RXSrevCdemo.c
+
+* Fixed command packet retrieval code
+
+
+Version 0.3.0
+=============
+
+Summary: update to ISISPACE AOCS ICD v1.6
+Release date: 27th of June 2024
+Prepared By: Owain Barker, Gerard Aalbers
+
+General changes:
+
+* Major version update of generator used for this library, header files are now C++ compatible
+* ISISPACE AOCS driver is now compatible with version 1.6 of the ICD
+
+Specific changes:
+
+Demos/isismeps_ivid5_pdu_demo.c & Demos/isismeps_ivid5_piu_demo.c
+
+* Add option to start background task to kick subsystem watchdogs
+
+Version 0.2.3
+=============
+
+Summary: several demo code improvements, allow TXS SPI speed specification
+Release date: 29th of February 2024
+Prepared By: Owain Barker, Gerard Aalbers
+
+Specific changes:
+
+isis_hstxs_v2_spi.c
+
+* Allow specification of SPI bus speed on initialization
+
+Demos/IsisAOCSdemo.c
+
+* Fixed conversion and added units for several SCG telemetry fields
+
+Demos/IsisTRXVUrevEdemo.c
+
+* Improved code that retrieves command frames from TRXVU
+* Fixed all telemetry conversions
+* Fixed reporting error on reentering submenu
+
+Demos/IsisTRXVUrevDdemo.c
+
+* Fixed reporting error on reentering submenu
+
+Demos/isismeps_ivid5_piu_demo.c
+
+* Fixed unit for battery voltage in telemetry display
+
+Version 0.2.2
+=============
+
+Summary: removed support for several subsystems, fixes to demo code
+Release date: 2nd of February 2024
+Prepared By: Owain Barker, Gerard Aalbers
+
+General changes:
+
+* Removed support for CubeSpace ADCS
+* Removed support for GOM EPS
+* Removed support for ISISPACE TRXVU rev. C
+* Removed support for Gecko camera
+
+Specific changes
+
+Demos/IsisAOCSdemo.c
+
+* Added code to retrieve and display telemetry from the magnetometer, star tracker, and thruster
+
+Version 0.2.1
+=============
+
+Summary: AntS driver updated, added RXS demo code
+Release date: 24th of November 2023
+Prepared By: Owain Barker
+
+General changes:
+
+* Replaced driver for ISISPACE AntS version 1 with generated version, updated associated demo code
+* Added demo code for RXS rev. C
+
+Version 0.2.0
+=============
+
+Summary: moved to generated driver interfaces, update all demos
+Release date: 3rd of November 2023
+Prepared By: Owain Barker, Gerard Aalbers
+
+General changes:
+
+* Moved to subsystem drivers generated from digital interface specification files
+* Updated and refreshed demo code to be fully compatible with the generated drivers
+
+Specific changes:
+
+* Added subsystem driver and demo code for for ISIS HSTxS V2
+* Added subsystem driver and demo code for ISIS TRXVU rev E
+* Added subsystem driver and demo code for ISIS AOCS
+* Added subsystem driver for two revisions (ivid5 and ivid7) of ISIS Multiboard EPS, iMEPS, consisting of PDU, PBU, and PCU, and demo code for ivid5
+* Removed deprecated ISIS TXS driver and ISIS solar panel temperature sensor driver
+* Renamed isis_ants2 to isis_ants_rev2 for clarity
+* Renamed EPS to PIU (Single Board EPS) and updated associated demo code
+
+Version 0.1.15
+============= 
+
+Summary: added driver for RXS, updated driver for AntS2
+Release date: 28th of March 2023
+Prepared by: Alf Henrik Sauge, Gerard Aalbers
+
+General changes:
+
+* Added subsystem driver for ISIS RXS revision C
+
+Specific changes:
+
+isis_ants2.h and isis_ants2_types.h
+
+* AntS2 driver functions now return type driver_error_t instead of type int
+* Improvements to the doxygen documentation
+
+Version 0.1.14
+============= 
+
+Summary: improvemements to GOM EPS, solar panel v2, demo code
+Release date: 29th of June 2022
+Prepared by: Gerard Aalbers
+
+Specific changes:
+
+GomEPS.c
+
+* Prevented use of functions before initialization
+* Improved checks in GomEpsInitialize
+
+IsisSolarPanelv2.h / IsisSolarPanelv2.c
+
+* GPIOs used for LTC2983 reset and interrupt pins now configurable on initialization
+* Function return types changed to IsisSolarPanelv2_Error_t and improved input parameter checks
+* Doxygen updates
+
+Demos/ISISSPv2demo.c & Demos/ISISSPdemo.c
+
+* Moved initialization of SPI bus 1 inside solar panel demos in order to prevent pin clashes on certain daughterboards
 
 Version 0.1.13
 ============= 

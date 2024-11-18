@@ -1,3 +1,27 @@
+/*
+ @licstart  The following is the entire license notice for the JavaScript code in this file.
+
+ The MIT License (MIT)
+
+ Copyright (C) 1997-2020 by Dimitri van Heesch
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ and associated documentation files (the "Software"), to deal in the Software without restriction,
+ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or
+ substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ @licend  The above is the entire license notice for the JavaScript code in this file
+*/
 var menudata={children:[
 {text:"Main Page",url:"index.html"},
 {text:"Data Structures",url:"annotated.html",children:[
@@ -14,6 +38,8 @@ var menudata={children:[
 {text:"g",url:"functions_g.html#index_g"},
 {text:"h",url:"functions_h.html#index_h"},
 {text:"i",url:"functions_i.html#index_i"},
+{text:"j",url:"functions_j.html#index_j"},
+{text:"k",url:"functions_k.html#index_k"},
 {text:"l",url:"functions_l.html#index_l"},
 {text:"m",url:"functions_m.html#index_m"},
 {text:"n",url:"functions_n.html#index_n"},
@@ -26,6 +52,7 @@ var menudata={children:[
 {text:"u",url:"functions_u.html#index_u"},
 {text:"v",url:"functions_v.html#index_v"},
 {text:"w",url:"functions_w.html#index_w"},
+{text:"x",url:"functions_x.html#index_x"},
 {text:"y",url:"functions_y.html#index_y"}]},
 {text:"Variables",url:"functions_vars.html",children:[
 {text:"a",url:"functions_vars.html#index_a"},
@@ -37,6 +64,8 @@ var menudata={children:[
 {text:"g",url:"functions_vars_g.html#index_g"},
 {text:"h",url:"functions_vars_h.html#index_h"},
 {text:"i",url:"functions_vars_i.html#index_i"},
+{text:"j",url:"functions_vars_j.html#index_j"},
+{text:"k",url:"functions_vars_k.html#index_k"},
 {text:"l",url:"functions_vars_l.html#index_l"},
 {text:"m",url:"functions_vars_m.html#index_m"},
 {text:"n",url:"functions_vars_n.html#index_n"},
@@ -49,56 +78,27 @@ var menudata={children:[
 {text:"u",url:"functions_vars_u.html#index_u"},
 {text:"v",url:"functions_vars_v.html#index_v"},
 {text:"w",url:"functions_vars_w.html#index_w"},
+{text:"x",url:"functions_vars_x.html#index_x"},
 {text:"y",url:"functions_vars_y.html#index_y"}]}]}]},
 {text:"Files",url:"files.html",children:[
 {text:"File List",url:"files.html"},
 {text:"Globals",url:"globals.html",children:[
 {text:"All",url:"globals.html",children:[
-{text:"_",url:"globals.html#index__"},
-{text:"a",url:"globals_a.html#index_a"},
-{text:"c",url:"globals_c.html#index_c"},
+{text:"_",url:"globals.html#index__5F"},
 {text:"d",url:"globals_d.html#index_d"},
-{text:"e",url:"globals_e.html#index_e"},
-{text:"f",url:"globals_f.html#index_f"},
-{text:"g",url:"globals_g.html#index_g"},
-{text:"h",url:"globals_h.html#index_h"},
 {text:"i",url:"globals_i.html#index_i"},
-{text:"m",url:"globals_m.html#index_m"},
-{text:"p",url:"globals_p.html#index_p"},
-{text:"r",url:"globals_r.html#index_r"},
-{text:"s",url:"globals_s.html#index_s"},
-{text:"t",url:"globals_t.html#index_t"}]},
+{text:"s",url:"globals_s.html#index_s"}]},
 {text:"Functions",url:"globals_func.html",children:[
-{text:"c",url:"globals_func.html#index_c"},
-{text:"g",url:"globals_func_g.html#index_g"},
-{text:"i",url:"globals_func_i.html#index_i"}]},
+{text:"i",url:"globals_func.html#index_i"}]},
 {text:"Variables",url:"globals_vars.html"},
 {text:"Typedefs",url:"globals_type.html",children:[
-{text:"c",url:"globals_type.html#index_c"},
-{text:"d",url:"globals_type_d.html#index_d"},
-{text:"e",url:"globals_type_e.html#index_e"},
-{text:"g",url:"globals_type_g.html#index_g"},
+{text:"d",url:"globals_type.html#index_d"},
 {text:"i",url:"globals_type_i.html#index_i"}]},
 {text:"Enumerations",url:"globals_enum.html",children:[
-{text:"_",url:"globals_enum.html#index__"},
-{text:"g",url:"globals_enum.html#index_g"},
+{text:"_",url:"globals_enum.html#index__5F"},
 {text:"i",url:"globals_enum.html#index_i"}]},
 {text:"Enumerator",url:"globals_eval.html",children:[
-{text:"a",url:"globals_eval.html#index_a"},
-{text:"c",url:"globals_eval_c.html#index_c"},
-{text:"d",url:"globals_eval_d.html#index_d"},
-{text:"e",url:"globals_eval_e.html#index_e"},
-{text:"f",url:"globals_eval_f.html#index_f"},
-{text:"g",url:"globals_eval_g.html#index_g"},
-{text:"h",url:"globals_eval_h.html#index_h"},
-{text:"i",url:"globals_eval_i.html#index_i"},
-{text:"m",url:"globals_eval_m.html#index_m"},
-{text:"p",url:"globals_eval_p.html#index_p"},
-{text:"r",url:"globals_eval_r.html#index_r"},
-{text:"s",url:"globals_eval_s.html#index_s"},
-{text:"t",url:"globals_eval_t.html#index_t"}]},
+{text:"d",url:"globals_eval.html#index_d"},
+{text:"i",url:"globals_eval_i.html#index_i"}]},
 {text:"Macros",url:"globals_defs.html",children:[
-{text:"c",url:"globals_defs.html#index_c"},
-{text:"e",url:"globals_defs.html#index_e"},
-{text:"i",url:"globals_defs.html#index_i"},
-{text:"t",url:"globals_defs.html#index_t"}]}]}]}]}
+{text:"i",url:"globals_defs.html#index_i"}]}]}]}]}
