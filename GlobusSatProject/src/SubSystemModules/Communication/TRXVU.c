@@ -27,21 +27,27 @@ time_unix period;
  * */
 int InitTrxvuAndAnts(){
 	// Definition of I2C and TRXVU
-	ISIStrxvuI2CAddress myTRXVUAddress[1];
-	ISIStrxvuFrameLengths myTRXVUBuffers[1];
-	ISIStrxvuBitrate myTRXVUBitrates[1];
-    int rv;
+    ISIS_VU_E_t myTRXVU[1];
+    driver_error_t rv;
+
+//	//Bitrate definition
+//	myTRXVUBitrates[0] = trxvu_bitrate_9600;
+//	//Initialize the trxvu subsystem
+//	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
+//
+
 
 	//I2C addresses defined
-	myTRXVUAddress[0].addressVu_rc = I2C_TRXVU_RC_ADDR;
-	myTRXVUAddress[0].addressVu_tc = I2C_TRXVU_TC_ADDR;
+    myTRXVU[0].rxAddr = I2C_TRXVU_RC_ADDR;
+    myTRXVU[0].txAddr = I2C_TRXVU_TC_ADDR;
+
 	//Buffer definition
-	myTRXVUBuffers[0].maxAX25frameLengthTX = SIZE_TXFRAME;
-	myTRXVUBuffers[0].maxAX25frameLengthRX = SIZE_RXFRAME;
-	//Bitrate definition
-	myTRXVUBitrates[0] = trxvu_bitrate_9600;
+    myTRXVU[0].maxSendBufferLength = SIZE_TXFRAME;
+    myTRXVU[0].maxReceiveBufferLength = SIZE_RXFRAME;
+
 	//Initialize the trxvu subsystem
-	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
+	rv = ISIS_VU_E_Init(myTRXVU, 1);
+
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
@@ -64,6 +70,7 @@ int InitTrxvuAndAnts(){
 
 
 	//Initialize the AntS system
+	if(rv == 6) return erroAnts;
 	return errorAnts + rv;
 #else
 	return logError(rv, "TRXVU - IsisTrxvu_initialize");
@@ -126,7 +133,7 @@ int turnOffIdle()
 	if(timeEnd == 0) return -1;
 	if(timeEnd > timeNow)
 		return 0;
-	return SetIdleState(trxvu_idle_state_off, 0);
+	return SetIdleState(isis_vu_e__onoff__off, 0);
 }
 
 /*
@@ -264,11 +271,11 @@ int setNewBeaconIntervalToPeriod()
  * 						-5 time problem
  * 						-6 not on or off
  */
-int SetIdleState(ISIStrxvuIdleState state, time_unix duration)
+int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 {
-	if(state == trxvu_idle_state_on)
+	if(state == isis_vu_e__onoff__on)
 	{
-		if(logError(IsisTrxvu_tcSetIdlestate(ISIS_TRXVU_I2C_BUS_INDEX, trxvu_idle_state_on), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
+		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__on), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
 			return -1;
 		if(duration > MAX_IDLE_TIME)
 			duration = MAX_IDLE_TIME;
@@ -285,9 +292,9 @@ int SetIdleState(ISIStrxvuIdleState state, time_unix duration)
 			return logError(-4, "SetIdleState - Not written what needed to be");
 	}
 
-	if(state == trxvu_idle_state_off)
+	if(state == isis_vu_e__onoff__off)
 	{
-		if(logError(IsisTrxvu_tcSetIdlestate(ISIS_TRXVU_I2C_BUS_INDEX, trxvu_idle_state_off), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
+		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__off), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
 				return -1;
 		duration = 0;
 		if(logError(FRAM_write((unsigned char*)&duration, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_write"))
@@ -310,7 +317,7 @@ int SetIdleState(ISIStrxvuIdleState state, time_unix duration)
 int GetNumberOfFramesInBuffer()
 {
 	unsigned short frameCount;
-	int err = logError(IsisTrxvu_rcGetFrameCount(0, &frameCount), "TRXVU - IsisTrxvu_rcGetFrameCount"); // Get number of packets in buffer
+	int err = logError(isis_vu_e__get_frame_count(0, &frameCount), "TRXVU - IsisTrxvu_rcGetFrameCount"); // Get number of packets in buffer
 	if(err != E_NO_SS_ERR)
 		return -1;
 	return frameCount;
@@ -325,8 +332,8 @@ int GetNumberOfFramesInBuffer()
 CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 {
 	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
-	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read
-	int error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"); // Get packet
+	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read //TODO: find right one
+	int error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"); // Get packet // TODO: need to find the right function
 	if(error != E_NO_SS_ERR)
 		return execution_error;
 	error = ParseDataToCommand(rx_frame.rx_framedata, cmd); // Put the info from the packet in the cmd parameter
@@ -348,8 +355,8 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 	unsigned char avail;
 	if(packet == NULL)
 		return -1;
-	int place = sizeof(packet->ID) + sizeof(packet->cmd_subtype) + sizeof(packet->cmd_type) + sizeof(packet->length) + packet->length; // Get the length of the data of the packet (including the headers we add)
-	int error = logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)packet, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");  // Transmit packet
+	size_t place = sizeof(packet->ID) + sizeof(packet->cmd_subtype) + sizeof(packet->cmd_type) + sizeof(packet->length) + packet->length; // Get the length of the data of the packet (including the headers we add)
+	int error = logError(isis_vu_e__send_frame(0, (unsigned char *)packet, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");  // Transmit packet
 	*avalFrames = (int)avail; // Get avail Frames
 	return error;
 }
@@ -372,8 +379,8 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	if(cmd == NULL)
 		return -1;
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2; // Change the packet for send with the needed info
-	int place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length; // Get the length of the data of the packet (including the headers we add)
-	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign"); // Transmit packet
+	size_t place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length; // Get the length of the data of the packet (including the headers we add)
+	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign"); // Transmit packet
 }
 
 /*

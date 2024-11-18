@@ -5,7 +5,7 @@
 #include <freertos/semphr.h>
 #include <freertos/task.h>
 
-#include <satellite-subsystems/IsisTRXVU.h>
+#include <satellite-subsystems/isis_vu_e.h>
 #include "satellite-subsystems/IsisAntS.h"
 
 #include "FRAM_FlightParameters.h"
@@ -205,7 +205,7 @@ int BeaconLogic();
  * 			-5 time problem
  * 			-6 not on or off
  */
-int SetIdleState(ISIStrxvuIdleState state, time_unix duration);
+int SetIdleState(isis_vu_e__onoff_t state, time_unix duration);
 
 
 /*!

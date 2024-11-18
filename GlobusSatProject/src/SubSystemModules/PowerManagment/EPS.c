@@ -5,7 +5,7 @@
  *      Author: maayan
  */
 
-#include "satellite-subsystems/imepsv2_piu.h"
+#include "satellite-subsystems/isismepsv2_ivid7_piu.h"
 #include "satellite-subsystems/IsisSolarPanelv2.h"
 #include "utils.h"
 #include "SysI2CAddr.h"
@@ -19,9 +19,9 @@ int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
 #ifdef WE_HAVE_EPS
-	IMEPSV2_PIU_t stract_1;
+	ISISMEPSV2_IVID7_PIU_t stract_1;
 	stract_1.i2cAddr = EPS_I2C_ADDR;
-	errorEPS = logError(IMEPSV2_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
+	errorEPS = logError(ISISMEPSV2_IVID7_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
 
 #endif
 #ifdef WE_HAVE_SP

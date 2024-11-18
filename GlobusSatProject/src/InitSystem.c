@@ -76,9 +76,9 @@ int WriteDefaultValuesToFRAM()
 	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error = -1;
 
 #ifdef TESTING
-	int timeDeploy = 120;
+	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY;
 #else
-	int timeDeploy = 120*60;
+	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY*60;
 #endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error = -1;
 

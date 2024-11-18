@@ -28,7 +28,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 	time_unix duration;
 	memcpy(&duration, cmd->data, cmd->length);
 	if(duration > MAX_IDLE_TIME) duration = MAX_IDLE_TIME;
-	int error = SetIdleState(trxvu_idle_state_on, duration);
+	int error = SetIdleState(isis_vu_e__onoff__on, duration);
 	switch(error)
 	{
 		case -1:
@@ -78,7 +78,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 int CMD_SetOff_IdleState(sat_packet_t *cmd)
 {
 	int error_ack;
-	int error = SetIdleState(trxvu_idle_state_off, 0);
+	int error = SetIdleState(isis_vu_e__onoff__off, 0);
 	switch(error)
 	{
 		case -1:
