@@ -22,7 +22,7 @@
 #include "InitSystem.h"
 #include "utils.h"
 
-#define TESTING
+//#define TESTING
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
