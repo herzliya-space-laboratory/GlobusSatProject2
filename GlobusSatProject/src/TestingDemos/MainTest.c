@@ -25,13 +25,18 @@ Boolean SelectAndExecuteTest()
 
 	printf( "\n\r Select the device to be tested to perform: \n\r");
 	printf("\t 1) TRXVU test \n\r");
+	printf("\t 2) Maintenance test \r\n");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 1) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 2) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
 		case 1:
 			IsisTRXVUTestingLoop();
+			offerMoreTests = TRUE;
+			break;
+		case 2:
+			IsisMaintenanceTestingLoop();
 			offerMoreTests = TRUE;
 			break;
 		default:

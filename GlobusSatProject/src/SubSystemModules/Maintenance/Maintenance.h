@@ -3,6 +3,7 @@
 #define MAINTENANCE_H_
 
 #include "GlobalStandards.h"
+#include <hcc/api_fat.h>
 
 
 #define MIN_FREE_SPACE 300000000

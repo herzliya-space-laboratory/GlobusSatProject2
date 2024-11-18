@@ -7,7 +7,6 @@
 
 #include "Maintenance.h"
 #include <hal/Timing/Time.h>
-#include <hcc/api_fat.h>
 #include "utils.h"
 
 

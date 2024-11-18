@@ -7,6 +7,13 @@
 
 Boolean CheckExecutionTimeFiveTimes();
 
+void CheckIsFSCorrupted();
+
 void MainMaintenanceTestBench();
+
+Boolean SelectAndExecuteMaintenance();
+
+void IsisMaintenanceTestingLoop();
+
 
 #endif /* MAINTENANCETESTINGDEMO_H_ */
