@@ -7,13 +7,16 @@
 
 #include "satellite-subsystems/imepsv2_piu.h"
 #include "satellite-subsystems/IsisSolarPanelv2.h"
-#include "utils.h"
-#include "SysI2CAddr.h"
 #include "EPS.h"
 
-#include <hal/Drivers/SPI.h>
+
 /*#define WE_HAVE_SP 1*/
 #define WE_HAVE_EPS 1
+
+#define SMOOTHING(currentVolt, alpha) (lastVoltage - (alpha * (currentVolt - lastVoltage)))
+
+voltage_t lastVoltage;
+EpsThreshVolt_t thresh_volts;
 
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
@@ -22,7 +25,11 @@ int EPS_And_SP_Init(){
 	IMEPSV2_PIU_t stract_1;
 	stract_1.i2cAddr = EPS_I2C_ADDR;
 	errorEPS = logError(IMEPSV2_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
-
+	if(!errorEPS)
+	{
+		GetThresholdVoltages(&thresh_volts);
+		GetBatteryVoltage(&lastVoltage);
+	}
 #endif
 #ifdef WE_HAVE_SP
 	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "Solar panels - IsisSolarPanelv2_initialize");
@@ -32,4 +39,115 @@ int EPS_And_SP_Init(){
 	if(errorSP || errorEPS)
 			return -1;
 		return 0;
+}
+
+/*!
+ * @brief returns the current voltage on the battery
+ * @param[out] vbat he current battery voltage
+ * @return	0 on success
+ * 			Error code according to <hal/errors.h>
+ */
+int GetBatteryVoltage(voltage_t *vbat)
+{
+	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
+	int error_eps = logError(imepsv2_piu__gethousekeepingeng(0,&responseEPS), "GetBatteryVoltage - imepsv2_piu__gethousekeepingeng"); //Get struct and get kind of error
+	if(error_eps) return error_eps;
+	*vbat = (voltage_t)responseEPS.fields.batt_input.fields.volt;
+	return 0;
+}
+
+/*!
+ * @brief getting the smoothing factor (alpha) from the FRAM.
+ * @param[out] alpha a buffer to hold the smoothing factor
+ * @return	0 on success
+ * 			-1 on NULL input array
+ * 			-2 on FRAM read errors
+ */
+int GetAlpha(float *alpha)
+{
+	if(alpha == NULL) return -1;
+	float alphaVal;
+	if(logError(FRAM_read((unsigned char*)&alphaVal, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "GetAlpha - FRAM_read"))
+		return -2;
+	*alpha = alphaVal;
+	return 0;
+
+}
+
+/*!
+ * @brief setting the new voltage smoothing factor (alpha) on the FRAM.
+ * @param[in] new_alpha new value for the smoothing factor alpha
+ * @note new_alpha is a value in the range - (0,1)
+ * @return	0 on success
+ * 			-1 on failure setting new smoothing factor
+ * 			-2 on invalid alpha
+ * 			-4 FRAM_read problem
+ * 			-5 written wrong data
+ * @see LPF- Low Pass Filter at wikipedia: https://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
+ */
+int UpdateAlpha(float alpha)
+{
+	if(alpha < 0 || alpha > 1) return -2;
+	if(logError(FRAM_write((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE),"UpdateAlpha - FRAM write")) return -1;
+	float writtenAlpha;
+	if(logError(GetAlpha(&writtenAlpha), "UpdateAlpha - GetAlpha")) return -4;
+	if(writtenAlpha != alpha) return -5;
+	return 0;
+}
+
+/*!
+ * @brief getting the EPS logic threshold  voltages on the FRAM.
+ * @param[out] thresh_volts a buffer to hold the threshold values
+ * @return	0 on success
+ * 			-1 on NULL input array
+ * 			-2 on FRAM read errors
+ */
+int GetThresholdVoltages(EpsThreshVolt_t *thresh_volts)
+{
+	if(thresh_volts == NULL) return -1;
+	if(logError(FRAM_read((unsigned char*)thresh_volts, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "GetThresholdVoltages - FRAM_read"))
+		return -2;
+	return 0;
+}
+
+/*!
+ * @brief EPS logic. controls the state machine of which subsystem
+ * is on or off, as a function of only the battery voltage
+ * @return	0 on success
+ * 			-1 on failure setting state of channels
+ */
+int EPS_Conditioning()
+{
+	voltage_t currentVoltage;
+	GetBatteryVoltage(currentVoltage);
+	if(lastVoltage < currentVoltage)
+	{
+		if(currentVoltage >= thresh_volts.fields.Vup_operational)
+		{
+			lastVoltage = currentVoltage;
+			return EnterOperationalMode();
+		}
+		else if(currentVoltage >= thresh_volts.fields.Vup_cruise)
+		{
+			lastVoltage = currentVoltage;
+			return EnterCruiseMode();
+		}
+		else
+			return 0;
+	}
+	else
+	{
+		if(currentVoltage <= thresh_volts.fields.Vdown_operational)
+		{
+			lastVoltage = currentVoltage;
+			return EnterCruiseMode();
+		}
+		else if(currentVoltage <= thresh_volts.fields.Vdown_cruise)
+		{
+			lastVoltage = currentVoltage;
+			return EnterPowerSafeModeMode();
+		}
+	}
+	lastVoltage = currentVoltage;
+	return 0;
 }

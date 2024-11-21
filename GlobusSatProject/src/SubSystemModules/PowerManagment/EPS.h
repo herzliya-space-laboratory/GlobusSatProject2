@@ -9,9 +9,14 @@
 
 #include "GlobalStandards.h"
 #include "EPSOperationModes.h"
+#include "FRAM_FlightParameters.h"
+
+#include "utils.h"
+#include "SysI2CAddr.h"
+
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 #include <stdint.h>
-
+#include <hal/Drivers/SPI.h>
 /*
  	 	 	 	    ____
 			  _____|	|_____
@@ -101,7 +106,7 @@ int UpdateThresholdVoltages(EpsThreshVolt_t *thresh_volts);
  * 			-1 on NULL input array
  * 			-2 on FRAM read errors
  */
-int GetThresholdVoltages(EpsThreshVolt_t thresh_volts[NUMBER_OF_THRESHOLD_VOLTAGES]);
+int GetThresholdVoltages(EpsThreshVolt_t *thresh_volts);
 
 /*!
  * @brief getting the smoothing factor (alpha) from the FRAM.
@@ -119,29 +124,10 @@ int GetAlpha(float *alpha);
  * @return	0 on success
  * 			-1 on failure setting new smoothing factor
  * 			-2 on invalid alpha
+ * 			-4 FRAM_read problem
+ * 			-5 written wrong data
  * @see LPF- Low Pass Filter at wikipedia: https://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
  */
-int UpdateAlpha(sat_packet_t *cmd);
-
-/*!
- * @brief setting the new voltage smoothing factor (alpha) to be the default value.
- * @return	0 on success
- * 			-1 on failure setting new smoothing factor
- * @see DEFAULT_ALPHA_VALUE
- */
-int RestoreDefaultAlpha();
-
-/*!
- * @brief	setting the new EPS logic threshold voltages on the FRAM to the default.
- * @return	0 on success
- * 			-1 on failure setting smoothing factor
-  * @see EPS_DEFAULT_THRESHOLD_VOLTAGES
- */
-int RestoreDefaultThresholdVoltages();
-
-int CMDGetHeaterValues(sat_packet_t *cmd);
-
-int CMDSetHeaterValues(sat_packet_t *cmd);
-
+int UpdateAlpha(float alpha);
 
 #endif

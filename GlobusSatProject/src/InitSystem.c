@@ -94,7 +94,8 @@ int WriteDefaultValuesToFRAM()
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
 
-	//TODO: EPS_THRESH_VOLTAGES_ADDR
+	EpsThreshVolt_t thresh = DEFAULT_EPS_THRESHOLD_VOLTAGES;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "default to FRAM - threshold voltages")) error = -1;
 	//TODO: LAST_COMM_TIME_ADDR
 	return error;
 }

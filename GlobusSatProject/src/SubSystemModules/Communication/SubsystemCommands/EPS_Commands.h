@@ -3,57 +3,57 @@
 #define EPS_COMMANDS_H_
 
 #include "SubSystemModules/Communication/SatCommandHandler.h"
+#include "SubSystemModules/Communication/AckHandler.h"
+#include "SubSystemModules/Communication/AckErrors.h"
+#include "SubSystemModules/Communication/TRXVU.h"
+#include "SubSystemModules/PowerManagment/EPS.h"
 
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd);
 
 int CMD_GetThresholdVoltages(sat_packet_t *cmd);
 
-int CMD_UpdateSmoothingFactor(sat_packet_t *cmd);
-
-int CMD_RestoreDefaultAlpha(sat_packet_t *cmd);
-
 int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd);
 
-int CMD_GetSmoothingFactor(sat_packet_t *cmd);
+/*
+ * Set new alpha value.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and the new alpha val)
+* @return type=int; return type of error
+* 										-1 on cmd NULL
+* 										errors according to "AckErrors.h"
+ * */
+int CMD_UpdateAlpha(sat_packet_t *cmd);
 
-int CMD_EnterCruiseMode(sat_packet_t *cmd);
+/*
+ * Set default alpha value.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										-1 on cmd NULL
+* 										errors according to "AckErrors.h"
+ * */
+int CMD_RestoreDefaultAlpha(sat_packet_t *cmd);
 
-int CMD_EnterOperationalMode(sat_packet_t *cmd);
+/*
+ * Get alpha value.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										-2 on FRAM_read error, and TransmitDataAsSPL_Packet errors
+ * */
+int CMD_GetAlpha(sat_packet_t *cmd);
 
-int CMD_EnterPowerSafeMode(sat_packet_t *cmd);
+//int CMD_GetMode(sat_packet_t *cmd);
+//
+//int CMD_SetMode(sat_packet_t *cmd);
 
-int CMD_GetCurrentMode(sat_packet_t *cmd);
+int CMD_GetState(sat_packet_t *cmd);
 
-int CMD_EPS_NOP(sat_packet_t *cmd);
+int CMD_ChangHeaterTemp(sat_packet_t *cmd);
 
 int CMD_EPS_ResetWDT(sat_packet_t *cmd);
 
-int CMD_EPS_SetChannels(sat_packet_t *cmd);
+int CMD_GetheaterValues(sat_packet_t *cmd);
 
-int CMD_SetChannels3V3_On(sat_packet_t *cmd);
+//int CMD_SetheaterValues(sat_packet_t *cmd); //????????????
 
-int CMD_SetChannels3V3_Off(sat_packet_t *cmd);
-
-int CMD_SetChannels5V_On(sat_packet_t *cmd);
-
-int CMD_SetChannels5V_Off(sat_packet_t *cmd);
-
-int CMD_GetEpsParemeter(sat_packet_t *cmd);
-
-int CMD_SetEpsParemeter(sat_packet_t *cmd);
-
-int CMD_ResetParameter(sat_packet_t *cmd);
-
-int CMD_ResetConfig(sat_packet_t *cmd);
-
-int CMD_LoadConfig(sat_packet_t *cmd);
-
-int CMD_SaveConfig(sat_packet_t *cmd);
-
-int CMD_SolarPanelWake(sat_packet_t *cmd);
-
-int CMD_SolarPanelSleep(sat_packet_t *cmd);
-
-int CMD_GetSolarPanelState(sat_packet_t *cmd);
+int CMD_GetstateChangesOverTime(sat_packet_t *cmd);
 
 #endif /* EPS_COMMANDS_H_ */
