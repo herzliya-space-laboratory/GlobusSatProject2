@@ -30,13 +30,6 @@ int InitTrxvuAndAnts(){
     ISIS_VU_E_t myTRXVU[1];
     driver_error_t rv;
 
-//	//Bitrate definition
-//	myTRXVUBitrates[0] = trxvu_bitrate_9600;
-//	//Initialize the trxvu subsystem
-//	rv = IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1);
-//
-
-
 	//I2C addresses defined
     myTRXVU[0].rxAddr = I2C_TRXVU_RC_ADDR;
     myTRXVU[0].txAddr = I2C_TRXVU_TC_ADDR;
@@ -47,7 +40,7 @@ int InitTrxvuAndAnts(){
 
 	//Initialize the trxvu subsystem
 	rv = ISIS_VU_E_Init(myTRXVU, 1);
-
+	//TODO: isis_vu_e__set_bitrate
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
@@ -84,7 +77,7 @@ int InitTrxvuAndAnts(){
 int setTransponderOn()
 {
 	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on //TODO: isis_vu_e__set_tx_mode
 }
 
 /*
@@ -94,7 +87,7 @@ int setTransponderOn()
 int setTransponderOff()
 {
 	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off //TODO: isis_vu_e__set_tx_mode
 }
 
 /*
