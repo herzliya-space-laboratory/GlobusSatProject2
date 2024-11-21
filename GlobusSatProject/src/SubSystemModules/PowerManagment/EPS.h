@@ -97,7 +97,7 @@ int GetBatteryVoltage(voltage_t *vbat);
  * 			-2 on invalid thresholds
  * 			ERR according to <hal/errors.h>
  */
-int UpdateThresholdVoltages(EpsThreshVolt_t *thresh_volts);
+int UpdateThresholdVoltages(EpsThreshVolt_t thresh_volts);
 
 /*!
  * @brief getting the EPS logic threshold  voltages on the FRAM.

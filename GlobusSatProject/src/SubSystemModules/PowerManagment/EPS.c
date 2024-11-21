@@ -14,9 +14,11 @@
 #define WE_HAVE_EPS 1
 
 #define SMOOTHING(currentVolt, alpha) (lastVoltage - (alpha * (currentVolt - lastVoltage)))
+#define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
+#define MIN_VOLTAGE_TO_STATES {6000, 6500, 6100, 6600}
 
 voltage_t lastVoltage;
-EpsThreshVolt_t thresh_volts;
+EpsThreshVolt_t threshold_volts;
 
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
@@ -27,7 +29,7 @@ int EPS_And_SP_Init(){
 	errorEPS = logError(IMEPSV2_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
 	if(!errorEPS)
 	{
-		GetThresholdVoltages(&thresh_volts);
+		GetThresholdVoltages(&threshold_volts);
 		GetBatteryVoltage(&lastVoltage);
 	}
 #endif
@@ -96,6 +98,30 @@ int UpdateAlpha(float alpha)
 }
 
 /*!
+ * @brief setting the new EPS logic threshold voltages on the FRAM.
+ * @param[in] thresh_volts an array holding the new threshold values
+ * @return	0 on success
+ * 			-1 on failure setting new threshold voltages
+ * 			-2 on invalid thresholds
+ * 			-3 on failure to read
+ * 			-4 written wrong
+ * 			ERR according to <hal/errors.h>
+ */
+int UpdateThresholdVoltages(EpsThreshVolt_t thresh_volts)
+{
+	voltage_t maxes[NUMBER_OF_THRESHOLD_VOLTAGES] = MAX_VOLTAGE_TO_STATES;
+	voltage_t mins[NUMBER_OF_THRESHOLD_VOLTAGES] = MIN_VOLTAGE_TO_STATES;
+	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
+		if(thresh_volts.raw[i] < mins[i] || thresh_volts.raw[i] > maxes[i]) return -4;
+	if(logError(FRAM_write((unsigned char*)&thresh_volts, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "UpdateThresholdVoltages - FRAM_read")) return -1;
+
+	if(GetThresholdVoltages(&threshold_volts)) return -3;
+	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
+		if(thresh_volts.raw[i] != threshold_volts.raw[i]) return -4;
+	return 0;
+}
+
+/*!
  * @brief getting the EPS logic threshold  voltages on the FRAM.
  * @param[out] thresh_volts a buffer to hold the threshold values
  * @return	0 on success
@@ -119,15 +145,15 @@ int GetThresholdVoltages(EpsThreshVolt_t *thresh_volts)
 int EPS_Conditioning()
 {
 	voltage_t currentVoltage;
-	GetBatteryVoltage(currentVoltage);
+	GetBatteryVoltage(&currentVoltage);
 	if(lastVoltage < currentVoltage)
 	{
-		if(currentVoltage >= thresh_volts.fields.Vup_operational)
+		if(currentVoltage >= threshold_volts.fields.Vup_operational)
 		{
 			lastVoltage = currentVoltage;
 			return EnterOperationalMode();
 		}
-		else if(currentVoltage >= thresh_volts.fields.Vup_cruise)
+		else if(currentVoltage >= threshold_volts.fields.Vup_cruise)
 		{
 			lastVoltage = currentVoltage;
 			return EnterCruiseMode();
@@ -137,15 +163,15 @@ int EPS_Conditioning()
 	}
 	else
 	{
-		if(currentVoltage <= thresh_volts.fields.Vdown_operational)
+		if(currentVoltage <= threshold_volts.fields.Vdown_operational)
 		{
 			lastVoltage = currentVoltage;
 			return EnterCruiseMode();
 		}
-		else if(currentVoltage <= thresh_volts.fields.Vdown_cruise)
+		else if(currentVoltage <= threshold_volts.fields.Vdown_cruise)
 		{
 			lastVoltage = currentVoltage;
-			return EnterPowerSafeModeMode();
+			return EnterPowerSafeMode();
 		}
 	}
 	lastVoltage = currentVoltage;

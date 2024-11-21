@@ -57,8 +57,7 @@ int CMD_UpdateAlpha(sat_packet_t *cmd)
 	 default:
 		 break;
 	}
-	SendAckPacket(ACK_UPDATE_EPS_ALPHA , cmd, NULL, 0);
-	return 0;
+	return SendAckPacket(ACK_UPDATE_EPS_ALPHA , cmd, NULL, 0);
 }
 
 /*
@@ -81,7 +80,7 @@ int CMD_RestoreDefaultAlpha(sat_packet_t *cmd)
  * Get alpha value.
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
 * @return type=int; return type of error
-* 										-2 on FRAM_read error, and TransmitDataAsSPL_Packet errors
+* 										1 on FRAM_read error, and TransmitDataAsSPL_Packet errors
  * */
 int CMD_GetAlpha(sat_packet_t *cmd)
 {
@@ -94,4 +93,93 @@ int CMD_GetAlpha(sat_packet_t *cmd)
 		return error_ack;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_SIZE), "CMD_GetSmoothingFactor - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+}
+
+/*
+ * Get threshold voltages.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										1 on FRAM_read error, and TransmitDataAsSPL_Packet errors
+ * */
+int CMD_GetThresholdVoltages(sat_packet_t *cmd)
+{
+	EpsThreshVolt_t threshold;
+	int error = GetThresholdVoltages(&threshold);
+	if(error == -2)
+	{
+		int error_ack = ERROR_READ_FROM_FRAM;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error_ack;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&threshold, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+
+}
+
+/*
+ * Set update threshold voltages.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and the new thresholds)
+* @return type=int; return type of error
+* 										-1 on cmd NULL
+* 										errors according to "AckErrors.h" and send ack
+ * */
+int CMD_UpdateThresholdVoltages(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	int error_ack = 0;
+	if(cmd->length != 8)
+	{
+		error_ack = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error_ack;
+	}
+	EpsThreshVolt_t threshold;
+	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
+		memcpy(&threshold.raw[i], &(cmd->data) + i*2, sizeof(voltage_t));
+	int error = UpdateThresholdVoltages(threshold);
+	switch(error)
+	{
+		case -1:
+		{
+			error_ack = ERROR_WRITE_TO_FRAM;
+			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			return error_ack;
+		}
+		case -2:
+		{
+			error_ack = INVALID_TRESHOLD;
+			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			return error_ack;
+		}
+		case -3:
+		{
+			error_ack = ERROR_READ_FROM_FRAM;
+			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			return error_ack;
+		}
+		case -4:
+		{
+			error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
+			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			return error_ack;
+		}
+		default:
+			break;
+	}
+	return SendAckPacket(ACK_UPDATE_EPS_VOLTAGES , cmd, NULL, 0);
+}
+
+/*
+ * restore default threshold voltages.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										-1 on cmd NULL
+* 										errors according to "AckErrors.h" and send ack
+ * */
+int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	cmd->length = 8;
+	EpsThreshVolt_t threshold = DEFAULT_EPS_THRESHOLD_VOLTAGES;
+	memcpy(cmd->data, (unsigned char*)&threshold, cmd->length);
+	return CMD_UpdateThresholdVoltages(cmd);
 }
