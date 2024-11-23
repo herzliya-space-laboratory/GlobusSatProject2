@@ -60,9 +60,14 @@ int CMD_RestoreDefaultAlpha(sat_packet_t *cmd);
  * */
 int CMD_GetAlpha(sat_packet_t *cmd);
 
+/*
+ * Get state of EPS.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										 GetState errors
+* 										 TransmitDataAsSPL_Packet errors
+ * */
 int CMD_GetState(sat_packet_t *cmd);
-
-int CMD_ChangHeaterTemp(sat_packet_t *cmd);
 
 int CMD_EPS_ResetWDT(sat_packet_t *cmd);
 

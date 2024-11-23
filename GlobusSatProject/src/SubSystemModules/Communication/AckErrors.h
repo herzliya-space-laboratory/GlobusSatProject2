@@ -20,12 +20,16 @@
 
 #define ERROR_CANT_SET_END_TIME			20
 
-#define ERROR_GET_UPTIME				25
+#define ERROR_GET_UPTIME				24
 
-#define ERROR_SIDE_ANTS_NOT_A_OR_B		27
+#define ERROR_SIDE_ANTS_NOT_A_OR_B		25
 
-#define INVALID_ALPHA					28
-#define INVALID_TRESHOLD				29
+#define ERROR_GET_STATE					26
+
+#define ERROR_GET_FROM_STRUCT			27
+
+#define ERROR_INVALID_ALPHA				28
+#define ERROR_INVALID_TRESHOLD			29
 
 #define ERROR_CANT_DO					30 //can't do what we want it to
 

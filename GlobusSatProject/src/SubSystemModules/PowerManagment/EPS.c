@@ -177,3 +177,51 @@ int EPS_Conditioning()
 	lastVoltage = currentVoltage;
 	return 0;
 }
+
+/*!
+ * @brief getting the EPS state.
+ * @param[out] state buffer to hold the given state
+ * @return	0 on success
+ * 			1 on NULL input array
+ * 			-1 on can't find state
+ * 			all the other errors according to <hal/errors.h>
+ */
+int GetState(char* state)
+{
+	if(state == NULL) return 1;
+	voltage_t currentVoltage;
+	int error = GetBatteryVoltage(&currentVoltage);
+	if(error) return error;
+	if(lastVoltage < currentVoltage)
+	{
+		if(currentVoltage >= threshold_volts.fields.Vup_operational)
+		{
+			lastVoltage = currentVoltage;
+			state = "Operational";
+			return 0;
+		}
+		else if(currentVoltage >= threshold_volts.fields.Vup_cruise)
+		{
+			lastVoltage = currentVoltage;
+			state = "Cruise";
+			return 0;
+		}
+	}
+	else
+	{
+		if(currentVoltage <= threshold_volts.fields.Vdown_operational)
+		{
+			lastVoltage = currentVoltage;
+			state = "Cruise";
+			return 0;
+		}
+		else if(currentVoltage <= threshold_volts.fields.Vdown_cruise)
+		{
+			lastVoltage = currentVoltage;
+			state = "Power Safe Mode";
+			return 0;
+		}
+	}
+	lastVoltage = currentVoltage;
+	return -1;
+}

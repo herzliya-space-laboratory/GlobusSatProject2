@@ -95,6 +95,8 @@ int eps_command_router(sat_packet_t *cmd)
 			return CMD_UpdateThresholdVoltages(cmd);
 		case UPDATE_THRESHOLD_DEFAULT:
 			return CMD_RestoreDefaultThresholdVoltages(cmd);
+		case GET_STATE:
+			return CMD_GetState(cmd);
 		default:
 			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "eps_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
 	}

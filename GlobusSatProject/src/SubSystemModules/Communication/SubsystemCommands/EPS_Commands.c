@@ -38,7 +38,7 @@ int CMD_UpdateAlpha(sat_packet_t *cmd)
 	 }
 	 case -2:
 	 {
-		error_ack = INVALID_ALPHA;
+		error_ack = ERROR_INVALID_ALPHA;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	 }
@@ -92,7 +92,7 @@ int CMD_GetAlpha(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_SIZE), "CMD_GetSmoothingFactor - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_SIZE), "CMD_GetSmoothingFactor - TransmitDataAsSPL_Packet"); // Send back the alpha value
 }
 
 /*
@@ -111,7 +111,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&threshold, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&threshold, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the threshold voltages
 
 }
 
@@ -146,7 +146,7 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd)
 		}
 		case -2:
 		{
-			error_ack = INVALID_TRESHOLD;
+			error_ack = ERROR_INVALID_TRESHOLD;
 			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error_ack;
 		}
@@ -179,7 +179,41 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
 	cmd->length = 8;
-	EpsThreshVolt_t threshold = DEFAULT_EPS_THRESHOLD_VOLTAGES;
+	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
+	EpsThreshVolt_t threshold;
+	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
+		threshold.raw[i] = defaultThershold[i];
+
 	memcpy(cmd->data, (unsigned char*)&threshold, cmd->length);
 	return CMD_UpdateThresholdVoltages(cmd);
+}
+
+/*
+ * Get state of EPS.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										 GetState errors
+* 										 TransmitDataAsSPL_Packet errors
+ * */
+int CMD_GetState(sat_packet_t *cmd)
+{
+	int error_ack;
+	char* state;
+	int error = GetState(state);
+	if(error)
+	{
+		if(error == -1)
+		{
+			error_ack = ERROR_GET_STATE;
+			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			return error_ack;
+		}
+		else
+		{
+			error_ack = ERROR_GET_FROM_STRUCT;
+			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			return error_ack;
+		}
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&state, sizeof(state)), "CMD_GetState - TransmitDataAsSPL_Packet"); // Send back the state of the eps
 }

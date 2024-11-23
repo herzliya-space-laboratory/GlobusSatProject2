@@ -35,7 +35,7 @@
 #define DEFAULT_ALPHA_VALUE 0.3
 
 #define NUMBER_OF_SOLAR_PANELS			6
-#define NUMBER_OF_THRESHOLD_VOLTAGES 	4 		///< first 3 are charging voltages, last 3 are discharging voltages
+#define NUMBER_OF_THRESHOLD_VOLTAGES 	4 		///< first 2 are charging voltages, last 2 are discharging voltages
 #define DEFAULT_EPS_THRESHOLD_VOLTAGES 	{(voltage_t)7000, (voltage_t)7400,	 \
 										  (voltage_t)7100, (voltage_t)7500}
 
@@ -130,4 +130,13 @@ int GetAlpha(float *alpha);
  */
 int UpdateAlpha(float alpha);
 
+/*!
+ * @brief getting the EPS state.
+ * @param[out] state buffer to hold the given state
+ * @return	0 on success
+ * 			1 on NULL input array
+ * 			-1 on can't find state
+ * 			all the other errors according to <hal/errors.h>
+ */
+int GetState(char* state);
 #endif
