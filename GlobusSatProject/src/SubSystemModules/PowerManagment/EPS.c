@@ -13,7 +13,7 @@
 /*#define WE_HAVE_SP 1*/
 #define WE_HAVE_EPS 1
 
-#define SMOOTHING(currentVolt, alpha) (lastVoltage - (alpha * (currentVolt - lastVoltage)))
+#define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage)))
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
 #define MIN_VOLTAGE_TO_STATES {6000, 6500, 6100, 6600}
 
