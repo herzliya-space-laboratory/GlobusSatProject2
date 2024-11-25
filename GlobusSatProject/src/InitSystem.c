@@ -202,11 +202,11 @@ int InitSubsystems(){
 
 	InitSupervisor();
 
-	EPS_And_SP_Init();
-
 	InitTrxvuAndAnts();
 
 	FirstActivition();
+
+	EPS_And_SP_Init();
 
 	printf("Did init\r\n");
 	return 0;
