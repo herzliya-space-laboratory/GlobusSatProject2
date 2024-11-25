@@ -199,7 +199,6 @@ int InitSubsystems(){
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
 
-
 	InitSupervisor();
 
 	InitTrxvuAndAnts();

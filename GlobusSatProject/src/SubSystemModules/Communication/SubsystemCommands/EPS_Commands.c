@@ -133,8 +133,7 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd)
 		return error_ack;
 	}
 	EpsThreshVolt_t threshold;
-	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
-		memcpy(&threshold.raw[i], &(cmd->data) + i*2, sizeof(voltage_t));
+	memcpy(threshold.raw, &(cmd->data), cmd->length);
 	int error = UpdateThresholdVoltages(threshold);
 	switch(error)
 	{
