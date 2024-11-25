@@ -3,6 +3,7 @@
 
 
 #include "GlobalStandards.h"
+#include <stdio.h>
 
 
 #define CHANNELS_OFF 0x00 	//!< channel state when all systems are off
