@@ -194,7 +194,7 @@ int GetState(char* state)
 	voltage_t currentVoltage;
 	int error = GetBatteryVoltage(&currentVoltage);
 	if(error) return error;
-	if(lastVoltage < SMOOTHING(currentVoltage, Alpha))
+	if(lastVoltage <= SMOOTHING(currentVoltage, Alpha))
 	{
 		if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_operational)
 		{
