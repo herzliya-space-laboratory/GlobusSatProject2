@@ -71,7 +71,7 @@ int CMD_RestoreDefaultAlpha(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
 	cmd->length = 4;
-	int alpha = DEFAULT_ALPHA_VALUE;
+	float alpha = DEFAULT_ALPHA_VALUE;
 	memcpy(cmd->data, (unsigned char*)&alpha, cmd->length);
 	return CMD_UpdateAlpha(cmd);
 }

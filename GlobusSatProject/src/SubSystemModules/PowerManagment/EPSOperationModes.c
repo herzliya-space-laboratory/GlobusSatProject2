@@ -25,7 +25,7 @@ int EnterOperationalMode()
  */
 int EnterCruiseMode()
 {
-	printf("entered cruise\r\n");
+	printf("entered Cruise\r\n");
 	return 0;
 }
 
