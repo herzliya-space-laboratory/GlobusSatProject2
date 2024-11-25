@@ -111,7 +111,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&threshold, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the threshold voltages
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)threshold.raw, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the threshold voltages
 
 }
 
