@@ -64,6 +64,7 @@ void taskMain()
 #else
 	while(TRUE)
 	{
+		EPS_Conditioning();
 		TRX_Logic();
 	}
 #endif

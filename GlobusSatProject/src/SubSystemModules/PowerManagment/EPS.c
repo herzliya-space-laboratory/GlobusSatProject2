@@ -19,7 +19,7 @@
 
 voltage_t lastVoltage;
 EpsThreshVolt_t threshold_volts;
-
+float Alpha;
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
@@ -31,6 +31,7 @@ int EPS_And_SP_Init(){
 	{
 		GetThresholdVoltages(&threshold_volts);
 		GetBatteryVoltage(&lastVoltage);
+		GetAlpha(&Alpha);
 	}
 #endif
 #ifdef WE_HAVE_SP
@@ -91,6 +92,7 @@ int UpdateAlpha(float alpha)
 {
 	if(alpha < 0 || alpha > 1) return -2;
 	if(logError(FRAM_write((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE),"UpdateAlpha - FRAM write")) return -1;
+	Alpha = alpha;
 	float writtenAlpha;
 	if(logError(GetAlpha(&writtenAlpha), "UpdateAlpha - GetAlpha")) return -4;
 	if(writtenAlpha != alpha) return -5;
@@ -192,15 +194,15 @@ int GetState(char* state)
 	voltage_t currentVoltage;
 	int error = GetBatteryVoltage(&currentVoltage);
 	if(error) return error;
-	if(lastVoltage < currentVoltage)
+	if(lastVoltage < SMOOTHING(currentVoltage, Alpha))
 	{
-		if(currentVoltage >= threshold_volts.fields.Vup_operational)
+		if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_operational)
 		{
 			lastVoltage = currentVoltage;
 			state = "Operational";
 			return 0;
 		}
-		else if(currentVoltage >= threshold_volts.fields.Vup_cruise)
+		else if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_cruise)
 		{
 			lastVoltage = currentVoltage;
 			state = "Cruise";
@@ -209,13 +211,13 @@ int GetState(char* state)
 	}
 	else
 	{
-		if(currentVoltage <= threshold_volts.fields.Vdown_operational)
+		if(SMOOTHING(currentVoltage, Alpha) <= threshold_volts.fields.Vdown_operational)
 		{
 			lastVoltage = currentVoltage;
 			state = "Cruise";
 			return 0;
 		}
-		else if(currentVoltage <= threshold_volts.fields.Vdown_cruise)
+		else if(SMOOTHING(currentVoltage, Alpha) <= threshold_volts.fields.Vdown_cruise)
 		{
 			lastVoltage = currentVoltage;
 			state = "Power Safe Mode";
