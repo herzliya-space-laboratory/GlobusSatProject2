@@ -148,7 +148,7 @@ int EPS_Conditioning()
 {
 	voltage_t currentVoltage;
 	GetBatteryVoltage(&currentVoltage);
-	if(lastVoltage < currentVoltage)
+	if(lastVoltage < SMOOTHING(currentVoltage, Alpha))
 	{
 		if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_operational)
 		{
