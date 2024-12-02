@@ -199,3 +199,17 @@ int CMD_GetState(sat_packet_t *cmd)
 	EpsState_t state = GetSystemState();
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&state, sizeof(state)), "CMD_GetState - TransmitDataAsSPL_Packet"); // Send back the state of the eps
 }
+
+int CMD_EPS_ResetWDT(sat_packet_t *cmd)
+{
+	imepsv2_piu__replyheader_t response;
+
+	int error = imepsv2_piu__resetwatchdog(0, &response);
+	if(error)
+	{
+		int error_ack = ERROR_CANT_RESET_WDT;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return error_ack;
+	}
+	return SendAckPacket(ACK_EPS_RESET_WDT , cmd, NULL, 0);
+}

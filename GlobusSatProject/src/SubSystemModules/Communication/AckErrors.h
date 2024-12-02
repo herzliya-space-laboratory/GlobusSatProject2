@@ -24,7 +24,7 @@
 
 #define ERROR_SIDE_ANTS_NOT_A_OR_B		25
 
-#define ERROR_GET_STATE					26
+#define ERROR_CANT_RESET_WDT			26
 
 #define ERROR_GET_FROM_STRUCT			27
 

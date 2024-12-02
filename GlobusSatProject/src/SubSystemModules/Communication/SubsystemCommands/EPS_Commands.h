@@ -71,8 +71,4 @@ int CMD_GetState(sat_packet_t *cmd);
 
 int CMD_EPS_ResetWDT(sat_packet_t *cmd);
 
-int CMD_GetheaterValues(sat_packet_t *cmd);
-
-int CMD_GetstateChangesOverTime(sat_packet_t *cmd);
-
 #endif /* EPS_COMMANDS_H_ */
