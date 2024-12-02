@@ -16,6 +16,8 @@
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
+#include "SubSystemModules/Maintenance/Maintenance.h"
+
 #include "TLM_management.h"
 
 #include "GlobalStandards.h"
@@ -85,7 +87,9 @@ int WriteDefaultValuesToFRAM()
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
 //Need to be written with the firstActivetion that will become 1.
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of cmd resets")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of resets")) error = -1;
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "default to FRAM - number of cmd resets")) error = -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
 
@@ -202,6 +206,8 @@ int InitSubsystems(){
 	InitSupervisor();
 
 	InitTrxvuAndAnts();
+
+	WakeupFromResetCMD();
 
 	FirstActivition();
 

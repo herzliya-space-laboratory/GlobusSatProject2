@@ -66,6 +66,7 @@ void taskMain()
 	{
 		EPS_Conditioning();
 		TRX_Logic();
+		Maintenance();
 	}
 #endif
 }

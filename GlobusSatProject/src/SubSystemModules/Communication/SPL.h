@@ -84,10 +84,9 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 	SET_RSSI_TRANSPONDER_DEFAULT =  0x0E,   //0b10100101
 	SET_ON_TRANSPONDER =            0x0B,   //0b10100110
 	SET_OFF_TRANSPONDER =           0x0C,   //0b10100110
-	ANT_GET_ARM_STATUS =        	0x0F,	//0b10110010 =
+//	ANT_GET_ARM_STATUS =        	0x0F,	//0b10110010 =
 	ANT_GET_UPTIME =	        	0x10,	//0b10110011 = //long int
 	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//delete before fllght
-	ANT_DEPLOY = 		        	0x12,	//0b10110111 *//delete before fllght
 	PING = 				        	0x13,
 
 }trxvu_subtypes_t;
@@ -102,8 +101,8 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 	UPDATE_THRESHOLD	       = 0x05,
 	UPDATE_THRESHOLD_DEFAULT   = 0x06,
 	GET_THRESHOLD	           = 0x07,
-	GET_STATE_CHANGES_OVERTIME = 0x0B,
-	GET_HEATER_VALUES   	   = 0x0C,
+//	GET_STATE_CHANGES_OVERTIME = 0x0B,
+//	GET_HEATER_VALUES   	   = 0x0C,
 	GET_STATE				   = 0x0E,
 
 }eps_subtypes_t;
