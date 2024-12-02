@@ -65,9 +65,9 @@ EpsState_t GetSystemState();
  */
 channel_t GetSystemChannelState();
 
-Boolean EpsGetLowVoltageFlag();
-
-void EpsSetLowVoltageFlag(Boolean low_volt_flag);
-
+/*
+ * Get if the Tx flag is on or off for us to put in the CheckAllowed in the TRXVU.c code.
+ * */
+Boolean GetTxFlag();
 
 #endif /* EPSOPERATIONMODES_H_ */
