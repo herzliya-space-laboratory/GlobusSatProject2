@@ -148,14 +148,15 @@ int EPS_Conditioning()
 {
 	voltage_t currentVoltage;
 	GetBatteryVoltage(&currentVoltage);
-	if(lastVoltage < SMOOTHING(currentVoltage, Alpha))
+	double smoothing = SMOOTHING(currentVoltage, Alpha);
+	if(lastVoltage <= smoothing)
 	{
-		if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_operational)
+		if(smoothing >= threshold_volts.fields.Vup_operational)
 		{
-			lastVoltage = SMOOTHING(currentVoltage, Alpha);
+			lastVoltage = smoothing;
 			return EnterOperationalMode();
 		}
-		else if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_cruise)
+		else if(smoothing >= threshold_volts.fields.Vup_cruise)
 		{
 			lastVoltage = SMOOTHING(currentVoltage, Alpha);
 			return EnterCruiseMode();
@@ -165,65 +166,17 @@ int EPS_Conditioning()
 	}
 	else
 	{
-		if(SMOOTHING(currentVoltage, Alpha) <= threshold_volts.fields.Vdown_operational)
+		if(smoothing <= threshold_volts.fields.Vdown_operational)
 		{
-			lastVoltage = SMOOTHING(currentVoltage, Alpha);
+			lastVoltage = smoothing;
 			return EnterCruiseMode();
 		}
-		else if(SMOOTHING(currentVoltage, Alpha) <= threshold_volts.fields.Vdown_cruise)
+		else if(smoothing <= threshold_volts.fields.Vdown_cruise)
 		{
-			lastVoltage = SMOOTHING(currentVoltage, Alpha);
+			lastVoltage = smoothing;
 			return EnterPowerSafeMode();
 		}
 	}
-	lastVoltage = SMOOTHING(currentVoltage, Alpha);
+	lastVoltage = smoothing;
 	return 0;
 }
-
-///*!
-// * @brief getting the EPS state.
-// * @param[out] state buffer to hold the given state
-// * @return	0 on success
-// * 			1 on NULL input array
-// * 			-1 on can't find state
-// * 			all the other errors according to <hal/errors.h>
-// */
-//int GetState(char* state)
-//{
-//	if(state == NULL) return 1;
-//	voltage_t currentVoltage;
-//	int error = GetBatteryVoltage(&currentVoltage);
-//	if(error) return error;
-//	if(lastVoltage <= SMOOTHING(currentVoltage, Alpha))
-//	{
-//		if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_operational)
-//		{
-//			lastVoltage = SMOOTHING(currentVoltage, Alpha);
-//			state = "Operational";
-//			return 0;
-//		}
-//		else if(SMOOTHING(currentVoltage, Alpha) >= threshold_volts.fields.Vup_cruise)
-//		{
-//			lastVoltage = SMOOTHING(currentVoltage, Alpha);
-//			state = "Cruise";
-//			return 0;
-//		}
-//	}
-//	else
-//	{
-//		if(SMOOTHING(currentVoltage, Alpha) <= threshold_volts.fields.Vdown_operational)
-//		{
-//			lastVoltage = SMOOTHING(currentVoltage, Alpha);
-//			state = "Cruise";
-//			return 0;
-//		}
-//		else if(SMOOTHING(currentVoltage, Alpha) <= threshold_volts.fields.Vdown_cruise)
-//		{
-//			lastVoltage = SMOOTHING(currentVoltage, Alpha);
-//			state = "Power Safe Mode";
-//			return 0;
-//		}
-//	}
-//	lastVoltage = SMOOTHING(currentVoltage, Alpha);
-//	return -1;
-//}

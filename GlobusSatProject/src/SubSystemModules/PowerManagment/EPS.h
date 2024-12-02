@@ -130,13 +130,4 @@ int GetAlpha(float *alpha);
  */
 int UpdateAlpha(float alpha);
 
-/*!
- * @brief getting the EPS state.
- * @param[out] state buffer to hold the given state
- * @return	0 on success
- * 			1 on NULL input array
- * 			-1 on can't find state
- * 			all the other errors according to <hal/errors.h>
- */
-int GetState(char* state);
 #endif
