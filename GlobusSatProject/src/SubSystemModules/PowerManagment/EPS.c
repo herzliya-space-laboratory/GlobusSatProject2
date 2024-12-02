@@ -152,30 +152,16 @@ int EPS_Conditioning()
 	if(lastVoltage <= smoothing)
 	{
 		if(smoothing >= threshold_volts.fields.Vup_operational)
-		{
-			lastVoltage = smoothing;
-			return EnterOperationalMode();
-		}
+			EnterOperationalMode();
 		else if(smoothing >= threshold_volts.fields.Vup_cruise)
-		{
-			lastVoltage = smoothing;
-			return EnterCruiseMode();
-		}
-		else
-			return 0;
+			EnterCruiseMode();
 	}
 	else
 	{
 		if(smoothing <= threshold_volts.fields.Vdown_operational)
-		{
-			lastVoltage = smoothing;
-			return EnterCruiseMode();
-		}
+			EnterCruiseMode();
 		else if(smoothing <= threshold_volts.fields.Vdown_cruise)
-		{
-			lastVoltage = smoothing;
-			return EnterPowerSafeMode();
-		}
+			EnterPowerSafeMode();
 	}
 	lastVoltage = smoothing;
 	return 0;
