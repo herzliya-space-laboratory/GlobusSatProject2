@@ -187,32 +187,15 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd)
 	return CMD_UpdateThresholdVoltages(cmd);
 }
 
-///*
-// * Get state of EPS.
-//* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
-//* @return type=int; return type of error
-//* 										 GetState errors
-//* 										 TransmitDataAsSPL_Packet errors
-// * */
-//int CMD_GetState(sat_packet_t *cmd)
-//{
-//	int error_ack;
-//	char* state;
-//	int error = GetState(state);
-//	if(error)
-//	{
-//		if(error == -1)
-//		{
-//			error_ack = ERROR_GET_STATE;
-//			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-//			return error_ack;
-//		}
-//		else
-//		{
-//			error_ack = ERROR_GET_FROM_STRUCT;
-//			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-//			return error_ack;
-//		}
-//	}
-//	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&state, sizeof(state)), "CMD_GetState - TransmitDataAsSPL_Packet"); // Send back the state of the eps
-//}
+/*
+ * Get state of EPS.
+* @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+* @return type=int; return type of error
+* 										 GetState errors
+* 										 TransmitDataAsSPL_Packet errors
+ * */
+int CMD_GetState(sat_packet_t *cmd)
+{
+	EpsState_t state = GetSystemState();
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&state, sizeof(state)), "CMD_GetState - TransmitDataAsSPL_Packet"); // Send back the state of the eps
+}
