@@ -204,6 +204,7 @@ int CMD_EPS_ResetWDT(sat_packet_t *cmd)
 {
 	imepsv2_piu__replyheader_t response;
 
+
 	int error = imepsv2_piu__resetwatchdog(0, &response);
 	if(error)
 	{

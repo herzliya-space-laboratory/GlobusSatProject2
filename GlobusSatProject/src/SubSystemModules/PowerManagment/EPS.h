@@ -10,6 +10,7 @@
 #include "GlobalStandards.h"
 #include "EPSOperationModes.h"
 #include "FRAM_FlightParameters.h"
+#include "satellite-subsystems/imepsv2_piu.h"
 
 #include "utils.h"
 #include "SysI2CAddr.h"

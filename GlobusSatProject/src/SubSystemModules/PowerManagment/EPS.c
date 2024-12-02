@@ -5,7 +5,6 @@
  *      Author: maayan
  */
 
-#include "satellite-subsystems/imepsv2_piu.h"
 #include "satellite-subsystems/IsisSolarPanelv2.h"
 #include "EPS.h"
 
