@@ -158,7 +158,7 @@ int EPS_Conditioning()
 		}
 		else if(smoothing >= threshold_volts.fields.Vup_cruise)
 		{
-			lastVoltage = SMOOTHING(currentVoltage, Alpha);
+			lastVoltage = smoothing;
 			return EnterCruiseMode();
 		}
 		else
