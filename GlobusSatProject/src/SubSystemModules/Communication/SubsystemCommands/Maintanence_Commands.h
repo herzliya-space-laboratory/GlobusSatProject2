@@ -3,7 +3,10 @@
 #define MAINTANENCE_COMMANDS_H_
 
 #include "SubSystemModules/Communication/SatCommandHandler.h"
-
+#include "SubSystemModules/Communication/AckHandler.h"
+#include "SubSystemModules/Communication/TRXVU.h"
+#include "SubSystemModules/Maintenance/Maintenance.h"
+#include <hal/Timing/Time.h>
 
 typedef enum __attribute__ ((__packed__)) reset_type_t
 {
