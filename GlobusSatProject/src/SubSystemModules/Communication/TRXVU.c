@@ -46,10 +46,6 @@ int InitTrxvuAndAnts(){
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
-// TODO: delete the 3 lines below
-	time_unix param = 0;
-	FRAM_write((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE);
-	FRAM_write((unsigned char*)&param, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE);
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
@@ -388,7 +384,6 @@ Boolean CheckTransmitionAllowed()
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch");
 	if(timeNow < getMuteEndTime()) // check we are after the mute end time.
 		return FALSE;
-	//TODO: check function and continue it
 	return TRUE;
 }
 

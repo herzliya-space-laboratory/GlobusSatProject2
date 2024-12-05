@@ -18,7 +18,7 @@
 int CMD_UpdateAlpha(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
-	int error_ack = 0;
+	unsigned char error_ack = 0;
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
@@ -88,7 +88,7 @@ int CMD_GetAlpha(sat_packet_t *cmd)
 	int error = GetAlpha(&alpha);
 	if(error == -2)
 	{
-		int error_ack = ERROR_READ_FROM_FRAM;
+		unsigned char error_ack = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
@@ -107,7 +107,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd)
 	int error = GetThresholdVoltages(&threshold);
 	if(error == -2)
 	{
-		int error_ack = ERROR_READ_FROM_FRAM;
+		unsigned char error_ack = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
@@ -125,7 +125,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd)
 int CMD_UpdateThresholdVoltages(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
-	int error_ack = 0;
+	unsigned char error_ack = 0;
 	if(cmd->length != 8)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
@@ -208,7 +208,7 @@ int CMD_EPS_ResetWDT(sat_packet_t *cmd)
 	int error = imepsv2_piu__resetwatchdog(0, &response);
 	if(error)
 	{
-		int error_ack = ERROR_CANT_RESET_WDT;
+		unsigned char error_ack = ERROR_CANT_RESET_WDT;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}

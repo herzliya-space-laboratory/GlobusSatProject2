@@ -74,7 +74,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 
 	if(!error_supervisor)
 	{
-		wod->number_of_resets = mySupervisor_housekeeping_hk.fields.iobcResetCount;
+		wod->number_of_resets = mySupervisor_housekeeping_hk.fields.iobcResetCount; //TODO: need to correct
 		wod->sat_uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
 	}
 	else // if have error in the supervisor put everything in that section to -1

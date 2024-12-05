@@ -33,4 +33,6 @@
 
 #define ERROR_CANT_DO					30 //can't do what we want it to
 
+#define ERROR_CANT_RESET				40
+
 #endif /* ACKERRORS_H_ */

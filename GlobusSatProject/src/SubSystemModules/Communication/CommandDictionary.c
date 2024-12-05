@@ -7,6 +7,7 @@
 
 #include "SubsystemCommands/TRXVU_Commands.h"
 #include "SubsystemCommands/EPS_Commands.h"
+#include "SubsystemCommands/Maintanence_Commands.h"
 #include "CommandDictionary.h"
 #include <stdio.h>
 
@@ -101,5 +102,31 @@ int eps_command_router(sat_packet_t *cmd)
 			return CMD_EPS_ResetWDT(cmd);
 		default:
 			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "eps_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
+	}
+}
+
+
+/*!
+ * @brief routes the data into the appropriate obc command according to the command sub type
+ * @param[in] cmd command pertaining to the MANAGMENT sub routine, to be executed.
+ * @note the type and subtype of the command are already inside cmd
+ * @see sat_packet_t structure
+ * @return errors according to <hal/errors.h>
+ */
+int managment_command_router(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+	{
+		printf("cmd_is_null\r\n");
+		return -1;
+	}
+	switch(cmd->cmd_subtype)
+	{
+		case GET_SAT_TIME:
+			return CMD_GetSatTime(cmd);
+		case RESET_COMPONENT:
+			return CMD_ResetComponent(cmd);
+		default:
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "managment_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
 	}
 }

@@ -119,7 +119,7 @@ int ActUponCommand(sat_packet_t *cmd)
 /*			error = logError(filesystem_command_router(cmd), "Command Dictionary - filesystem_command_router");*/
 			return error;
 		case managment_cmd_type:
-/*			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");*/
+			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");
 			return error;
 		case payload_cmd_type:
 /*			error = logError(payload_command_router(cmd), "Command Dictionary - telemetry_command_router");*/

@@ -22,9 +22,9 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_RESET_WAKEUP = 		0x7F,			// after waking up from reset
 
 	ACK_FS_RESET = 			0x70,			// before going to filesystem reset
-	ACK_TRXVU_SOFT_RESET = 	0x71,			// before going to trxvu reset
-	ACK_TRXVU_HARD_RESET =	0x72,			// before going to trxvu reset
-	ACK_ANTS_RESET = 		0x73,			// before reseting antennas
+	ACK_TX_HARD_RESET =		0x73,			// before going to trxvu reset
+	ACK_RX_HARD_RESET =		0x74,			// before going to trxvu reset
+	ACK_ANTS_RESET = 		0x75,			// before reseting antennas
 	ACK_EPS_RESET = 		0x80,			// before going to eps reset
 	ACK_SOFT_RESET = 		0x81,			// before going to reset
 	ACK_HARD_RESET = 		0x82,			// before starting hardware reset
@@ -135,7 +135,8 @@ typedef enum __attribute__ ((__packed__)) management_subtypes_t
 	FRAM_WRITE_AND_TRANSMIT =   0xE0,       //0b11100000
 	FRAM_READ_AND_TRANSMIT =    0xE1,
 	FRAM_RESTART =    			0xE2,
-	GET_SAT_UPTIME =    		0xE3
+	GET_SAT_UPTIME =    		0xE3,
+	GET_SAT_TIME =				0xE4
 }management_subtypes_t;
 //-----------------
 

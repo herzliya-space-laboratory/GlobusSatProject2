@@ -5,18 +5,17 @@
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 #include "SubSystemModules/Communication/AckHandler.h"
 #include "SubSystemModules/Communication/TRXVU.h"
+#include "SubSystemModules/PowerManagment/EPS.h"
 #include "SubSystemModules/Maintenance/Maintenance.h"
 #include <hal/Timing/Time.h>
 
 typedef enum __attribute__ ((__packed__)) reset_type_t
 {
-	reset_software,
-	reset_hardware,
-	reset_eps,
-	reset_trxvu_hard,
-	reset_trxvu_soft,
-	reset_ant_SideA,
-	reset_ant_SideB,
+	reset_software, //from eps
+	reset_hardware, //from eps
+	reset_tx_hard,
+	reset_rx_hard,
+	reset_ants,
 	reset_filesystem
 
 }reset_type_t;
@@ -41,12 +40,19 @@ int CMD_GetSatTime(sat_packet_t *cmd);
 
 int CMD_GetSatUptime(sat_packet_t *cmd);
 
-int CMD_SoftTRXVU_ComponenetReset(sat_packet_t *cmd);
 
-int CMD_HardTRXVU_ComponenetReset(sat_packet_t *cmd);
+/*help functions of CMD_ResetComponent*/
+int HardTX_ComponenetReset();
 
+int HardRX_ComponenetReset();
 
+int Soft_ComponenetReset();
 
+int Hurt_ComponenetReset();
+
+int Ants_ComponenetReset();
+
+int FS_ComponenetReset();
 
 /*!
  * @brief 	starts a reset according to 'reset_type_t'
