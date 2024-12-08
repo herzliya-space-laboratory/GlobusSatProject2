@@ -1,11 +1,11 @@
 /*
- * Maintanence_Commands.c
+ * Maintenance_Commands.c
  *
  *  Created on: 3 Dec 2024
  *      Author: maayan
  */
 
-#include "Maintanence_Commands.h"
+#include "Maintenance_Commands.h"
 #include <string.h>
 
 /*

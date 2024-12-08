@@ -7,7 +7,7 @@
 
 #include "SubsystemCommands/TRXVU_Commands.h"
 #include "SubsystemCommands/EPS_Commands.h"
-#include "SubsystemCommands/Maintanence_Commands.h"
+#include "SubsystemCommands/Maintenance_Commands.h"
 #include "CommandDictionary.h"
 #include <stdio.h>
 

@@ -1,6 +1,6 @@
 
-#ifndef MAINTANENCE_COMMANDS_H_
-#define MAINTANENCE_COMMANDS_H_
+#ifndef MAINTENANCE_COMMANDS_H_
+#define MAINTENANCE_COMMANDS_H_
 
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 #include "SubSystemModules/Communication/AckHandler.h"
@@ -74,4 +74,4 @@ int FS_ComponenetReset();
  */
 int CMD_ResetComponent(sat_packet_t *cmd);
 
-#endif /* MAINTANENCE_COMMANDS_H_ */
+#endif /* MAINTENANCE_COMMANDS_H_ */
