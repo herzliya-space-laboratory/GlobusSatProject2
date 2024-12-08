@@ -8,6 +8,7 @@
 #include "SubSystemModules/PowerManagment/EPS.h"
 #include "SubSystemModules/Maintenance/Maintenance.h"
 #include <hal/Timing/Time.h>
+#include <hal/supervisor.h>
 
 typedef enum __attribute__ ((__packed__)) reset_type_t
 {
@@ -16,28 +17,37 @@ typedef enum __attribute__ ((__packed__)) reset_type_t
 	reset_tx_hard,
 	reset_rx_hard,
 	reset_ants,
+	reset_fram,
 	reset_filesystem
 
 }reset_type_t;
 
-int CMD_GenericI2C(sat_packet_t *cmd);
+int CMD_GenericI2C(sat_packet_t *cmd); //todo
 
-int CMD_FRAM_ReadAndTransmitt(sat_packet_t *cmd);
-
-int CMD_FRAM_WriteAndTransmitt(sat_packet_t *cmd);
-
-int CMD_FRAM_Start(sat_packet_t *cmd);
-
-int CMD_FRAM_Stop(sat_packet_t *cmd);
-
-int CMD_FRAM_GetDeviceID(sat_packet_t *cmd);
-
-int CMD_FRAM_ReStart(sat_packet_t *cmd);
-
+/*
+ * Set the time on the OBC
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add and the new time)
+ * @return type=int; 	-1 on cmd Null
+ * 						-3 on wrong length
+ * 						1 if cant set new time
+ * 						type of error according to <hal/error.h>
+ * 					 	0 on success.
+ * */
 int CMD_UpdateSatTime(sat_packet_t *cmd);
 
+/*
+ * Get the time save on the sat at the sat.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error 0 on success.
+ * */
 int CMD_GetSatTime(sat_packet_t *cmd);
 
+/*
+ * Get the time the OBC was active since the last reset
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error according to <hal/error.h> or TransmitDataAsSPL_Packet errors
+ * 					 0 on success.
+ * */
 int CMD_GetSatUptime(sat_packet_t *cmd);
 
 
@@ -51,6 +61,8 @@ int Soft_ComponenetReset();
 int Hurt_ComponenetReset();
 
 int Ants_ComponenetReset();
+
+int FRAM_ComponenetReset();
 
 int FS_ComponenetReset();
 

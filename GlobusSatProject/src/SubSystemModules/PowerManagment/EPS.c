@@ -10,7 +10,6 @@
 
 
 /*#define WE_HAVE_SP 1*/
-#define WE_HAVE_EPS 1
 
 #define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage)))
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
@@ -22,7 +21,6 @@ float Alpha;
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
-#ifdef WE_HAVE_EPS
 	IMEPSV2_PIU_t stract_1;
 	stract_1.i2cAddr = EPS_I2C_ADDR;
 	errorEPS = logError(IMEPSV2_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
@@ -32,7 +30,6 @@ int EPS_And_SP_Init(){
 		GetBatteryVoltage(&lastVoltage);
 		GetAlpha(&Alpha);
 	}
-#endif
 #ifdef WE_HAVE_SP
 	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "Solar panels - IsisSolarPanelv2_initialize");
 	if(errorSP == 0)

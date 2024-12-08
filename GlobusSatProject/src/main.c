@@ -50,13 +50,6 @@ void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 	InitSubsystems();
-#ifdef WE_HAVE_EPS
-	while (TRUE) {
-		EPS_Conditioning();
-		vTaskDelay(10);
-	}
-
-#endif
 #ifdef Testing_TRXVU
 	MainTrxvuTestBench();
 #elif Testing_Maintenance
@@ -65,6 +58,7 @@ void taskMain()
 	while(TRUE)
 	{
 		EPS_Conditioning();
+		vTaskDelay(10);
 		TRX_Logic();
 		Maintenance();
 	}

@@ -126,6 +126,10 @@ int managment_command_router(sat_packet_t *cmd)
 			return CMD_GetSatTime(cmd);
 		case RESET_COMPONENT:
 			return CMD_ResetComponent(cmd);
+		case GET_SAT_UPTIME:
+			return CMD_GetSatUptime(cmd);
+		case UPDATE_SAT_TIME:
+			return CMD_UpdateSatTime(cmd);
 		default:
 			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "managment_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
 	}

@@ -35,4 +35,6 @@
 
 #define ERROR_CANT_RESET				40
 
+#define ERROR_COULDNT_UPDATE_SAT_TIME	50
+
 #endif /* ACKERRORS_H_ */

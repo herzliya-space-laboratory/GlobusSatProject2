@@ -29,20 +29,20 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 /*help functions of CMD_ResetComponent*/
 int HardTX_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0), "SoftTX_ComponenetReset - SendAckPacket");
+	logError(SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0), "HardTX_ComponenetReset - SendAckPacket");
 	return logError(IsisTrxvu_componentHardReset(0, trxvu_tc), "SoftTX_ComponenetReset - IsisTrxvu_componentSoftReset");
 }
 
 int HardRX_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0), "SoftRX_ComponenetReset - SendAckPacket");
+	logError(SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0), "HardRX_ComponenetReset - SendAckPacket");
 	return logError(IsisTrxvu_componentHardReset(0, trxvu_rc), "SoftRX_ComponenetReset - IsisTrxvu_componentSoftReset");
 }
 
 int Soft_ComponenetReset()
 {
 	int one = 1;
-	logError(SendAckPacket(ACK_SOFT_RESET, NULL, NULL, 0), "SoftRX_ComponenetReset - SendAckPacket");
+	logError(SendAckPacket(ACK_SOFT_RESET, NULL, NULL, 0), "Soft_ComponenetReset - SendAckPacket");
 	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
 	restart();
 	return 0;
@@ -50,7 +50,7 @@ int Soft_ComponenetReset()
 
 int Ants_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_ANTS_RESET, NULL, NULL, 0), "SoftRX_ComponenetReset - SendAckPacket");
+	logError(SendAckPacket(ACK_ANTS_RESET, NULL, NULL, 0), "Ants_ComponenetReset - SendAckPacket");
 	int err1 = logError(IsisAntS_reset(0, isisants_sideA), "Ants_ComponenetReset - IsisAntS_reset - a");
 	int err2 = logError(IsisAntS_reset(0, isisants_sideB), "Ants_ComponenetReset - IsisAntS_reset - b");
 	return err1 + err2;
@@ -61,13 +61,20 @@ int Hard_ComponenetReset()
 	imepsv2_piu__replyheader_t replyheader;
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
-	logError(SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0), "SoftRX_ComponenetReset - SendAckPacket");
+	logError(SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0), "Hard_ComponenetReset - SendAckPacket");
 	return logError(imepsv2_piu__reset(0, &replyheader), "Hard_ComponenetReset - imepsv2_piu__reset");
 }
 
 int FS_ComponenetReset()
 {
 	return 0; //TODO later
+}
+
+int FRAM_ComponenetReset()
+{
+	logError(SendAckPacket(ACK_FRAM_RESET, NULL, NULL, 0), "FRAM_ComponenetReset - SendAckPacket");
+	FRAM_stop();
+	return logError(FRAM_start(), "FRAM_ComponenetReset - FRAM_start");
 }
 
 
@@ -134,6 +141,16 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 			}
 			return 0;
 		}
+		case reset_fram:
+		{
+			if(FRAM_ComponenetReset())
+			{
+				ackError = ERROR_CANT_RESET;
+				SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
+				return ackError;
+			}
+			return 0;
+		}
 		case reset_filesystem:
 		{
 			return 0;
@@ -145,4 +162,56 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 			return ackError;
 		}
 	}
+}
+
+/*
+ * Get the time the OBC was active since the last reset
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return type of error according to <hal/error.h> or TransmitDataAsSPL_Packet errors
+ * 					 0 on success.
+ * */
+int CMD_GetSatUptime(sat_packet_t *cmd)
+{
+	supervisor_housekeeping_t supervisorHK; //create a variable that is the struct we need from supervisor
+	int error = logError(Supervisor_getHousekeeping(&supervisorHK, SUPERVISOR_SPI_INDEX), "CMD_GetSatUptime - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
+	if(error)
+	{
+		char ack_error = ERROR_GET_FROM_STRUCT;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ack_error, sizeof(ack_error)); // Send ack error according to "AckErrors.h"
+		return error;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&supervisorHK.fields.iobcUptime, sizeof(supervisorHK.fields.iobcUptime)), "CMD_GetSatUptime - TransmitDataAsSPL_Packet"); //send back the sat time
+}
+
+
+/*
+ * Set the time on the OBC
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add and the new time)
+ * @return type=int; 	-1 on cmd Null
+ * 						-3 on wrong length
+ * 						1 if cant set new time
+ * 						type of error according to <hal/error.h>
+ * 					 	0 on success.
+ * */
+int CMD_UpdateSatTime(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	int error_ack = 0;
+	if(cmd->length != 4)
+	{
+		error_ack = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -3;
+	}
+	time_unix newSatTime;
+	memcpy((unsigned char*)&newSatTime, cmd->data, cmd->length);
+	int error = Time_setUnixEpoch(newSatTime);
+	if(error)
+	{
+		error_ack = ERROR_COULDNT_UPDATE_SAT_TIME;
+		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return 1;
+	}
+	return SendAckPacket(ACK_UPDATE_TIME , cmd, (unsigned char*)&newSatTime, sizeof(newSatTime));
+
 }
