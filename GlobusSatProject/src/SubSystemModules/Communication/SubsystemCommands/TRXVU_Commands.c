@@ -432,7 +432,7 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
  * */
 int CMD_GetTxUptime(sat_packet_t *cmd)
 {
-	unsigned int uptime;
+	uint32_t uptime;
 	int error = isis_vu_e__tx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
 	if(error)
 	{
@@ -450,7 +450,7 @@ int CMD_GetTxUptime(sat_packet_t *cmd)
  * */
 int CMD_GetRxUptime(sat_packet_t *cmd)
 {
-	unsigned int uptime;
+	uint32_t uptime;
 	int error = isis_vu_e__rx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
 	if(error)
 	{
@@ -475,7 +475,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
 	int error = 0;
-	unsigned int uptime;
+	uint32_t uptime;
 	error = isis_ants_rev2__get_uptime(0, &uptime);
 	if(error)
 	{

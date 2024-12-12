@@ -126,8 +126,7 @@ int ActUponCommand(sat_packet_t *cmd)
 			return error;
 		default:
 		{
-			unsigned char unknownType_msg[] = "Unknown type";
-			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, unknownType_msg, sizeof(unknownType_msg)), "ActUponCommand - SendAckPacket invalid type"); // Send ack that says what written in unknownType_msg
+			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0), "ActUponCommand - SendAckPacket invalid type"); // Send ack that says what written in unknownType_msg
 		}
 	}
 }
