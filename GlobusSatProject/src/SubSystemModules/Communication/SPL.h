@@ -123,18 +123,17 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) management_subtypes_t
 {
+/*
 	SOFT_RESET_SUBTYPE = 		0xAA,		//0b10101010
 	HARD_RESET_SUBTYPE = 		0x99,		//0b10101010
 	TRXVU_SOFT_RESET_SUBTYPE =	0xC3,		//0b11000011
 	TRXVU_HARD_RESET_SUBTYPE = 	0x3C,		//0b00111100
 	EPS_RESET_SUBTYPE =			0xBB,		//0b10111011
 	FS_RESET_SUBTYPE =			0xCC,		//0b11001100
+*/
 	UPDATE_SAT_TIME =           0xDD,       //0b‭11011101‬
 	GENERIC_I2C_CMD =           0xDF,       //0b‭11011111‬
 	RESET_COMPONENT =           0xDE,       //0b‭11011110
-	FRAM_WRITE_AND_TRANSMIT =   0xE0,       //0b11100000
-	FRAM_READ_AND_TRANSMIT =    0xE1,
-	FRAM_RESTART =    			0xE2,
 	GET_SAT_UPTIME =    		0xE3,
 	GET_SAT_TIME =				0xE4
 }management_subtypes_t;

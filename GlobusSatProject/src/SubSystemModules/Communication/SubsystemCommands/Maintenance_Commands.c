@@ -31,6 +31,7 @@ int HardTX_ComponenetReset()
 {
 	logError(SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0), "HardTX_ComponenetReset - SendAckPacket");
 	return logError(IsisTrxvu_componentHardReset(0, trxvu_tc), "SoftTX_ComponenetReset - IsisTrxvu_componentSoftReset");
+	//TODO: maybe on the new drivers needed to do init here and in the rx reset.
 }
 
 int HardRX_ComponenetReset()
@@ -176,7 +177,7 @@ int CMD_GetSatUptime(sat_packet_t *cmd)
 	int error = logError(Supervisor_getHousekeeping(&supervisorHK, SUPERVISOR_SPI_INDEX), "CMD_GetSatUptime - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
 	if(error)
 	{
-		char ack_error = ERROR_GET_FROM_STRUCT;
+		unsigned char ack_error = ERROR_GET_FROM_STRUCT;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ack_error, sizeof(ack_error)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
@@ -195,8 +196,9 @@ int CMD_GetSatUptime(sat_packet_t *cmd)
  * */
 int CMD_UpdateSatTime(sat_packet_t *cmd)
 {
+	//can sat at min on 1.1.2000 00:00:00 start at 1.1.1970 so the min time in seconds is 946,728,000 or in hex 386D EC40 and we need it as opposite so 40 EC 6D 38
 	if(cmd == NULL) return -1;
-	int error_ack = 0;
+	unsigned char error_ack = 0;
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
@@ -205,7 +207,7 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 	}
 	time_unix newSatTime;
 	memcpy((unsigned char*)&newSatTime, cmd->data, cmd->length);
-	int error = Time_setUnixEpoch(newSatTime);
+	int error = logError(Time_setUnixEpoch(newSatTime), "CMD_UpdateSatTime - Time_setUnixEpoch");
 	if(error)
 	{
 		error_ack = ERROR_COULDNT_UPDATE_SAT_TIME;
@@ -215,3 +217,4 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 	return SendAckPacket(ACK_UPDATE_TIME , cmd, (unsigned char*)&newSatTime, sizeof(newSatTime));
 
 }
+
