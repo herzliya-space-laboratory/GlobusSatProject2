@@ -16,7 +16,7 @@
  */
 int CMD_SetOn_IdleState(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL)
 		return -6;
 	if(cmd->length != 4)
@@ -77,7 +77,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 */
 int CMD_SetOff_IdleState(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	int error = SetIdleState(isis_vu_e__onoff__off, 0);
 	switch(error)
 	{
@@ -112,7 +112,6 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
 		}
 	}
 	return logError(SendAckPacket(ACK_IDLE_OFF , cmd, NULL, 0), "CMD_SetOff_dleState - SendAckPacket");
-
 }
 
 /*
@@ -127,7 +126,7 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
  * */
 int CMD_SetOn_Transponder(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL)
 		return -1;
 	if(cmd->length != 4)
@@ -181,7 +180,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 * */
 int CMD_SetOff_Transponder(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
 	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
 	if(error)
@@ -221,7 +220,7 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
  * */
 int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL)
 		return -1;
 	short new_rssi_val = -1;
@@ -273,7 +272,7 @@ int CMD_GetRSSI_Transponder(sat_packet_t *cmd)
 	short rssi_val = getTransponderRSSIFromFRAM();
 	if(rssi_val == -1)
 	{
-		int error_ack = ERROR_READ_FROM_FRAM;
+		unsigned char error_ack = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -1;
 	}
@@ -289,7 +288,7 @@ int CMD_GetRSSI_Transponder(sat_packet_t *cmd)
  * */
 int CMD_MuteTRXVU(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL)
 		return -1;
 	if(cmd->length != 4)
@@ -327,7 +326,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
  * */
 int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	int error = setMuteEndTime(0); // set new end time to time now
 	if(error == -2)
 	{
@@ -351,7 +350,7 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 * */
 int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL)
 		return -1;
 	if(cmd->length != 4)
@@ -417,7 +416,7 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 	int error = logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read"); // Read the beacon interval from FRAM
 	if(error)
 	{
-		int error_ack = ERROR_READ_FROM_FRAM;
+		unsigned char error_ack = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
@@ -437,7 +436,7 @@ int CMD_GetTxUptime(sat_packet_t *cmd)
 	int error = isis_vu_e__tx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
 	if(error)
 	{
-		int error_ack = ERROR_GET_UPTIME;
+		unsigned char error_ack = ERROR_GET_UPTIME;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
@@ -455,7 +454,7 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 	int error = isis_vu_e__rx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
 	if(error)
 	{
-		int error_ack = ERROR_GET_UPTIME;
+		unsigned char error_ack = ERROR_GET_UPTIME;
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
@@ -469,7 +468,7 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
  * */
 int GetAntSide(sat_packet_t *cmd, char *side)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL) return -1;
 	if(cmd->length != 1)
 	{
@@ -492,7 +491,7 @@ int GetAntSide(sat_packet_t *cmd, char *side)
  * */
 int CMD_AntGetUptime(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL) return -1;
 	int error = 0;
 	char side;
@@ -529,7 +528,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
  * */
 int CMD_AntCancelDeployment(sat_packet_t *cmd)
 {
-	int error_ack;
+	unsigned char error_ack;
 	if(cmd == NULL) return -1;
 	int error;
 	char side;

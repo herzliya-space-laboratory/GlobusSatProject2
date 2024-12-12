@@ -113,13 +113,13 @@ int ActUponCommand(sat_packet_t *cmd)
 		case trxvu_cmd_type:
 			return logError(trxvu_command_router(cmd), "Command Dictionary - trxvu_command_router");
 		case eps_cmd_type:
-/*			error = logError(eps_command_router(cmd), "Command Dictionary - eps_command_router");*/
+			error = logError(eps_command_router(cmd), "Command Dictionary - eps_command_router");
 			return error;
 		case filesystem_cmd_type:
 /*			error = logError(filesystem_command_router(cmd), "Command Dictionary - filesystem_command_router");*/
 			return error;
 		case managment_cmd_type:
-/*			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");*/
+			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");
 			return error;
 		case payload_cmd_type:
 /*			error = logError(payload_command_router(cmd), "Command Dictionary - telemetry_command_router");*/

@@ -16,6 +16,8 @@
 
 #include "SubSystemModules/Communication/TRXVU.h"
 #include "SubSystemModules/PowerManagment/EPS.h"
+#include "SubSystemModules/Maintenance/Maintenance.h"
+
 #include "TLM_management.h"
 
 #include "GlobalStandards.h"
@@ -85,7 +87,9 @@ int WriteDefaultValuesToFRAM()
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
 //Need to be written with the firstActivetion that will become 1.
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of cmd resets")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of resets")) error = -1;
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "default to FRAM - number of cmd resets")) error = -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
 
@@ -94,7 +98,11 @@ int WriteDefaultValuesToFRAM()
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
 
-	//TODO: EPS_THRESH_VOLTAGES_ADDR
+	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
+	EpsThreshVolt_t thresh;
+		for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
+			thresh.raw[i] = defaultThershold[i];
+	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "default to FRAM - threshold voltages")) error = -1;
 	//TODO: LAST_COMM_TIME_ADDR
 	return error;
 }
@@ -155,7 +163,7 @@ int FirstActivition()
 		return 0;
 	int error = 0;
 	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
-	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1;
+	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1; //TODO: when we can change SD do it and formating the other SD
 	if(WriteDefaultValuesToFRAM()) error = -1;
 
 #ifdef WE_HAVE_ANTS
@@ -167,7 +175,7 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-		//TODO: add check telemntry
+		//TODO: add check telemetry
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
@@ -195,14 +203,15 @@ int InitSubsystems(){
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
 
-
 	InitSupervisor();
-
-	EPS_And_SP_Init();
 
 	InitTrxvuAndAnts();
 
+	WakeupFromResetCMD();
+
 	FirstActivition();
+
+	EPS_And_SP_Init();
 
 	printf("Did init\r\n");
 	return 0;

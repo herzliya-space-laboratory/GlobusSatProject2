@@ -3,6 +3,7 @@
 #define MAINTENANCETESTINGDEMO_H_
 
 #include "GlobalStandards.h"
+#include <hal/Utility/util.h>
 #include "SubSystemModules/Maintenance/Maintenance.h"
 
 Boolean CheckExecutionTimeFiveTimes();

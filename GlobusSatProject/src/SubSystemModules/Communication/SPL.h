@@ -22,22 +22,24 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_RESET_WAKEUP = 		0x7F,			// after waking up from reset
 
 	ACK_FS_RESET = 			0x70,			// before going to filesystem reset
-	ACK_TRXVU_SOFT_RESET = 	0x71,			// before going to trxvu reset
-	ACK_TRXVU_HARD_RESET =	0x72,			// before going to trxvu reset
-	ACK_ANTS_RESET = 		0x73,			// before reseting antennas
+	ACK_TX_HARD_RESET =		0x73,			// before going to trxvu reset
+	ACK_RX_HARD_RESET =		0x74,			// before going to trxvu reset
+	ACK_ANTS_RESET = 		0x75,			// before reseting antennas
 	ACK_EPS_RESET = 		0x80,			// before going to eps reset
 	ACK_SOFT_RESET = 		0x81,			// before going to reset
 	ACK_HARD_RESET = 		0x82,			// before starting hardware reset
+	ACK_FRAM_RESET =		0x83,
 
-	ACK_MEMORY_DELETE = 0x83,				// when memory delete is completed success
+	ACK_MEMORY_DELETE = 0x84,				// when memory delete is completed success
 
 	ACK_UPDATE_TIME = 0x12,					// after updating time
 	ACK_UPDATE_BEACON_BIT_RATE = 0x13,
 	ACK_UPDATE_BEACON_INTERVAL = 0x14,
 	ACK_UPDATE_RSSI_VALUE = 0x18,
-	ACK_UPDATE_EPS_VOLTAGES = 0x15,
-	ACK_UPDATE_EPS_HEATER_VALUES = 0x16,
+	ACK_UPDATE_EPS_VOLTAGES = 0x16,
 	ACK_UPDATE_EPS_ALPHA = 0x17,
+
+	ACK_EPS_RESET_WDT = 0x15,
 
 	ACK_MUTE = 0x8D,
 	ACK_UNMUTE = 0x8E,
@@ -54,7 +56,6 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_ARM_DISARM = 0x94,					//after changing arm state of the ants
 	ACK_REDEPLOY = 0x95,
 	ACK_RESET_DELAYED_CMD = 0x9E,			//maybe we dont need
-	ACK_FRAM_RESET = 0xA0,
 	ACK_ANT_CANCEL_DEPLOY = 0xA3,
 
 	ACK_DELETE_TLM = 0xC0,					// after deleting TLM file(s)
@@ -83,10 +84,9 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 	SET_RSSI_TRANSPONDER_DEFAULT =  0x0E,   //0b10100101
 	SET_ON_TRANSPONDER =            0x0B,   //0b10100110
 	SET_OFF_TRANSPONDER =           0x0C,   //0b10100110
-	ANT_GET_ARM_STATUS =        	0x0F,	//0b10110010 =
+//	ANT_GET_ARM_STATUS =        	0x0F,	//0b10110010 =
 	ANT_GET_UPTIME =	        	0x10,	//0b10110011 = //long int
 	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//delete before fllght
-	ANT_DEPLOY = 		        	0x12,	//0b10110111 *//delete before fllght
 	PING = 				        	0x13,
 
 }trxvu_subtypes_t;
@@ -94,10 +94,17 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 {
-	UPDATE_ALPHA 		= 0x01,
-    GET_HEATER_VALUES 	= 0x02,
-    SET_HEATER_VALUES 	= 0x03,
-    RESET_EPS_WDT	 	= 0x04
+	RESET_EPS_WDT	 	       = 0x01,
+	UPDATE_ALPHA 		       = 0x02,
+	UPDATE_ALPHA_DEFAULT       = 0x03,
+	GET_ALPHA	    	       = 0x04,
+	UPDATE_THRESHOLD	       = 0x05,
+	UPDATE_THRESHOLD_DEFAULT   = 0x06,
+	GET_THRESHOLD	           = 0x07,
+//	GET_STATE_CHANGES_OVERTIME = 0x0B,
+//	GET_HEATER_VALUES   	   = 0x0C,
+	GET_STATE				   = 0x0E,
+
 }eps_subtypes_t;
 
 
@@ -116,19 +123,19 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) management_subtypes_t
 {
+/*
 	SOFT_RESET_SUBTYPE = 		0xAA,		//0b10101010
 	HARD_RESET_SUBTYPE = 		0x99,		//0b10101010
 	TRXVU_SOFT_RESET_SUBTYPE =	0xC3,		//0b11000011
 	TRXVU_HARD_RESET_SUBTYPE = 	0x3C,		//0b00111100
 	EPS_RESET_SUBTYPE =			0xBB,		//0b10111011
 	FS_RESET_SUBTYPE =			0xCC,		//0b11001100
+*/
 	UPDATE_SAT_TIME =           0xDD,       //0b‭11011101‬
 	GENERIC_I2C_CMD =           0xDF,       //0b‭11011111‬
 	RESET_COMPONENT =           0xDE,       //0b‭11011110
-	FRAM_WRITE_AND_TRANSMIT =   0xE0,       //0b11100000
-	FRAM_READ_AND_TRANSMIT =    0xE1,
-	FRAM_RESTART =    			0xE2,
-	GET_SAT_UPTIME =    		0xE3
+	GET_SAT_UPTIME =    		0xE3,
+	GET_SAT_TIME =				0xE4
 }management_subtypes_t;
 //-----------------
 

@@ -1,6 +1,7 @@
 
 #ifndef ACKHANDLER_H_
 #define ACKHANDLER_H_
+#include "SubSystemModules/Communication/AckErrors.h"
 #include <hal/errors.h>
 #include "SatCommandHandler.h"
 #include "SPL.h"

@@ -109,8 +109,6 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd);
 * */
 int CMD_GetBeacon_Interval(sat_packet_t *cmd);
 
-//int CMD_Trasmit_Beacon(sat_packet_t *cmd);
-
 /*
  * Get transmitter uptime and send to ground
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
@@ -151,8 +149,6 @@ int CMD_AntGetUptime(sat_packet_t *cmd);
  * */
 int CMD_AntCancelDeployment(sat_packet_t *cmd);
 
-int CMD_AntDeploy(sat_packet_t *cmd);
-
 /*
  * Send ack ping
 * @param[in] name=cmd; type=sat_packet_t*; Not needed can be NULL
@@ -166,8 +162,6 @@ int CMD_Ping(sat_packet_t *cmd);
  * @param[out] name=side; type=char*; here we left the side for further use.
  * */
 int GetAntSide(sat_packet_t *cmd, char *side);
-
-//int CMD_StopReDeployment(sat_packet_t *cmd);
 
 #endif
 /*COMMANDS_H_ */

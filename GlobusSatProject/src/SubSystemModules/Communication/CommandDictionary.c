@@ -6,6 +6,8 @@
  */
 
 #include "SubsystemCommands/TRXVU_Commands.h"
+#include "SubsystemCommands/EPS_Commands.h"
+#include "SubsystemCommands/Maintenance_Commands.h"
 #include "CommandDictionary.h"
 #include <stdio.h>
 
@@ -60,9 +62,75 @@ int trxvu_command_router(sat_packet_t *cmd)
 		case PING:
 			return CMD_Ping(cmd);
 		default:
-		{
-			unsigned char unknownSubtype_msg[] = "TRXVU - unknown subtype";
-			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, unknownSubtype_msg, sizeof(unknownSubtype_msg)), "trxvu_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
-		}
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "trxvu_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
+	}
+}
+
+
+/*!
+ * @brief routes the data into the appropriate eps command according to the command sub type
+ * @param[in] cmd command pertaining to the EPS system, to be executed.
+ * @note the type and subtype of the command are already inside cmd
+ * @see sat_packet_t structure
+ * @return errors according to <hal/errors.h>
+ */
+int eps_command_router(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+	{
+		printf("cmd_is_null\r\n");
+		return -1;
+	}
+	// Go to each subtype known and according to trxvu_subtypes_t struct and check if it's equal to the subtype in the cmd. if equal go the function of the command
+	switch(cmd->cmd_subtype)
+	{
+		case UPDATE_ALPHA:
+			return CMD_UpdateAlpha(cmd);
+		case UPDATE_ALPHA_DEFAULT:
+			return CMD_RestoreDefaultAlpha(cmd);
+		case GET_ALPHA:
+			return CMD_GetAlpha(cmd);
+		case GET_THRESHOLD:
+			return CMD_GetThresholdVoltages(cmd);
+		case UPDATE_THRESHOLD:
+			return CMD_UpdateThresholdVoltages(cmd);
+		case UPDATE_THRESHOLD_DEFAULT:
+			return CMD_RestoreDefaultThresholdVoltages(cmd);
+		case GET_STATE:
+			return CMD_GetState(cmd);
+		case RESET_EPS_WDT:
+			return CMD_EPS_ResetWDT(cmd);
+		default:
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "eps_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
+	}
+}
+
+
+/*!
+ * @brief routes the data into the appropriate obc command according to the command sub type
+ * @param[in] cmd command pertaining to the MANAGMENT sub routine, to be executed.
+ * @note the type and subtype of the command are already inside cmd
+ * @see sat_packet_t structure
+ * @return errors according to <hal/errors.h>
+ */
+int managment_command_router(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+	{
+		printf("cmd_is_null\r\n");
+		return -1;
+	}
+	switch(cmd->cmd_subtype)
+	{
+		case GET_SAT_TIME:
+			return CMD_GetSatTime(cmd);
+		case RESET_COMPONENT:
+			return CMD_ResetComponent(cmd);
+		case GET_SAT_UPTIME:
+			return CMD_GetSatUptime(cmd);
+		case UPDATE_SAT_TIME:
+			return CMD_UpdateSatTime(cmd);
+		default:
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "managment_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
 	}
 }
