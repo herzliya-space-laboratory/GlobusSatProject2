@@ -55,7 +55,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	}
 
 	IsisSolarPanelv2_wakeup();
-	int error_sp;
+	IsisSolarPanelv2_Error_t error_sp;
 	uint8_t status = 0;
 	int32_t paneltemp = 0;
 	float conv_temp;
@@ -73,15 +73,9 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
 
 	if(!error_supervisor)
-	{
-		wod->number_of_resets = mySupervisor_housekeeping_hk.fields.iobcResetCount; //TODO: need to correct
 		wod->sat_uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
-	}
 	else // if have error in the supervisor put everything in that section to -1
-	{
-		wod->number_of_resets = -1;
 		wod->sat_uptime = -1;
-	}
 
 	if(!ret)
 	{
@@ -101,6 +95,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	{
 		wod->sat_time = -1;
 	}
+	wod->number_of_resets = -1; //TODO
 	wod->num_of_cmd_resets = -1; //TODO
 	/*
 	unsigned int num_of_cmd_resets;

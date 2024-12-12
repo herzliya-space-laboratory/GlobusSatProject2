@@ -40,7 +40,7 @@ int InitTrxvuAndAnts(){
 
 	//Initialize the trxvu subsystem
 	rv = ISIS_VU_E_Init(myTRXVU, 1);
-	//TODO: isis_vu_e__set_bitrate
+	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
@@ -49,10 +49,10 @@ int InitTrxvuAndAnts(){
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
-	ISISantsI2Caddress myAntennaAddress[2];
+	ISIS_ANTS_REV2_t myAntennaAddress[2];
 	myAntennaAddress[0].addressSideA = ANTS_I2C_SIDE_A_ADDR;
-	myAntennaAddress[0].addressSideB = ANTS_I2C_SIDE_B_ADDR;
-	int errorAnts = IsisAntS_initialize(myAntennaAddress, 1);
+	myAntennaAddress[0].addressSideB = ANTS_I2C_SIDE_B_ADDR; //todo: need to check what is the i2c of the ant
+	int errorAnts = ISIS_ANTS_REV2_Init(myAntennaAddress, 1);
 
 	logError(errorAnts, "Ants - IsisAntS_initialize")
 	logError(rv, "TRXVU - IsisTrxvu_initialize");

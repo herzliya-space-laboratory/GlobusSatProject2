@@ -8,7 +8,7 @@
 #include "EPS.h"
 
 
-/*#define WE_HAVE_SP 1*/
+//#define WE_HAVE_SP 1
 
 #define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage)))
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
@@ -20,12 +20,9 @@ float Alpha;
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
-#ifdef WE_HAVE_EPS
 	ISISMEPSV2_IVID7_PIU_t stract_1;
 	stract_1.i2cAddr = EPS_I2C_ADDR;
 	errorEPS = logError(ISISMEPSV2_IVID7_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
-
-#endif
 	if(!errorEPS)
 	{
 		GetThresholdVoltages(&threshold_volts);
