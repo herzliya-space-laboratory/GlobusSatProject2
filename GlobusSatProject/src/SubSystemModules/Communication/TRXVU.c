@@ -44,25 +44,24 @@ int InitTrxvuAndAnts(){
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
-	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "InitTrxvuAndAnts - Time_getUnixEpoch");
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
-	ISIS_ANTS_REV2_t myAntennaAddress[2];
-	myAntennaAddress[0].addressSideA = ANTS_I2C_SIDE_A_ADDR;
-	myAntennaAddress[0].addressSideB = ANTS_I2C_SIDE_B_ADDR; //todo: need to check what is the i2c of the ant
+	ISIS_ANTS_REV2_t myAntennaAddress;
+	myAntennaAddress.i2cAddr = ANTS_I2C_ADDR;
 	int errorAnts = ISIS_ANTS_REV2_Init(myAntennaAddress, 1);
 
-	logError(errorAnts, "Ants - IsisAntS_initialize")
-	logError(rv, "TRXVU - IsisTrxvu_initialize");
+	logError(errorAnts, "Ants - ISIS_ANTS_REV2_Init")
+	logError(rv, "TRXVU - ISIS_VU_E_Init");
 
 
 	//Initialize the AntS system
 	if(rv == 6) return erroAnts;
 	return errorAnts + rv;
 #else
-	return logError(rv, "TRXVU - IsisTrxvu_initialize");
+	return logError(rv, "TRXVU - ISIS_VU_E_Init");
 #endif
 }
 
