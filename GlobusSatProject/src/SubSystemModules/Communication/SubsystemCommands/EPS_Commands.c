@@ -202,10 +202,10 @@ int CMD_GetState(sat_packet_t *cmd)
 
 int CMD_EPS_ResetWDT(sat_packet_t *cmd)
 {
-	imepsv2_piu__replyheader_t response;
+	isismepsv2_ivid7_piu__replyheader_t response;
 
 
-	int error = imepsv2_piu__resetwatchdog(0, &response);
+	int error = isismepsv2_ivid7_piu__resetwatchdog(0, &response);
 	if(error)
 	{
 		unsigned char error_ack = ERROR_CANT_RESET_WDT;

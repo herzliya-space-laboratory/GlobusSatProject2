@@ -156,12 +156,5 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd);
  * */
 int CMD_Ping(sat_packet_t *cmd);
 
-/*
- * Helper function to get side of ants.
- * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
- * @param[out] name=side; type=char*; here we left the side for further use.
- * */
-int GetAntSide(sat_packet_t *cmd, char *side);
-
 #endif
 /*COMMANDS_H_ */

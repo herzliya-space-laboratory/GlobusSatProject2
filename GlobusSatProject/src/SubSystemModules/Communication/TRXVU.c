@@ -72,8 +72,7 @@ int InitTrxvuAndAnts(){
  * */
 int setTransponderOn()
 {
-	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on //TODO: isis_vu_e__set_tx_mode
+	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_on), "setTransponderOn - isis_vu_e__set_tx_mode"); // Set transponder off //TODO: isis_vu_e__set_tx_mode
 }
 
 /*
@@ -82,8 +81,7 @@ int setTransponderOn()
  * */
 int setTransponderOff()
 {
-	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
-	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off //TODO: isis_vu_e__set_tx_mode
+	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_off), "CMD_SetOff_Transponder - isis_vu_e__set_tx_mode"); // Set transponder off //TODO: isis_vu_e__set_tx_mode
 }
 
 /*
@@ -195,10 +193,10 @@ time_unix getTransponderEndTime()
  */
 time_unix getIdleEndTime()
 {
-	time_unix IdleEndTime;
-	if(logError(FRAM_read((unsigned char*)&IdleEndTime, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "getIdleEndTime - FRAM_read"))
+	time_unix idleEndTime;
+	if(logError(FRAM_read((unsigned char*)&idleEndTime, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "getIdleEndTime - FRAM_read"))
 		return 0;
-	return IdleEndTime;
+	return idleEndTime;
 }
 
 /**
@@ -321,11 +319,11 @@ int GetNumberOfFramesInBuffer()
 CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 {
 	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
-	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read //TODO: find right one
-	int error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"); // Get packet // TODO: need to find the right function
+	isis_vu_e__get_frame__from_t rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read
+	int error = logError(isis_vu_e__get_frame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"); // Get packet
 	if(error != E_NO_SS_ERR)
 		return execution_error;
-	error = ParseDataToCommand(rx_frame.rx_framedata, cmd); // Put the info from the packet in the cmd parameter
+	error = ParseDataToCommand(rx_frame.data, cmd); // Put the info from the packet in the cmd parameter
 	return error;
 }
 

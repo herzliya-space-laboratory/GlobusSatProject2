@@ -461,24 +461,6 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
 }
 
-/*
- * Helper function to get side of ants.
- * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
- * @param[out] name=side; type=char*; here we left the side for further use.
- * */
-int GetAntSide(sat_packet_t *cmd, char *side)
-{
-	unsigned char error_ack;
-	if(cmd == NULL) return -1;
-	if(cmd->length != 1)
-	{
-		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-		return -2;
-	}
-	*side = cmd->data[0];
-	return 0;
-}
 
 /*
  * Gets Ant uptime according to side.
@@ -492,22 +474,9 @@ int GetAntSide(sat_packet_t *cmd, char *side)
 int CMD_AntGetUptime(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
-	if(cmd == NULL) return -1;
 	int error = 0;
-	char side;
-	error = GetAntSide(cmd, &side);
-	if(error) return error;
 	unsigned int uptime;
-	if(side == 'A')
-		error = IsisAntS_getUptime(0, isisants_sideA, &uptime);
-	else if(side == 'B')
-		error = IsisAntS_getUptime(0, isisants_sideB, &uptime);
-	else
-	{
-		error_ack = ERROR_SIDE_ANTS_NOT_A_OR_B;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-		return -3;
-	}
+	error = isis_ants_rev2__get_uptime(0, &uptime);
 	if(error)
 	{
 		error_ack = ERROR_GET_UPTIME;
@@ -529,21 +498,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 int CMD_AntCancelDeployment(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
-	if(cmd == NULL) return -1;
-	int error;
-	char side;
-	error = GetAntSide(cmd, &side);
-	if(error) return error;
-	if(side == 'A')
-		error = IsisAntS_cancelDeployment(0, isisants_sideA);
-	else if(side == 'B')
-		error = IsisAntS_cancelDeployment(0, isisants_sideB);
-	else
-	{
-		error_ack = ERROR_SIDE_ANTS_NOT_A_OR_B;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-		return -3;
-	}
+	int error = isis_ants_rev2__cancel_deploy(0);
 	if(error)
 	{
 		error_ack = ERROR_CANT_DO;

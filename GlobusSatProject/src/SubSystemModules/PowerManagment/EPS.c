@@ -5,7 +5,6 @@
  *      Author: maayan
  */
 
-#include "satellite-subsystems/isismepsv2_ivid7_piu.h"
 #include "EPS.h"
 
 
@@ -51,8 +50,8 @@ int EPS_And_SP_Init(){
  */
 int GetBatteryVoltage(voltage_t *vbat)
 {
-	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
-	int error_eps = logError(imepsv2_piu__gethousekeepingeng(0,&responseEPS), "GetBatteryVoltage - imepsv2_piu__gethousekeepingeng"); //Get struct and get kind of error
+	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
+	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetBatteryVoltage - imepsv2_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(error_eps) return error_eps;
 	*vbat = (voltage_t)responseEPS.fields.batt_input.fields.volt;
 	return 0;

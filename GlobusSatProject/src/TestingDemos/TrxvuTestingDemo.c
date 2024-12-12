@@ -103,35 +103,6 @@ void ParseDataToCommandLengthEqualZero()
 	}
 }
 
-void GetAntsSide_SideA()
-{
-	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x41};
-	sat_packet_t cmd;
-	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
-	{
-		char side;
-		int error = GetAntSide(&cmd, &side);
-		if(error)
-			printf("something is wrong - test 10 (not side but in the function)\n\r");
-		if(side != 'A')
-			printf("something is wrong - test 10\n\r");
-	}
-}
-
-void GetAntsSide_SideB()
-{
-	unsigned char pac[] = {0x00, 0x00, 0x00, 0x13, 0x00, 0x01, 0x01, 0x00, 0x42};
-	sat_packet_t cmd;
-	if(!logError(ParseDataToCommand(pac, &cmd), "ParseDataToCommand"))
-	{
-		char side;
-		int error = GetAntSide(&cmd, &side);
-		if(error)
-			printf("something is wrong - test 11 (not side but in the function)\n\r");
-		if(side != 'B')
-			printf("something is wrong - test 11\n\r");
-	}
-}
 
 void MainTrxvuTestBench()
 {
@@ -145,8 +116,6 @@ void MainTrxvuTestBench()
 	ParseDataToCommandDontHaveLength();
 	ParseDataToCommandLengthEqualZero();
 
-	GetAntsSide_SideA();
-	GetAntsSide_SideB();
 }
 
 Boolean SelectAndExecuteTrxvu()
@@ -163,10 +132,8 @@ Boolean SelectAndExecuteTrxvu()
 	printf("\t7)  ParseDataToCommend wrong sat id\n\r");
 	printf("\t8)  ParseDataToCommand don't have length\n\r");
 	printf("\t9)  ParseDataToCommand length equal to zero\n\r");
-	printf("\t10) GetAntSide in data have A\n\r");
-	printf("\t11) GetAntSide in data have B\n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 9) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
@@ -198,12 +165,6 @@ Boolean SelectAndExecuteTrxvu()
 			break;
 		case 9:
 			ParseDataToCommandLengthEqualZero();
-			break;
-		case 10:
-			GetAntsSide_SideA();
-			break;
-		case 11:
-			GetAntsSide_SideB();
 			break;
 		default:
 			break;
