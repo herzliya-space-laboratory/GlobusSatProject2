@@ -15,10 +15,8 @@
 #include <time.h>
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 
-
 #define MAX_FILE_NAME_SIZE 11
 #define NUM_ELEMENTS_READ_AT_ONCE 1000
-
 
 #define FS_FILE_ENDING	"TLM"
 #define FS_FILE_ENDING_SIZE	3
@@ -27,8 +25,7 @@
 #define FSFRAM 0x20000
 #endif
 
-typedef enum
-{
+typedef enum {
 	FS_SUCCSESS,
 	FS_DUPLICATED,
 	FS_LOCKED,
@@ -41,26 +38,28 @@ typedef enum
 	FS_FAIL
 } FileSystemResult;
 
-typedef struct imageInfo
-{
-	unsigned short imageID;
-	unsigned short numberChunks;
-	char imageType;
-} imageInfo_t;
+/*
+ typedef struct imageInfo
+ {
+ unsigned short imageID;
+ unsigned short numberChunks;
+ char imageType;
+ } imageInfo_t;
 
-typedef struct imageData
-{
-	unsigned short chunkID;
-	char data[IMG_CHUNK_SIZE];
-} imageData_t;
+ typedef struct imageData
+ {
+ unsigned short chunkID;
+ char data[IMG_CHUNK_SIZE];
+ } imageData_t;
 
-
+ */
 
 static Boolean stopDump = FALSE;
 
-int CMD_getInfoImage(sat_packet_t *cmd);
+/*int CMD_getInfoImage(sat_packet_t *cmd);
 
-int CMD_getDataImage(sat_packet_t *cmd);
+ int CMD_getDataImage(sat_packet_t *cmd);*/
+
 /**
  * write telematry data to file
  */
@@ -73,20 +72,24 @@ int deleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays);
  */
 int deleteTLMFile(tlm_type_t tlmType, Time date, int days2Add);
 
-void calculateFileName(Time curr_date,char* file_name, char* endFileName, int days2Add);
+void calculateFileName(Time curr_date, char* file_name, char* endFileName,
+		int days2Add);
 /*
  * Read telematry file and send it to ground station over RF
  */
-int readTLMFile(tlm_type_t tlmType, Time date, int numOfDays,int cmd_id,int resolution);
+int readTLMFile(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
+		int resolution);
 /*
  *
  */
-int readTLMFiles(tlm_type_t tlmType, Time date, int numOfDays,int cmd_id,int resolution);
+int readTLMFiles(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
+		int resolution);
 
-int readTLMFileTimeRange(tlm_type_t tlmType,time_t from_time,time_t to_time, int cmd_id,int resolution);
-
+int readTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
+		int cmd_id, int resolution);
 
 void delete_allTMFilesFromSD();
+
 /*!
  * Initializes the file system.
  * @note call once for boot and after DeInitializeFS.
@@ -110,8 +113,8 @@ void DeInitializeFS(int sd_card);
  * FS_FRAM_FAIL,
  * FS_SUCCSESS on success.
  */
-FileSystemResult c_fileCreate(char* c_file_name,
-		int size_of_element);
+FileSystemResult c_fileCreate(char* c_file_name, int size_of_element);
+
 /*!
  * Write element to c_file.
  * @param c_file_name the name of the c_file.
@@ -140,8 +143,8 @@ FileSystemResult c_fileDeleteElements(char* c_file_name, time_unix from_time,
  * @param to_time time of last element, LAST_ELEMENT_IN_C_FILE to last element.
  * @return num of elements.
  */
-int c_fileGetNumOfElements(char* c_file_name,time_unix from_time
-		,time_unix to_time);
+int c_fileGetNumOfElements(char* c_file_name, time_unix from_time,
+		time_unix to_time);
 /*!
  * Read elements from c_file to buffer
  * @param c_file_name the name of the c_file.
@@ -155,7 +158,8 @@ int c_fileGetNumOfElements(char* c_file_name,time_unix from_time
  * FS_SUCCSESS on success.
  */
 FileSystemResult c_fileRead(char* c_file_name, byte* buffer, int size_of_buffer,
-		time_unix from_time, time_unix to_time, int* read,time_unix* last_read_time);
+		time_unix from_time, time_unix to_time, int* read,
+		time_unix* last_read_time);
 
 char* getName();
 //print c_file for testing
@@ -164,7 +168,4 @@ FileSystemResult c_fileReset(char* c_file_name);
 int FS_test();
 void test_i();
 #endif /* TM_MANAGMENT_H_ */
-
-
-
 

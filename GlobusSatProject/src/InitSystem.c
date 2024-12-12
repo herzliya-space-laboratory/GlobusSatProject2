@@ -163,7 +163,7 @@ int FirstActivition()
 		return 0;
 	int error = 0;
 	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
-	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1;
+	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1; //TODO: when we can change SD do it and formating the other SD
 	if(WriteDefaultValuesToFRAM()) error = -1;
 
 #ifdef WE_HAVE_ANTS
@@ -175,7 +175,7 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-		//TODO: add check telemntry
+		//TODO: add check telemetry
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
