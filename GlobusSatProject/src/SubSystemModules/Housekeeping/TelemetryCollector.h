@@ -6,7 +6,12 @@
 #include "TLM_management.h"
 #include <satellite-subsystems/IsisSolarPanelv2.h>
 #include "SubSystemModules/PowerManagment/EPS.h"
+#include <hal/supervisor.h>
+#include <hcc/api_fat.h>
+#include <satellite-subsystems/IsisSolarPanelv2.h>
+#include <hal/Storage/FRAM.h>
 
+#include "utils.h"
 #define NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS 5
 
 

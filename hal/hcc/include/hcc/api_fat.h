@@ -453,7 +453,7 @@ extern F_FILE_CHANGED_EVENTFUNC  f_filechangedevent;
  #define f_getcwd( buffer, maxlen )                                     fm_getcwd( buffer, maxlen )
  #define f_getdcwd( drivenum, buffer, maxlen )                          fm_getdcwd( drivenum, buffer, maxlen )
  #define f_chdrive( drivenum )                                          fm_chdrive( drivenum )
- #define f_getdrive fm_getdrive
+ #define f_getdrive 													fm_getdrive
  #define f_getfreespace( drivenum, pspace )                             fm_getfreespace( drivenum, pspace )
 
  #define f_chdir( dirname )                                             fm_chdir( dirname )

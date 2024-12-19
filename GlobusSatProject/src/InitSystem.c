@@ -24,7 +24,7 @@
 #include "InitSystem.h"
 #include "utils.h"
 
-//#define TESTING
+#define TESTING
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
@@ -162,8 +162,11 @@ int FirstActivition()
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
-	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
-	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1; //TODO: when we can change SD do it and formating the other SD
+	int sd = f_getdrive();
+	if(sd == 0 || sd == 1)
+		if(logError(f_format(sd, F_FAT32_MEDIA), ("FirstActivition - Formating SD %d Card", sd))) error = -1;
+	else
+		if(logError(sd, "FirstActivition - in get which SD we are using")) error = -1;
 	if(WriteDefaultValuesToFRAM()) error = -1;
 
 #ifdef WE_HAVE_ANTS

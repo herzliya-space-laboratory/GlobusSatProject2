@@ -11,6 +11,7 @@
 #include <hcc/api_mdriver_atmel_mcipdc.h>
 #include <hcc/api_mdriver.h>
 #include <hcc/api_hcc_mem.h>
+#include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 
 
 #include "utils.h"
@@ -57,4 +58,9 @@ FileSystemResult InitializeFS(){
 		return FS_FAIL;
 
 	return FS_SUCCSESS;
+}
+
+int write2File(void* data, tlm_type_t tlmType)
+{
+	return 0;
 }

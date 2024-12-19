@@ -7,11 +7,7 @@
 
 #include "TelemetryCollector.h"
 
-#include <hal/supervisor.h>
-#include <hcc/api_fat.h>
-#include <satellite-subsystems/imepsv2_piu.h>
-#include <satellite-subsystems/IsisSolarPanelv2.h>
-#include "utils.h"
+
 
 /*!
  * @brief Gets all necessary telemetry and arranges it into a WOD structure
@@ -73,15 +69,9 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
 
 	if(!error_supervisor)
-	{
-		wod->number_of_resets = mySupervisor_housekeeping_hk.fields.iobcResetCount; //TODO: need to correct
 		wod->sat_uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
-	}
 	else // if have error in the supervisor put everything in that section to -1
-	{
-		wod->number_of_resets = -1;
 		wod->sat_uptime = -1;
-	}
 
 	if(!ret)
 	{
@@ -98,12 +88,14 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->used_bytes = -1;
 	}
 	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "TelemetryCollector - Time_getUnixEpoch")) // if have error in geting the sat time put the time to -1
-	{
 		wod->sat_time = -1;
-	}
-	wod->num_of_cmd_resets = -1; //TODO
-	/*
-	unsigned int num_of_cmd_resets;
-	 */
+
+	unsigned int numberOfResets;
+	unsigned int numberOfCMDResets;
+	if(logError(FRAM_read((unsigned char*)&numberOfResets, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "GetCurrentWODTelemetry - FRAM_read resets")) wod->number_of_resets = -1;
+	else wod->number_of_resets = numberOfResets;
+	if(logError(FRAM_read((unsigned char*)&numberOfCMDResets, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "GetCurrentWODTelemetry - FRAM_read cmd resets")) wod->num_of_cmd_resets = -1;
+	else wod->num_of_cmd_resets = numberOfCMDResets;
+
 	return 0;
 }
