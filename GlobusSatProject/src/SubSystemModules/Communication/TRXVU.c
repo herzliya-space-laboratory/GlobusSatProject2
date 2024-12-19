@@ -49,9 +49,9 @@ int InitTrxvuAndAnts(){
 		setTransponderOn();
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
-	ISIS_ANTS_REV2_t myAntennaAddress;
+	ISIS_ANTS_t myAntennaAddress;
 	myAntennaAddress.i2cAddr = ANTS_I2C_ADDR;
-	int errorAnts = ISIS_ANTS_REV2_Init(myAntennaAddress, 1);
+	int errorAnts = ISIS_ANTS_Init(myAntennaAddress, 1);
 
 	logError(errorAnts, "Ants - ISIS_ANTS_REV2_Init")
 	logError(rv, "TRXVU - ISIS_VU_E_Init");
@@ -71,7 +71,7 @@ int InitTrxvuAndAnts(){
  * */
 int setTransponderOn()
 {
-	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_on), "setTransponderOn - isis_vu_e__set_tx_mode"); // Set transponder off //TODO: isis_vu_e__set_tx_mode
+	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_on), "setTransponderOn - isis_vu_e__set_tx_mode"); // Set transponder off
 }
 
 /*
@@ -80,7 +80,7 @@ int setTransponderOn()
  * */
 int setTransponderOff()
 {
-	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_off), "CMD_SetOff_Transponder - isis_vu_e__set_tx_mode"); // Set transponder off //TODO: isis_vu_e__set_tx_mode
+	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_off), "CMD_SetOff_Transponder - isis_vu_e__set_tx_mode"); // Set transponder off
 }
 
 /*

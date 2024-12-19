@@ -52,7 +52,7 @@ int Soft_ComponenetReset()
 int Ants_ComponenetReset()
 {
 	logError(SendAckPacket(ACK_ANTS_RESET, NULL, NULL, 0), "Ants_ComponenetReset - SendAckPacket");
-	int err = logError(isis_ants_rev2__reset(0), "Ants_ComponenetReset - isis_ants_rev2__reset");
+	int err = logError(isis_ants__reset(0), "Ants_ComponenetReset - isis_ants_rev2__reset");
 	return err;
 }
 

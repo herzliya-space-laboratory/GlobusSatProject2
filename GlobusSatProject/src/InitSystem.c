@@ -115,7 +115,7 @@ int AntArm()
 	}
 	printf("ants: %d\r\n", !antsOn);
 #else
-	int rv = isis_ants_rev2__arm(0);
+	int rv = isis_ants__arm(0);
 	if(rv)
 	{
 		printf("Ants not armed\r\n");
@@ -135,7 +135,7 @@ int AntDeployment()
 	}
 	printf("ants: %d\r\n", !deploy);
 #else
-	int rv = isis_ants_rev2__start_auto_deploy(0, 10); //todo: need to check redandent
+	int rv = isis_ants__start_auto_deploy(0, 10); //todo: need to check redandent
 	if(rv)
 	{
 		printf("Ants not deployed\r\n");

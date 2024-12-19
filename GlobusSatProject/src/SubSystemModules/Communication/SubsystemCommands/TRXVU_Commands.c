@@ -476,7 +476,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 	unsigned char error_ack;
 	int error = 0;
 	uint32_t uptime;
-	error = isis_ants_rev2__get_uptime(0, &uptime);
+	error = isis_ants__get_uptime(0, &uptime);
 	if(error)
 	{
 		error_ack = ERROR_GET_UPTIME;
@@ -498,7 +498,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 int CMD_AntCancelDeployment(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
-	int error = isis_ants_rev2__cancel_deploy(0);
+	int error = isis_ants__cancel_deploy(0);
 	if(error)
 	{
 		error_ack = ERROR_CANT_DO;

@@ -6,7 +6,7 @@
 #include <freertos/task.h>
 
 #include <satellite-subsystems/isis_vu_e.h>
-#include "satellite-subsystems/isis_ants_rev2.h"
+#include "satellite-subsystems/isis_ants.h"
 
 #include "FRAM_FlightParameters.h"
 #include "GlobalStandards.h"
