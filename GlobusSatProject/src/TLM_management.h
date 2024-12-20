@@ -63,32 +63,32 @@ static Boolean stopDump = FALSE;
 /**
  * write telematry data to file
  */
-int write2File(void* data, tlm_type_t tlmType);
+int Write2File(void* data, tlm_type_t tlmType);
 
-int deleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays);
+int DeleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays);
 
 /*
  * delete a single file from the SD
  */
-int deleteTLMFile(tlm_type_t tlmType, Time date, int days2Add);
+int DeleteTLMFile(tlm_type_t tlmType, Time date, int days2Add);
 
-void calculateFileName(Time curr_date, char* file_name, char* endFileName,
+void CalculateFileName(Time date, char* file_name, char* endFileName,
 		int days2Add);
 /*
  * Read telematry file and send it to ground station over RF
  */
-int readTLMFile(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
+int ReadTLMFile(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
 		int resolution);
 /*
  *
  */
-int readTLMFiles(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
+int ReadTLMFiles(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
 		int resolution);
 
-int readTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
+int ReadTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
 		int cmd_id, int resolution);
 
-void delete_allTMFilesFromSD();
+int Delete_allTMFilesFromSD();
 
 /*!
  * Initializes the file system.
@@ -161,7 +161,7 @@ FileSystemResult c_fileRead(char* c_file_name, byte* buffer, int size_of_buffer,
 		time_unix from_time, time_unix to_time, int* read,
 		time_unix* last_read_time);
 
-char* getName();
+char* GetName();
 //print c_file for testing
 void print_file(char* c_file_name);
 FileSystemResult c_fileReset(char* c_file_name);

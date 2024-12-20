@@ -164,9 +164,12 @@ int FirstActivition()
 	int error = 0;
 	int sd = f_getdrive();
 	if(sd == 0 || sd == 1)
-		if(logError(f_format(sd, F_FAT32_MEDIA), ("FirstActivition - Formating SD %d Card", sd))) error = -1;
+	{
+		printf("SD: %d\r\n", sd);
+		if(logError(f_format(sd, F_FAT32_MEDIA), "FirstActivition - Formating SD Card")) error = -1;//TODO: don't think we need here logError
+	}
 	else
-		if(logError(sd, "FirstActivition - in get which SD we are using")) error = -1;
+		if(logError(sd, "FirstActivition - in get which SD we are using")) error = -1; //same
 	if(WriteDefaultValuesToFRAM()) error = -1;
 
 #ifdef WE_HAVE_ANTS

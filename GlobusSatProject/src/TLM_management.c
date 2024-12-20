@@ -62,10 +62,17 @@ FileSystemResult InitializeFS(){
 	return FS_SUCCSESS;
 }
 
-void calculateFileName(Time curr_date,char* file_name, char* endFileName, int days2Add)
+/*
+ * Get the final file name.
+ * @param[in] name=date; type=Time; which time we want to save/delete/read the data.
+ * @param[out] name=file_name; type=char*; final file name will be written to here
+ * @param[in] name=endFileName; type=char*; the ".something" to the specific type we want to find the name
+ * @param[in] name=days2Add; type=int; get size of the struct we want to keep in bytes
+ * */
+void CalculateFileName(Time date, char* file_name, char* endFileName, int days2Add)
 {
 	/* initialize */
-	struct tm t = { .tm_year = curr_date.year + 100, .tm_mon = curr_date.month - 1, .tm_mday = curr_date.date }; //TODO: ask for explanation
+	struct tm t = { .tm_year = date.year + 100, .tm_mon = date.month - 1, .tm_mday = date.date }; //need to read how mktime work and get and Time to understand
 	/* modify */
 	t.tm_mday += days2Add;
 	mktime(&t);
@@ -77,7 +84,13 @@ void calculateFileName(Time curr_date,char* file_name, char* endFileName, int da
 	sprintf(file_name, "%s.%s" ,file_buff, endFileName);
 }
 
-void getTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
+/*
+ * Get important info about the file (for save, read and delete).
+ * @param[in] name=tlmType; type=tlm_type_t; which type of telemtry we want.
+ * @param[out] name=endFileName; type=char*; get the ".something" to the specific type
+ * @param[out] name=structSize; type=int*; get size of the struct we want to keep in bytes
+ * */
+void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 {
 	switch(tlmType)
 	{
@@ -157,13 +170,13 @@ void getTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 		case tlm_sel:
 		{
 			memcpy(endFileName,END_FILENAME_SEL_TLM,sizeof(END_FILENAME_SEL_TLM));
-			*structSize = sizeof(int);
+			*structSize = sizeof(int); //TODO: create a struct for the stuff we need to find and them put the name here
 			break;
 		}
 		case tlm_seu:
 		{
 			memcpy(endFileName,END_FILENAME_SEU_TLM,sizeof(END_FILENAME_SEU_TLM));
-			*structSize = sizeof(int);
+			*structSize = sizeof(int); //TODO: create a struct for the stuff we need to find and them put the name here
 			break;
 		}
 		default:
@@ -171,7 +184,15 @@ void getTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 	}
 }
 
-int write2File(void* data, tlm_type_t tlmType)
+/*
+ * write to a file and create a file if not exist the file we need to write to
+ * @param[in] name=data; type=void*; which data we want to save (can be any type).
+ * @param[in] name=days2Add; type=int; get size of the struct we want to keep in bytes
+ * @return type=int; 	-2 on get sat time problem (as seconds)
+ * 						-3 on get sat time as Time struct
+ * 						-1 on problem with opening the file
+ * */
+int Write2File(void* data, tlm_type_t tlmType)
 {
 	time_unix timeNow;
 	if(Time_getUnixEpoch((unsigned int*)&timeNow)) return -2;
@@ -180,14 +201,14 @@ int write2File(void* data, tlm_type_t tlmType)
 	if(Time_get(&currDate)) return -3;
 	char endFile[3];
 	int structSize;
-	getTlmTypeInfo(tlmType, endFile, &structSize);
+	GetTlmTypeInfo(tlmType, endFile, &structSize);
 
 	char fileName[MAX_FILE_NAME_SIZE] = {0};
-	calculateFileName(currDate , fileName, endFile, 0);
+	CalculateFileName(currDate , fileName, endFile, 0);
 	F_FILE *fp =  f_open(fileName, "a");
 	if(!fp)
 	{
-		printf("hi, we have an error in opening the file");
+		printf("Hi, we have an error in opening the file");
 		return -1;
 	}
 	f_write(&timeNow , sizeof(timeNow) ,1, fp );
@@ -197,4 +218,57 @@ int write2File(void* data, tlm_type_t tlmType)
 	f_flush(fp);
 	f_close (fp);
 	return 0;
+}
+
+/*
+ * delete files from specific start time and type
+ * @param[in] name=tlmType; type=tlm_type_t; which type of telemtry we want to delete.
+ * @param[in] name=date; type=Time; which time we want to start delete from
+ * @param[in] name=numOfDays; type=int; how many days we want to delete from the date start
+ * @return type=int; how many days were successfully deleted
+ * */
+int DeleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays){
+	int deletedFiles = 0;
+	for(int i = 0; i < numOfDays; i++){
+		if (DeleteTLMFile(tlmType, date, i) == F_NO_ERROR){
+			deletedFiles++;
+		} //TODO: what to do if we fount an error
+	}
+	return deletedFiles;
+}
+
+/*
+ * delete a file from specific time and type
+ * @param[in] name=tlmType; type=tlm_type_t; which subsystem we are want to delete a file from
+ * @param[in] name=date; type=Time; which time we want to delete
+ * @param[in] name=days2Add; type=int; for the counter of days to add a number of days for the last struct
+ * @return type=int; return error according to "https://drive.google.com/file/d/0B7WEDvdtTWV6NXlmOWpPV20yelk/view?usp=sharing&resourcekey=0-ltj73kO4Iv1PaHq2sZopEw" page 142
+ * */
+int DeleteTLMFile(tlm_type_t tlmType, Time date, int days2Add){
+
+	char endFileName [3] = {0};
+	int size;
+	GetTlmTypeInfo(tlmType,endFileName,&size);
+	char fileName[MAX_FILE_NAME_SIZE] = {0};
+	CalculateFileName(date,&fileName, endFileName, days2Add);
+
+	return f_delete(fileName);
+}
+
+/*
+ * Formating the SD we are on and then call to init
+ * return type=int; return -2 if we are having an error in f_getdrive and -1 on formating error
+ * */
+int Delete_allTMFilesFromSD()
+{ //TODO: maybe we can use it in the init firstActivition
+	int error = 0;
+	int sd = f_getdrive(); //get in which sd we are using now
+	if(sd == 0 || sd == 1)
+	{
+		printf("SD: %d\r\n", sd);
+		if(logError(f_format(sd, F_FAT32_MEDIA), "Delete_allTMFilesFromSD - Formating SD Card")) error = -1; //TODO: don't think we need here logError
+	}
+	else
+		if(logError(sd, "Delete_allTMFilesFromSD - in get which SD we are using")) error = -2; //same
+	return error;
 }
