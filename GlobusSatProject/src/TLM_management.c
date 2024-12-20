@@ -12,7 +12,9 @@
 #include <hcc/api_mdriver.h>
 #include <hcc/api_hcc_mem.h>
 #include "SubSystemModules/Housekeeping/TelemetryCollector.h"
-
+#include "SubSystemModules/Communication/TRXVU.h"
+#include "SubSystemModules/Payload/payload_drivers.h"
+#include <string.h>
 
 #include "utils.h"
 
@@ -22,13 +24,13 @@ FileSystemResult InitializeFS(){
 		// Initialize the memory for the FS
 	int err = hcc_mem_init();
 	if (err != E_NO_SS_ERR){
-		logError(err, "FS - hcc_mem_init");
+		printf("FS - hcc_mem_init Error - %d ", err);
 		flag = 1;
 	}
 	// Initialize the FS
 	err = fs_init();
 	if (err != E_NO_SS_ERR){
-		logError(err, "FS - fs_init");
+		printf("FS - fs_init Error - %d ", err);
 		flag = 1;
 	}
 
@@ -37,7 +39,7 @@ FileSystemResult InitializeFS(){
 	// Tell the OS (freeRTOS) about our FS
 	err = f_enterFS();
 	if (err != E_NO_SS_ERR){
-		logError(err, "FS - f_enterFS");
+		printf("FS - f_enterFS Error - %d ", err);
 		flag = 1;
 	}
 
@@ -60,7 +62,139 @@ FileSystemResult InitializeFS(){
 	return FS_SUCCSESS;
 }
 
+void calculateFileName(Time curr_date,char* file_name, char* endFileName, int days2Add)
+{
+	/* initialize */
+	struct tm t = { .tm_year = curr_date.year + 100, .tm_mon = curr_date.month - 1, .tm_mday = curr_date.date }; //TODO: ask for explanation
+	/* modify */
+	t.tm_mday += days2Add;
+	mktime(&t);
+
+	char file_buff[7];
+
+	strftime(file_buff, sizeof file_buff, "%y%0m%0d", &t);
+
+	sprintf(file_name, "%s.%s" ,file_buff, endFileName);
+}
+
+void getTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
+{
+	switch(tlmType)
+	{
+		case tlm_tx:
+		{
+			memcpy(endFileName, END_FILE_NAME_TX, sizeof(END_FILE_NAME_TX));
+			*structSize = sizeof(ISIStrxvuTxTelemetry);
+			break;
+		}
+		case tlm_rx:
+		{
+			memcpy(endFileName, END_FILE_NAME_RX, sizeof(END_FILE_NAME_RX));
+			*structSize = sizeof(ISIStrxvuRxTelemetry);
+			break;
+		}
+		case tlm_antenna:
+		{
+			memcpy(endFileName,END_FILE_NAME_ANTENNA,sizeof(END_FILE_NAME_ANTENNA));
+			*structSize = sizeof(ISISantsTelemetry);
+			break;
+		}
+		case tlm_eps_raw_mb_NOT_USED:
+		{
+			memcpy(endFileName,END_FILENAME_EPS_RAW_MB_TLM,sizeof(END_FILENAME_EPS_RAW_MB_TLM));
+			*structSize = sizeof(imepsv2_piu__gethousekeepingraw__from_t);
+			break;
+
+		}
+		case tlm_eps_raw_cdb_NOT_USED:
+		{
+			memcpy(endFileName,END_FILENAME_EPS_RAW_CDB_TLM,sizeof(END_FILENAME_EPS_RAW_CDB_TLM));
+			*structSize = sizeof(imepsv2_piu__gethousekeepingrawincdb__from_t);
+			break;
+		}
+		case tlm_eps:
+		{
+			memcpy(endFileName,END_FILENAME_EPS_TLM,sizeof(END_FILENAME_EPS_TLM));
+			*structSize = sizeof(imepsv2_piu__gethousekeepingeng__from_t);
+			break;
+		}
+		case tlm_eps_eng_cdb_NOT_USED:
+		{
+			memcpy(endFileName,END_FILENAME_EPS_ENG_CDB_TLM,sizeof(END_FILENAME_EPS_ENG_CDB_TLM));
+			*structSize = sizeof(imepsv2_piu__gethousekeepingrunningavg__from_t);
+			break;
+		}
+		case tlm_eps_eng_mb_NOT_USED:
+		{
+			memcpy(endFileName,END_FILENAME_EPS_ENG_CDB_TLM,sizeof(END_FILENAME_EPS_ENG_CDB_TLM));
+			*structSize = sizeof(imepsv2_piu__gethousekeepingengrunningavgincdb__from_t);
+			break;
+		}
+		case tlm_wod:
+		{
+			memcpy(endFileName,END_FILENAME_WOD_TLM,sizeof(END_FILENAME_WOD_TLM));
+			*structSize = sizeof(WOD_Telemetry_t);
+			break;
+		}
+		case tlm_solar:
+		{
+			memcpy(endFileName,END_FILENAME_SOLAR_PANELS_TLM,sizeof(END_FILENAME_SOLAR_PANELS_TLM));
+			*structSize = sizeof(solar_tlm_t);
+			break;
+		}
+		case tlm_log:
+		{
+			memcpy(endFileName,END_FILENAME_LOGS,sizeof(END_FILENAME_LOGS));
+			*structSize = sizeof(logData_t);
+			break;
+		}
+		case tlm_radfet:
+		{
+			memcpy(endFileName,END_FILENAME_RADFET_TLM,sizeof(END_FILENAME_RADFET_TLM));
+			*structSize = sizeof(PayloadEnvironmentData);
+			break;
+		}
+		case tlm_sel:
+		{
+			memcpy(endFileName,END_FILENAME_SEL_TLM,sizeof(END_FILENAME_SEL_TLM));
+			*structSize = sizeof(int);
+			break;
+		}
+		case tlm_seu:
+		{
+			memcpy(endFileName,END_FILENAME_SEU_TLM,sizeof(END_FILENAME_SEU_TLM));
+			*structSize = sizeof(int);
+			break;
+		}
+		default:
+			break;
+	}
+}
+
 int write2File(void* data, tlm_type_t tlmType)
 {
+	time_unix timeNow;
+	if(Time_getUnixEpoch((unsigned int*)&timeNow)) return -2;
+
+	Time currDate;
+	if(Time_get(&currDate)) return -3;
+	char endFile[3];
+	int structSize;
+	getTlmTypeInfo(tlmType, endFile, &structSize);
+
+	char fileName[MAX_FILE_NAME_SIZE] = {0};
+	calculateFileName(currDate , fileName, endFile, 0);
+	F_FILE *fp =  f_open(fileName, "a");
+	if(!fp)
+	{
+		printf("hi, we have an error in opening the file");
+		return -1;
+	}
+	f_write(&timeNow , sizeof(timeNow) ,1, fp );
+	f_write(data , structSize , 1, fp );
+
+	/* close the file*/
+	f_flush(fp);
+	f_close (fp);
 	return 0;
 }
