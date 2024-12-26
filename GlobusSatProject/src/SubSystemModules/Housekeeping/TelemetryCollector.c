@@ -180,7 +180,7 @@ void TelemetrySaveAnt()
 void TelemetrySaveSolarPanels()
 {
 	time_unix time = GetTime();
-		if(time == 0) return;
+	if(time == 0) return;
 	IsisSolarPanelv2_wakeup();
 	int error_sp;
 	uint8_t status = 0;
@@ -190,17 +190,57 @@ void TelemetrySaveSolarPanels()
 	for(int panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ ) //Go for the count of solar panels we have.
 	{
 		error_sp = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //Gets the temperature of each panel and the error message.
-		if( error_sp ) //if there is error
+		if(error_sp) //if there is error
 		{
-			tempSolar[panel] = -1;
+			tempSolar.values[panel] = -1;
 			continue;
 		}
 		conv_temp = (float)(paneltemp) * ISIS_SOLAR_PANEL_CONV;
-		tempSolar[panel] = conv_temp;
+		tempSolar.values[panel] = conv_temp;
 	}
 	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
 	Write2File(&tempSolar, tlm_solar);
 	lastTimeSave[tlm_solar] = time;
+}
+
+void TelemetrySavePayloadRADFET()
+{
+	time_unix time = GetTime();
+	if(time == 0) return;
+	PayloadEnvironmentData radfetData;
+	if(logError(payloadReadEnvironment(&radfetData), "TelemetrySavePayloadRADFET - payloadReadEnvironment")) return;
+	Write2File(&radfetData, tlm_radfet);
+	lastTimeSave[tlm_radfet] = time;
+}
+
+void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
+{
+	selData->count = eventsData.sel_count;
+	if(logError(FRAM_read((unsigned char*)&selData->sat_resets_count, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->sat_resets_count = -1;
+	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->changes_in_mode = -1;
+}
+
+void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time)
+{
+	payloadSEL_data selData;
+	GetSEL_telemetry(eventsData, &selData);
+	Write2File(&selData, tlm_sel);
+	lastTimeSave[tlm_sel] = time;
+}
+
+void TelemetrySavePayloadEvents()
+{
+	time_unix time = GetTime();
+	if(time == 0) return;
+	PayloadEventData eventsData;
+	if(logError(payloadReadEvents(&eventsData), "TelemetrySavePayloadEvents - payloadReadEvents")) return;
+	if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel))
+	{
+		Write2File(&eventsData.seu_count, tlm_seu);
+		lastTimeSave[tlm_seu] = time;
+	}
+	if(CheckExecutionTime(lastTimeSave[tlm_sel], periods.fields.seu_sel))
+		TelemetrySavePayloadSEL(eventsData, time);
 }
 
 void TelemetryCollectorLogic()
@@ -217,8 +257,9 @@ void TelemetryCollectorLogic()
 		TelemetrySaveWOD();
 	if(CheckExecutionTime(lastTimeSave[tlm_solar], periods.fields.solar_panels))
 		TelemetrySaveSolarPanels();
-	if(CheckExecutionTime(lastTimeSave[tlm_radfet], periods.fields.radfet)){} //TODO
-	if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel)){} //TODO : maybe to have a different function that does that
-	if(CheckExecutionTime(lastTimeSave[tlm_sel], periods.fields.seu_sel)){} //TODO : and this
+	if(CheckExecutionTime(lastTimeSave[tlm_radfet], periods.fields.radfet))
+		TelemetrySavePayloadRADFET();
+
+	TelemetrySavePayloadEvents();
 
 }

@@ -60,6 +60,6 @@ int InitSubsystems();
  * @return	0 successful deployment
  * 			-1 failed to deploy
  */
-int FirstActivition();
+int FirstActivation();
 
 #endif /* INITSYSTEM_H_ */

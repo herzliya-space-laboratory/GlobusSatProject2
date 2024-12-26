@@ -7,6 +7,7 @@
 #include "SPL.h"
 #include "utils.h"
 #include <freertos/FreeRTOS.h>
+#include "AckErrors.h"
 
 
 #define SendAnonymosAck(acksubtype) SendAckPacket(acksubtype,NULL,NULL,0) //<! sends an ACK without command ID nor data

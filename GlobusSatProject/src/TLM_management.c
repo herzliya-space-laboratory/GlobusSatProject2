@@ -147,13 +147,13 @@ void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 		case tlm_sel:
 		{
 			memcpy(endFileName,END_FILENAME_SEL_TLM,sizeof(END_FILENAME_SEL_TLM));
-			*structSize = sizeof(int); //TODO: create a struct for the stuff we need to find and them put the name here
+			*structSize = sizeof(payloadSEL_data);
 			break;
 		}
 		case tlm_seu:
 		{
 			memcpy(endFileName,END_FILENAME_SEU_TLM,sizeof(END_FILENAME_SEU_TLM));
-			*structSize = sizeof(int); //TODO: create a struct for the stuff we need to find and them put the name here
+			*structSize = sizeof(int);
 			break;
 		}
 		default:
@@ -280,7 +280,7 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 			offset += size + sizeof(int);
 
 			memcpy(&currTime, &element, sizeof(int));
-/*			printTLM(&element,tlmType);*/
+			printTLM(&element,tlmType); //check only for some of the TRXVU
 
 			sat_packet_t dump_tlm = { 0 };
 
@@ -317,4 +317,31 @@ int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*
 	}
 
 	return totalReads;
+}
+
+void PrintTLM(void* element, tlm_type_t tlmType)
+{
+	int offset = sizeof(int);
+	if (tlmType==tlm_tx){
+		ISIStrxvuTxTelemetry data;
+		offset += (sizeof(unsigned short) * 7);// skip 7 unsigned short fields
+		memcpy(&data.fields.pa_temp,element+offset,sizeof(data.fields.pa_temp));
+		offset += sizeof(data.fields.pa_temp);
+		printf("pa_temp: %d\n ",data.fields.pa_temp);
+
+		memcpy(&data.fields.board_temp,element+offset,sizeof(data.fields.board_temp));
+		offset += sizeof(data.fields.board_temp);
+		printf("board_temp: %d\n ",data.fields.board_temp);
+	}
+	else if (tlmType==tlm_rx){
+		ISIStrxvuRxTelemetry data;
+		offset += (sizeof(unsigned short) * 1);// skip 1 unsigned short fields
+		memcpy(&data.fields.rx_rssi,element+offset,sizeof(data.fields.rx_rssi));
+		offset += sizeof(data.fields.rx_rssi);
+		printf("rx_rssi: %d\n ",data.fields.rx_rssi);
+
+		memcpy(&data.fields.bus_volt,element+offset,sizeof(data.fields.bus_volt));
+		offset += sizeof(data.fields.bus_volt);
+		printf("bus_volt: %d\n ",data.fields.bus_volt);
+	}
 }

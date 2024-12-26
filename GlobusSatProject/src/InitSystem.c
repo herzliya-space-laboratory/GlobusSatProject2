@@ -80,7 +80,7 @@ int WriteDefaultValuesToFRAM()
 #ifdef TESTING
 	int timeDeploy = 120;
 #else
-	int timeDeploy = 120*60;
+	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY*60;
 #endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error = -1;
 
@@ -93,10 +93,12 @@ int WriteDefaultValuesToFRAM()
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
 
-	int arrPeriod[4] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
+	int arrPeriod[7] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
 	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error = -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "default to FRAM - transmission abort flag")) error = -1;
 
 	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 	EpsThreshVolt_t thresh;
@@ -154,7 +156,7 @@ int AntDeployment()
 	return 0;
 }
 
-int FirstActivition()
+int FirstActivation()
 {
 	int zero = 0;
 	int firstActiveFlag;
@@ -164,7 +166,6 @@ int FirstActivition()
 		return 0;
 	int error = 0;
 	Delete_allTMFilesFromSD();
-	if(WriteDefaultValuesToFRAM()) error = -1;
 
 #ifdef WE_HAVE_ANTS
 	int max;
@@ -175,7 +176,7 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-		//TODO: add check telemetry
+		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
@@ -185,7 +186,7 @@ int FirstActivition()
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - first activation flag")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - first activation flag = 0")) error = -1;
 	return error;
 }
 
@@ -203,17 +204,21 @@ int InitSubsystems(){
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
 
+	int firstActiveFlag;
+	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
+	if(firstActiveFlag) WriteDefaultValuesToFRAM();
+
 	InitSupervisor();
 
 	InitTrxvuAndAnts();
 
-	WakeupFromResetCMD();
-
-	FirstActivition();
-
 	EPS_And_SP_Init();
 
+	WakeupFromResetCMD();
+
 	payloadInit();
+
+	FirstActivation();
 
 	printf("Did init\r\n");
 	return 0;

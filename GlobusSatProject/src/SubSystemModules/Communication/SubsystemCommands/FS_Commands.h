@@ -3,9 +3,11 @@
 #define FS_COMMANDS_H_
 #define WAIT_TIME_SEM_DUMP	3
 #include "SubSystemModules/Communication/SatCommandHandler.h"
-
+#include "TLM_management.h"
+#include "SubSystemModules/Communication/AckHandler.h"
+#include "Maintenance_Commands.h"
 /**
- * delete files from SD by passinf tlmtype, frotime, totime
+ * delete files from SD by passing tlmtype, fromtime, totime
  */
 int CMD_DeleteTLM(sat_packet_t *cmd);
 
