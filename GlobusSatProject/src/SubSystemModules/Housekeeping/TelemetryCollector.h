@@ -9,7 +9,6 @@
 #include "SubSystemModules/Communication/TRXVU.h"
 #include <hal/supervisor.h>
 #include <hcc/api_fat.h>
-#include <satellite-subsystems/IsisSolarPanelv2.h>
 #include <hal/Storage/FRAM.h>
 #include "TLM_management.h"
 

@@ -15,5 +15,5 @@ int CMD_DeleteAllFiles(sat_packet_t *cmd)
 		return SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char*)&ackError, sizeof(ackError));
 	}
 	SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
-	return Hurt_ComponenetReset();
+	return Hard_ComponenetReset();
 }

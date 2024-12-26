@@ -2,7 +2,6 @@
 #define PAYLOAD_DRIVERS_H_
 
 #include <hal/boolean.h>
-//TODO: ask Adi if I can change it to have the structs we need to save in the SD.
 
 /**
  * @file payload_drivers.h

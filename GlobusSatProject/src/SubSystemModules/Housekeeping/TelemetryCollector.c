@@ -74,7 +74,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	}
 
 	IsisSolarPanelv2_wakeup();
-	IsisSolarPanelv2_Error_t error_sp;
+	int error_sp;
 	uint8_t status = 0;
 	int32_t paneltemp = 0;
 	float conv_temp;
@@ -135,10 +135,10 @@ void TelemetrySaveWOD()
 
 void TelemetrySaveEPS()
 {
-	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
+	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(imepsv2_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - imepsv2_piu__gethousekeepingeng"))
+	if(!logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - imepsv2_piu__gethousekeepingeng"))
 	{
 		Write2File(&responseEPS, tlm_eps); //Get struct and get kind of error
 		lastTimeSave[tlm_eps] = time;
@@ -148,10 +148,10 @@ void TelemetrySaveEPS()
 
 void TelemetrySaveTx()
 {
-	ISIStrxvuTxTelemetry txTelem;
+	isis_vu_e__get_tx_telemetry__from_t txTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(IsisTrxvu_tcGetTelemetryAll(0, &txTelem), "TelemetrySaveTRXVU - IsisTrxvu_tcGetTelemetryAll"))
+	if(!logError(isis_vu_e__get_tx_telemetry(0, &txTelem), "TelemetrySaveTRXVU - isis_vu_e__get_tx_telemetry"))
 	{
 		Write2File(&txTelem, tlm_tx);
 		lastTimeSave[tlm_tx] = time;
@@ -160,10 +160,10 @@ void TelemetrySaveTx()
 
 void TelemetrySaveRx()
 {
-	ISIStrxvuRxTelemetry rxTelem;
+	isis_vu_e__get_rx_telemetry__from_t rxTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(IsisTrxvu_rcGetTelemetryAll(0, &rxTelem), "TelemetrySaveTRXVU - IsisTrxvu_rcGetTelemetryAll"))
+	if(!logError(isis_vu_e__get_rx_telemetry(0, &rxTelem), "TelemetrySaveTRXVU - isis_vu_e__get_rx_telemetry"))
 	{
 		Write2File(&rxTelem, tlm_rx);
 		lastTimeSave[tlm_rx] = time;
@@ -172,10 +172,10 @@ void TelemetrySaveRx()
 
 void TelemetrySaveAnt()
 {
-	ISISantsTelemetry antsTelem;
+	isis_ants__get_all_telemetry__from_t antsTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(IsisAntS_getAlltelemetry(0, isisants_sideA, &antsTelem), "TelemetrySaveANT - IsisAntS_getAlltelemetry"))
+	if(!logError(isis_ants__get_all_telemetry(0, &antsTelem), "TelemetrySaveANT - isis_ants__get_all_telemetry"))
 	{
 		Write2File(&antsTelem, tlm_antenna);
 		lastTimeSave[tlm_antenna] = time;

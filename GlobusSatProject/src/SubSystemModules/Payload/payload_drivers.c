@@ -4,7 +4,7 @@
 #include "hal/Drivers/I2C.h"
 #include <string.h>
 #include <hal/Timing/Time.h>
-#include <satellite-subsystems/imepsv2_piu.h>
+#include <satellite-subsystems/isismepsv2_ivid7_piu.h>
 
 
 #define PAYLOAD_I2C_ADDRESS 0x55
@@ -107,13 +107,13 @@ SoreqResult payloadSoftReset() {
 }
 
 SoreqResult payloadTurnOff() {
-	imepsv2_piu__replyheader_t response;
-    return imepsv2_piu__outputbuschanneloff(EPS_INDEX, PAYLOAD_BUS_CHANNEL, &response) ? EPS_ERROR : PAYLOAD_SUCCESS;
+	isismepsv2_ivid7_piu__replyheader_t response;
+    return isismepsv2_ivid7_piu__outputbuschanneloff(EPS_INDEX, PAYLOAD_BUS_CHANNEL, &response) ? EPS_ERROR : PAYLOAD_SUCCESS;
 }
 
 SoreqResult payloadTurnOn() {
-	imepsv2_piu__replyheader_t response;
-    return imepsv2_piu__outputbuschannelon(EPS_INDEX, PAYLOAD_BUS_CHANNEL, &response) ? EPS_ERROR : PAYLOAD_SUCCESS;
+	isismepsv2_ivid7_piu__replyheader_t response;
+    return isismepsv2_ivid7_piu__outputbuschannelon(EPS_INDEX, PAYLOAD_BUS_CHANNEL, &response) ? EPS_ERROR : PAYLOAD_SUCCESS;
 }
 
 

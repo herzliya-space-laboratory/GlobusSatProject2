@@ -58,7 +58,7 @@ int HardRX_ComponenetReset();
 
 int Soft_ComponenetReset();
 
-int Hurt_ComponenetReset();
+int Hard_ComponenetReset();
 
 int Ants_ComponenetReset();
 
