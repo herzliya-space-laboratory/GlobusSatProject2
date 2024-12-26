@@ -24,7 +24,7 @@
 #include "InitSystem.h"
 #include "utils.h"
 
-//#define TESTING
+#define TESTING
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
@@ -91,10 +91,12 @@ int WriteDefaultValuesToFRAM()
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
 
-	int arrPeriod[4] = {5, 5, 5, 5};
+	int arrPeriod[7] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
 	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error = -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
+
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "default to FRAM - transmission abort flag")) error = -1;
 
 	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 	EpsThreshVolt_t thresh;
@@ -138,6 +140,7 @@ int AntDeployment()
 	int rv = isis_ants__start_auto_deploy(0, 10); //todo: need to check redandent
 	if(rv)
 	{
+		//TODO: use the second function for deploy and then if not work try again, when we are with the new drivers
 		printf("Ants not deployed\r\n");
 		return -1;
 	}
@@ -146,18 +149,16 @@ int AntDeployment()
 	return 0;
 }
 
-int FirstActivition()
+int FirstActivation()
 {
 	int zero = 0;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy");
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy");
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
-	if(logError(f_format(0, F_FAT32_MEDIA), "FirstActivition - Formating SD 0 Card")) error = -1;
-	if(logError(f_format(1, F_FAT32_MEDIA), "FirstActivition - Formating SD 1 Card")) error = -1; //TODO: when we can change SD do it and formating the other SD
-	if(WriteDefaultValuesToFRAM()) error = -1;
+	Delete_allTMFilesFromSD();
 
 #ifdef WE_HAVE_ANTS
 	int max;
@@ -168,7 +169,7 @@ int FirstActivition()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-		//TODO: add check telemetry
+		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
@@ -178,7 +179,7 @@ int FirstActivition()
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "default to FRAM - first activation flag")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - first activation flag = 0")) error = -1;
 	return error;
 }
 
@@ -196,15 +197,21 @@ int InitSubsystems(){
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
 
+	int firstActiveFlag;
+	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
+	if(firstActiveFlag) WriteDefaultValuesToFRAM();
+
 	InitSupervisor();
 
 	InitTrxvuAndAnts();
 
+	EPS_And_SP_Init();
+
 	WakeupFromResetCMD();
 
-	FirstActivition();
+	payloadInit();
 
-	EPS_And_SP_Init();
+	FirstActivation();
 
 	printf("Did init\r\n");
 	return 0;

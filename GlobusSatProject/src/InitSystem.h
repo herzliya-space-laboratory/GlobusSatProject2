@@ -9,7 +9,7 @@
 #define INITSYSTEM_H_
 
 
-#define MIN_2_WAIT_BEFORE_DEPLOY 120 // how many minutes to wait before we open the Ants TODO: before flight change to 30
+#define MIN_2_WAIT_BEFORE_DEPLOY 45 // how many minutes to wait before we open the Ants TODO: before flight change to 60 and use in the right place
 #define RESTART_TIME 3 // how much time does it take to restart the SAT
 /*!
  * @brief	Starts the FRAM using drivers, and checks for errors.
@@ -60,6 +60,6 @@ int InitSubsystems();
  * @return	0 successful deployment
  * 			-1 failed to deploy
  */
-int FirstActivition();
+int FirstActivation();
 
 #endif /* INITSYSTEM_H_ */

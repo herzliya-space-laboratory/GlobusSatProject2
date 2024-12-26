@@ -13,7 +13,7 @@ typedef enum __attribute__ ((__packed__)) spl_command_type_t {
 }spl_command_type;
 
 
-
+//TODO: change to have the subtype dolev wants for the important functions
 typedef enum __attribute__ ((__packed__)) ack_subtype_t
 {
 	ACK_RECEIVE_COMM = 		0x00,			// when receive any packet

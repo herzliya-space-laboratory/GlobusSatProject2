@@ -6,8 +6,30 @@
 #include "TLM_management.h"
 #include <satellite-subsystems/IsisSolarPanelv2.h>
 #include "SubSystemModules/PowerManagment/EPS.h"
+#include "SubSystemModules/Communication/TRXVU.h"
+#include <hal/supervisor.h>
+#include <hcc/api_fat.h>
+#include <satellite-subsystems/IsisSolarPanelv2.h>
+#include <hal/Storage/FRAM.h>
+#include "TLM_management.h"
 
-#define NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS 5
+#include "utils.h"
+#define NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS 7
+
+typedef union __attribute__ ((__packed__)) _PeriodTimes
+{
+    unsigned char raw[sizeof(int)*7];
+    struct __attribute__ ((__packed__))
+    {
+        unsigned int eps;
+        unsigned int trxvu;
+        unsigned int ants;
+        unsigned int solar_panels;
+        unsigned int wod;
+        unsigned int radfet;
+        unsigned int seu_sel;
+    } fields;
+} PeriodTimes;
 
 
 typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
@@ -36,6 +58,13 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 
 typedef struct solar_tlm { int32_t values[ISIS_SOLAR_PANEL_COUNT]; } solar_tlm_t;
 
+typedef struct
+{
+	int count;
+	int sat_resets_count;
+	int changes_in_mode; //TODO: need to check if only for turn on or off payload or all the modes.
+} payloadSEL_data;
+
 /**
  * get all tlm save time periods from FRAM
  */
@@ -62,17 +91,27 @@ void TelemetrySaveEPS();
 /*!
  *  @brief saves current TRXVU telemetry into file
  */
-void TelemetrySaveTRXVU();
+void TelemetrySaveTx();
+
+/*!
+ *  @brief saves current TRXVU telemetry into file
+ */
+void TelemetrySaveRx();
+
 
 /*!
  *  @brief saves current Antenna telemetry into file
  */
-void TelemetrySaveANT();
+void TelemetrySaveAnt();
 
 /*!
  *  @brief saves current solar panel telemetry (temparture of each panel) into file
  */
 void TelemetrySaveSolarPanels();
+
+void TelemetrySavePayloadRADFET();
+
+void TelemetrySavePayloadEvents();
 
 /*!
  *  @brief saves current WOD telemetry into file
@@ -85,5 +124,10 @@ void TelemetrySaveWOD();
  * @return 0 	//error according to <hal/errors.h>
  */
 int GetCurrentWODTelemetry(WOD_Telemetry_t *wod);
+
+void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData);
+
+void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time);
+
 
 #endif /* TELEMETRYCOLLECTOR_H_ */

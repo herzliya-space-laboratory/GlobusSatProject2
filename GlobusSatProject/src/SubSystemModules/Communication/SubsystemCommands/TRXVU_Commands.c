@@ -25,7 +25,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
-	time_unix duration;
+	int duration;
 	memcpy(&duration, cmd->data, cmd->length);
 	if(duration > MAX_IDLE_TIME) duration = MAX_IDLE_TIME;
 	int error = SetIdleState(isis_vu_e__onoff__on, duration);
@@ -297,7 +297,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
-	time_unix muteEndTime = 0;
+	int muteEndTime = 0;
 	memcpy(&muteEndTime, cmd->data, cmd->length);
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;

@@ -51,7 +51,7 @@ Boolean IsFS_Corrupted()
  */
 int WakeupFromResetCMD()
 {
-	time_unix time;
+	time_unix time = 0;
 	logError(Time_getUnixEpoch((unsigned int*)&time), "WakeupFromResetCMD - Time_getUnixEpoch");
 
 	int reset = 0;

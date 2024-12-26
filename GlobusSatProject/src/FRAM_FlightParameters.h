@@ -49,6 +49,9 @@
 #define RESET_CMD_FLAG_ADDR				0x105		//<! the flag is raised whenever a restart is commissioned
 #define RESET_CMD_FLAG_SIZE				1			//<! size of the parameter in bytes
 
+#define NUM_OF_CHANGES_IN_MODE_ADDR		0x110
+#define NUM_OF_CHANGES_IN_MODE_SIZE		4
+
 #define TLM_SAVE_PERIOD_START_ADDR		0x130		//<! start of the save periods in the FRAM
 
 #define DEFAULT_EPS_SAVE_TLM_TIME		5			//<! save EPS TLM every 5 seconds
@@ -65,6 +68,13 @@
 
 #define DEFAULT_WOD_SAVE_TLM_TIME		5			//<! save WOD TLM every 5 seconds
 #define WOD_SAVE_TLM_PERIOD_ADDR		0x146		//<! address where the save tlm period will be
+
+#define DEFAULT_RADFET_SAVE_TLM_TIME	15*60
+#define RADFET_SAVE_TLM_PERIOD_ADDR		0x150
+
+#define DEFAULT_SEU_SEL_SAVE_TLM_TIME	20
+#define SEU_SEL_SAVE_TLM_PERIOD_ADDR	0x154
+
 
 #define NUMBER_OF_CMD_RESETS_ADDR		0x160		//<! counts how many restarts did the satellite endure from ground command
 #define NUMBER_OF_CMD_RESETS_SIZE		4			//<! size of the parameter in bytes

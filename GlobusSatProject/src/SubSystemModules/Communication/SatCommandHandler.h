@@ -12,8 +12,8 @@
 
 //<! how many command can be saved in the buffer
 #define MAX_NUM_OF_DELAYED_CMD (100)
-#define CUBE_SAT_ID 	19
-#define ALL_SAT_ID 		0
+#define CUBE_SAT_ID 	14
+#define ALL_SAT_ID 		10
 
 
 typedef enum __attribute__ ((__packed__)) CMD_ERR{

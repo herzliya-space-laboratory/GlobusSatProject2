@@ -159,8 +159,9 @@ time_unix getMuteEndTime()
 
 /*
  * Sets transponder end time value from FRAM
- * @return type=time_unix; 0 on success
- * 						   error according to <hal/errors.h>
+ * @param[int] name=transponderEndTime; type=time_unix; get the time we sat as the transponder end time
+ * @return type=int; 	0 on success
+ * 						error according to <hal/errors.h>
  */
 int setTransponderEndTime(time_unix transponderEndTime)
 {

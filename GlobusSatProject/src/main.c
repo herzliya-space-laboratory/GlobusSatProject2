@@ -61,6 +61,7 @@ void taskMain()
 		vTaskDelay(10);
 		TRX_Logic();
 		Maintenance();
+		TelemetryCollectorLogic();
 	}
 #endif
 }
