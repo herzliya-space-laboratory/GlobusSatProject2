@@ -190,7 +190,7 @@ int Write2File(void* data, tlm_type_t tlmType)
 	}
 	f_write(&timeNow , sizeof(timeNow) ,1, fp );
 	f_write(data , structSize , 1, fp );
-
+	PrintTLM(data,tlmType);
 	/* close the file*/
 	f_flush(fp);
 	f_close (fp);
@@ -280,7 +280,7 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 			offset += size + sizeof(int);
 
 			memcpy(&currTime, &element, sizeof(int));
-			printTLM(&element,tlmType); //check only for some of the TRXVU
+			PrintTLM(&element,tlmType); //check only for some of the TRXVU
 
 			sat_packet_t dump_tlm = { 0 };
 

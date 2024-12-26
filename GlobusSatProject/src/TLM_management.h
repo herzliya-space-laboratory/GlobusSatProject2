@@ -103,6 +103,8 @@ FileSystemResult InitializeFS();
  */
 void DeInitializeFS(int sd_card);
 
+void PrintTLM(void* element, tlm_type_t tlmType);
+
 char* GetName();
 void print_file(char* c_file_name);
 int FS_test();
