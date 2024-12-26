@@ -216,7 +216,7 @@ int InitSubsystems(){
 
 	WakeupFromResetCMD();
 
-	payloadInit();
+/*	payloadInit();*/
 
 	FirstActivation();
 

@@ -257,9 +257,11 @@ void TelemetryCollectorLogic()
 		TelemetrySaveWOD();
 	if(CheckExecutionTime(lastTimeSave[tlm_solar], periods.fields.solar_panels))
 		TelemetrySaveSolarPanels();
+/*
 	if(CheckExecutionTime(lastTimeSave[tlm_radfet], periods.fields.radfet))
 		TelemetrySavePayloadRADFET();
 
 	TelemetrySavePayloadEvents();
+*/
 
 }
