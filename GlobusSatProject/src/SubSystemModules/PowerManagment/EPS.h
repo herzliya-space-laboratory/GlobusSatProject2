@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "SysI2CAddr.h"
 
+#include "SubSystemModules/Payload/payload_drivers.h"
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 #include <stdint.h>
 #include <hal/Drivers/SPI.h>

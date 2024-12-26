@@ -77,16 +77,15 @@ void CalculateFileName(Time date, char* file_name, char* endFileName,
 /*
  * Read telematry file and send it to ground station over RF
  */
-int ReadTLMFile(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
-		int resolution);
+int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id/*,
+		int resolution*/);
 /*
  *
  */
-int ReadTLMFiles(tlm_type_t tlmType, Time date, int numOfDays, int cmd_id,
-		int resolution);
+int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*, int resolution*/);
 
 int ReadTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
-		int cmd_id, int resolution);
+		int cmd_id/*, int resolution*/);
 
 int Delete_allTMFilesFromSD();
 
@@ -104,67 +103,8 @@ FileSystemResult InitializeFS();
  */
 void DeInitializeFS(int sd_card);
 
-/*!
- * Create new c_file.
- * @param c_file_name the name of the c_file.
- * @param size_of_element size of the structure.
- * DEFAULT_NUM_OF_FILES for default(recommended).
- * @return FS_TOO_LONG_NAME if c_file_name size is bigger then MAX_F_FILE_NAME_SIZE,
- * FS_FRAM_FAIL,
- * FS_SUCCSESS on success.
- */
-FileSystemResult c_fileCreate(char* c_file_name, int size_of_element);
-
-/*!
- * Write element to c_file.
- * @param c_file_name the name of the c_file.
- * @param element the structure of the telemetry/data.
- * @return FS_NOT_EXIST if c_file not exist,
- * FS_LOCKED if c_file used by other thread,
- * FS_SUCCSESS on success.
- */
-FileSystemResult c_fileWrite(void* element);
-
-/*!
- * Delete elements from c_file from "from_time" to "to_time".
- * @param c_file_name the name of the c_file.
- * @param from_time time of first element, FIRST_ELEMENT_IN_C_FILE to first element.
- * @param to_time time of last element, LAST_ELEMENT_IN_C_FILE to last element.
- * @return FS_NOT_EXIST if c_file not exist,
- * FS_LOCKED if c_file used by other thread,
- * FS_SUCCSESS on success.
- */
-FileSystemResult c_fileDeleteElements(char* c_file_name, time_unix from_time,
-		time_unix to_time);
-/*!
- * Find number of elements from "from_time" to "to_time"
- * @param c_file_name the name of the c_file.
- * @param from_time time of first element, FIRST_ELEMENT_IN_C_FILE to first element.
- * @param to_time time of last element, LAST_ELEMENT_IN_C_FILE to last element.
- * @return num of elements.
- */
-int c_fileGetNumOfElements(char* c_file_name, time_unix from_time,
-		time_unix to_time);
-/*!
- * Read elements from c_file to buffer
- * @param c_file_name the name of the c_file.
- * @param buffer.
- * @param size_of_buffer.
- * @param read[out] number of elements read.
- * @param from_time time of first element, FIRST_ELEMENT_IN_C_FILE to first element.
- * @param to_time time of last element, LAST_ELEMENT_IN_C_FILE to last element.
- * @return FS_BUFFER_OVERFLOW if size_of_buffer too small,
- * @return FS_NOT_EXIST if c_file not exist,
- * FS_SUCCSESS on success.
- */
-FileSystemResult c_fileRead(char* c_file_name, byte* buffer, int size_of_buffer,
-		time_unix from_time, time_unix to_time, int* read,
-		time_unix* last_read_time);
-
 char* GetName();
-//print c_file for testing
 void print_file(char* c_file_name);
-FileSystemResult c_fileReset(char* c_file_name);
 int FS_test();
 void test_i();
 #endif /* TM_MANAGMENT_H_ */

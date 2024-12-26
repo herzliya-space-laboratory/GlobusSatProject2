@@ -93,7 +93,7 @@ int WriteDefaultValuesToFRAM()
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
 
-	int arrPeriod[4] = {5, 5, 5, 5};
+	int arrPeriod[4] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
 	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error = -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
@@ -145,6 +145,7 @@ int AntDeployment()
 	int rv2 = IsisAntS_autoDeployment(0, isisants_sideB, 10);
 	if(rv || rv2)
 	{
+		//TODO: use the second function for deploy and then if not work try again, when we are with the new drivers
 		printf("Ants not deployed\r\n");
 		return -1;
 	}
@@ -158,18 +159,11 @@ int FirstActivition()
 	int zero = 0;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy");
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy");
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
-	int sd = f_getdrive();
-	if(sd == 0 || sd == 1)
-	{
-		printf("SD: %d\r\n", sd);
-		if(logError(f_format(sd, F_FAT32_MEDIA), "FirstActivition - Formating SD Card")) error = -1;//TODO: don't think we need here logError
-	}
-	else
-		if(logError(sd, "FirstActivition - in get which SD we are using")) error = -1; //same
+	Delete_allTMFilesFromSD();
 	if(WriteDefaultValuesToFRAM()) error = -1;
 
 #ifdef WE_HAVE_ANTS
@@ -191,7 +185,7 @@ int FirstActivition()
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "default to FRAM - first activation flag")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - first activation flag")) error = -1;
 	return error;
 }
 
@@ -218,6 +212,8 @@ int InitSubsystems(){
 	FirstActivition();
 
 	EPS_And_SP_Init();
+
+	payloadInit();
 
 	printf("Did init\r\n");
 	return 0;

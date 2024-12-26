@@ -2,6 +2,7 @@
 #define PAYLOAD_DRIVERS_H_
 
 #include <hal/boolean.h>
+//TODO: ask Adi if I can change it to have the structs we need to save in the SD.
 
 /**
  * @file payload_drivers.h
@@ -17,8 +18,8 @@
  * @brief Result codes for payload operations.
  */
 typedef enum {
-    EPS_ERROR,              /**< General error in the EPS system */
     PAYLOAD_SUCCESS,        /**< Operation completed successfully */
+	EPS_ERROR,              /**< General error in the EPS system */
     PAYLOAD_I2C_WRITE_ERROR,/**< Error during I2C write operation */
     PAYLOAD_I2C_READ_ERROR, /**< Error during I2C read operation */
     PAYLOAD_TIMEOUT         /**< Operation timed out */

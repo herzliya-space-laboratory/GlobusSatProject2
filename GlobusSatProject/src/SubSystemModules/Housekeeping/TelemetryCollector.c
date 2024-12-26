@@ -7,7 +7,25 @@
 
 #include "TelemetryCollector.h"
 
+time_unix lastTimeSave[sizeof(tlm_type_t)] = {0};
 
+
+PeriodTimes periods;
+
+time_unix GetTime()
+{
+	time_unix time = 0;
+	logError(Time_getUnixEpoch((unsigned int*)&time), "TelemetryCollector - Time_getUnixEpoch");
+	return time;
+}
+
+/**
+ * get all tlm save time periods from FRAM
+ */
+void InitSavePeriodTimes()
+{
+	logError(FRAM_read(periods.raw, TLM_SAVE_PERIOD_START_ADDR, sizeof(periods.raw)), "InitSavePeriodTimes - FRAM_read");
+}
 
 /*!
  * @brief Gets all necessary telemetry and arranges it into a WOD structure
@@ -98,4 +116,109 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	else wod->num_of_cmd_resets = numberOfCMDResets;
 
 	return 0;
+}
+
+void TelemetrySaveWOD()
+{
+	time_unix time = GetTime();
+	if(time == 0) return;
+	WOD_Telemetry_t wod;
+	if(GetCurrentWODTelemetry(&wod)) return;
+	Write2File(&wod, tlm_wod);
+	lastTimeSave[tlm_wod] = time;
+}
+
+void TelemetrySaveEPS()
+{
+	imepsv2_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
+	time_unix time = GetTime();
+	if(time == 0) return;
+	if(!logError(imepsv2_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - imepsv2_piu__gethousekeepingeng"))
+	{
+		Write2File(&responseEPS, tlm_eps); //Get struct and get kind of error
+		lastTimeSave[tlm_eps] = time;
+	}
+
+}
+
+void TelemetrySaveTx()
+{
+	ISIStrxvuTxTelemetry txTelem;
+	time_unix time = GetTime();
+	if(time == 0) return;
+	if(!logError(IsisTrxvu_tcGetTelemetryAll(0, &txTelem), "TelemetrySaveTRXVU - IsisTrxvu_tcGetTelemetryAll"))
+	{
+		Write2File(&txTelem, tlm_tx);
+		lastTimeSave[tlm_tx] = time;
+	}
+}
+
+void TelemetrySaveRx()
+{
+	ISIStrxvuRxTelemetry rxTelem;
+	time_unix time = GetTime();
+	if(time == 0) return;
+	if(!logError(IsisTrxvu_rcGetTelemetryAll(0, &rxTelem), "TelemetrySaveTRXVU - IsisTrxvu_rcGetTelemetryAll"))
+	{
+		Write2File(&rxTelem, tlm_rx);
+		lastTimeSave[tlm_rx] = time;
+	}
+}
+
+void TelemetrySaveAnt()
+{
+	ISISantsTelemetry antsTelem;
+	time_unix time = GetTime();
+	if(time == 0) return;
+	if(!logError(IsisAntS_getAlltelemetry(0, isisants_sideA, &antsTelem), "TelemetrySaveANT - IsisAntS_getAlltelemetry"))
+	{
+		Write2File(&antsTelem, tlm_antenna);
+		lastTimeSave[tlm_antenna] = time;
+	}
+}
+
+void TelemetrySaveSolarPanels()
+{
+	time_unix time = GetTime();
+		if(time == 0) return;
+	IsisSolarPanelv2_wakeup();
+	int error_sp;
+	uint8_t status = 0;
+	int32_t paneltemp = 0;
+	float conv_temp;
+	solar_tlm_t tempSolar;
+	for(int panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ ) //Go for the count of solar panels we have.
+	{
+		error_sp = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //Gets the temperature of each panel and the error message.
+		if( error_sp ) //if there is error
+		{
+			tempSolar[panel] = -1;
+			continue;
+		}
+		conv_temp = (float)(paneltemp) * ISIS_SOLAR_PANEL_CONV;
+		tempSolar[panel] = conv_temp;
+	}
+	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
+	Write2File(&tempSolar, tlm_solar);
+	lastTimeSave[tlm_solar] = time;
+}
+
+void TelemetryCollectorLogic()
+{
+	if(CheckExecutionTime(lastTimeSave[tlm_eps], periods.fields.eps))
+		TelemetrySaveEPS();
+	if(CheckExecutionTime(lastTimeSave[tlm_tx], periods.fields.trxvu))
+		TelemetrySaveTx();
+	if(CheckExecutionTime(lastTimeSave[tlm_rx], periods.fields.trxvu))
+		TelemetrySaveRx();
+	if(CheckExecutionTime(lastTimeSave[tlm_antenna], periods.fields.ants))
+		TelemetrySaveAnt();
+	if(CheckExecutionTime(lastTimeSave[tlm_wod], periods.fields.wod))
+		TelemetrySaveWOD();
+	if(CheckExecutionTime(lastTimeSave[tlm_solar], periods.fields.solar_panels))
+		TelemetrySaveSolarPanels();
+	if(CheckExecutionTime(lastTimeSave[tlm_radfet], periods.fields.radfet)){} //TODO
+	if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel)){} //TODO : maybe to have a different function that does that
+	if(CheckExecutionTime(lastTimeSave[tlm_sel], periods.fields.seu_sel)){} //TODO : and this
+
 }

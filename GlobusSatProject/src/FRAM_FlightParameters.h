@@ -66,6 +66,13 @@
 #define DEFAULT_WOD_SAVE_TLM_TIME		5			//<! save WOD TLM every 5 seconds
 #define WOD_SAVE_TLM_PERIOD_ADDR		0x146		//<! address where the save tlm period will be
 
+#define DEFAULT_RADFET_SAVE_TLM_TIME	15*60
+#define RADFET_SAVE_TLM_PERIOD_ADDR		0x150
+
+#define DEFAULT_SEU_SEL_SAVE_TLM_TIME	20
+#define SEU_SEL_SAVE_TLM_PERIOD_ADDR	0x154
+
+
 #define NUMBER_OF_CMD_RESETS_ADDR		0x160		//<! counts how many restarts did the satellite endure from ground command
 #define NUMBER_OF_CMD_RESETS_SIZE		4			//<! size of the parameter in bytes
 

@@ -18,6 +18,8 @@
 
 #include "utils.h"
 
+static char buffer[MAX_COMMAND_DATA_LENGTH * NUM_ELEMENTS_READ_AT_ONCE]; // buffer for data coming from SD (time+size of data struct)
+
 FileSystemResult InitializeFS(){
 	int flag = 0;
 	// in FS init we don't want to use a log file !
@@ -112,35 +114,10 @@ void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 			*structSize = sizeof(ISISantsTelemetry);
 			break;
 		}
-		case tlm_eps_raw_mb_NOT_USED:
-		{
-			memcpy(endFileName,END_FILENAME_EPS_RAW_MB_TLM,sizeof(END_FILENAME_EPS_RAW_MB_TLM));
-			*structSize = sizeof(imepsv2_piu__gethousekeepingraw__from_t);
-			break;
-
-		}
-		case tlm_eps_raw_cdb_NOT_USED:
-		{
-			memcpy(endFileName,END_FILENAME_EPS_RAW_CDB_TLM,sizeof(END_FILENAME_EPS_RAW_CDB_TLM));
-			*structSize = sizeof(imepsv2_piu__gethousekeepingrawincdb__from_t);
-			break;
-		}
 		case tlm_eps:
 		{
 			memcpy(endFileName,END_FILENAME_EPS_TLM,sizeof(END_FILENAME_EPS_TLM));
 			*structSize = sizeof(imepsv2_piu__gethousekeepingeng__from_t);
-			break;
-		}
-		case tlm_eps_eng_cdb_NOT_USED:
-		{
-			memcpy(endFileName,END_FILENAME_EPS_ENG_CDB_TLM,sizeof(END_FILENAME_EPS_ENG_CDB_TLM));
-			*structSize = sizeof(imepsv2_piu__gethousekeepingrunningavg__from_t);
-			break;
-		}
-		case tlm_eps_eng_mb_NOT_USED:
-		{
-			memcpy(endFileName,END_FILENAME_EPS_ENG_CDB_TLM,sizeof(END_FILENAME_EPS_ENG_CDB_TLM));
-			*structSize = sizeof(imepsv2_piu__gethousekeepingengrunningavgincdb__from_t);
 			break;
 		}
 		case tlm_wod:
@@ -246,11 +223,11 @@ int DeleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays){
  * */
 int DeleteTLMFile(tlm_type_t tlmType, Time date, int days2Add){
 
-	char endFileName [3] = {0};
+	char endFileName[3] = {0};
 	int size;
 	GetTlmTypeInfo(tlmType,endFileName,&size);
 	char fileName[MAX_FILE_NAME_SIZE] = {0};
-	CalculateFileName(date,&fileName, endFileName, days2Add);
+	CalculateFileName(date, fileName, endFileName, days2Add);
 
 	return f_delete(fileName);
 }
@@ -260,15 +237,84 @@ int DeleteTLMFile(tlm_type_t tlmType, Time date, int days2Add){
  * return type=int; return -2 if we are having an error in f_getdrive and -1 on formating error
  * */
 int Delete_allTMFilesFromSD()
-{ //TODO: maybe we can use it in the init firstActivition
+{
 	int error = 0;
 	int sd = f_getdrive(); //get in which sd we are using now
 	if(sd == 0 || sd == 1)
 	{
 		printf("SD: %d\r\n", sd);
-		if(logError(f_format(sd, F_FAT32_MEDIA), "Delete_allTMFilesFromSD - Formating SD Card")) error = -1; //TODO: don't think we need here logError
+		if(logError(f_format(sd, F_FAT32_MEDIA), "Delete_allTMFilesFromSD - Formating SD Card")) error = -1;
 	}
 	else
-		if(logError(sd, "Delete_allTMFilesFromSD - in get which SD we are using")) error = -2; //same
+		if(logError(sd, "Delete_allTMFilesFromSD - in get which SD we are using")) error = -2;
 	return error;
+}
+
+int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int resolution*/)
+{
+	unsigned int offset = 0;
+
+	int size=0;
+	char file_name[MAX_FILE_NAME_SIZE] = {0};
+	char endFileName[3] = {0};
+
+	GetTlmTypeInfo(tlmType, endFileName, &size);
+	CalculateFileName(date, file_name, endFileName , days2Add);
+	//printf("reading from file %s...\n",file_name);
+	F_FILE *fp = f_open(file_name, "r");
+
+	if (!fp) return -1; //unable to open file
+
+	char element[(sizeof(int)+size)];// buffer for a single element that we will send
+	int numOfElementsSent=0;
+	time_unix currTime = 0;
+
+	while(TRUE)
+	{
+		int readElements = f_read(buffer , sizeof(int)+size , NUM_ELEMENTS_READ_AT_ONCE, fp );
+		offset = 0;
+		if(!readElements) break;
+		for (;readElements > 0; readElements--){
+
+			memcpy( &element, buffer + offset, sizeof(int) + size); // copy time+data
+			offset += size + sizeof(int);
+
+			memcpy(&currTime, &element, sizeof(int));
+/*			printTLM(&element,tlmType);*/
+
+			sat_packet_t dump_tlm = { 0 };
+
+			AssembleCommand((unsigned char*)element, sizeof(int)+size, dump_type, tlmType, cmd_id, &dump_tlm);
+
+			logError(TransmitSplPacket(&dump_tlm, NULL), "ReadTLMFile - TransmitSplPacket");
+			numOfElementsSent++;
+			/*if(CheckDumpAbort()){ //TODO: need to do that
+				stopDump = TRUE;
+				break;
+
+			}*/
+		}
+		if(stopDump){
+			break;
+		}
+	}
+
+	/* close the file*/
+	f_close(fp);
+	return numOfElementsSent;
+}
+
+int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*, int resolution*/)
+{
+	stopDump = FALSE;
+	int totalReads=0;
+	int elementsRead=0;
+	for(int i = 0; i < numOfDays; i++){
+		elementsRead = ReadTLMFile(tlmType, startDate, i,cmd_id);
+		totalReads+= (elementsRead>0) ? elementsRead : 0;
+		if(stopDump) break;
+		vTaskDelay(100);
+	}
+
+	return totalReads;
 }
