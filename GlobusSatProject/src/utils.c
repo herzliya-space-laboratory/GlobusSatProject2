@@ -9,7 +9,7 @@
 
 int logError(int error ,char* msg)
 {
-	if(error != 0 || error != 6)
+	if(error != 0 && error != 6)
 	{
 		printf("%s - ERROR %d\r\n", msg, error);
 	}
