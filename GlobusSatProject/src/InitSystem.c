@@ -212,11 +212,11 @@ int InitSubsystems(){
 
 	InitTrxvuAndAnts();
 
-/*	EPS_And_SP_Init();*/
+	EPS_And_SP_Init();
 
 	WakeupFromResetCMD();
 
-/*	payloadInit();*/
+	payloadInit();
 
 	FirstActivation();
 
