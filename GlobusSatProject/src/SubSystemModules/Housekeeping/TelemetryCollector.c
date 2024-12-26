@@ -245,8 +245,8 @@ void TelemetrySavePayloadEvents()
 
 void TelemetryCollectorLogic()
 {
-	if(CheckExecutionTime(lastTimeSave[tlm_eps], periods.fields.eps))
-		TelemetrySaveEPS();
+/*	if(CheckExecutionTime(lastTimeSave[tlm_eps], periods.fields.eps))
+		TelemetrySaveEPS();*/
 	if(CheckExecutionTime(lastTimeSave[tlm_tx], periods.fields.trxvu))
 		TelemetrySaveTx();
 	if(CheckExecutionTime(lastTimeSave[tlm_rx], periods.fields.trxvu))

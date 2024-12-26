@@ -57,7 +57,7 @@ void taskMain()
 #else
 	while(TRUE)
 	{
-		EPS_Conditioning();
+/*		EPS_Conditioning();*/
 		vTaskDelay(10);
 		TRX_Logic();
 		Maintenance();
