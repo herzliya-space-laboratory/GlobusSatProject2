@@ -19,15 +19,15 @@ int CMD_DeleteAllFiles(sat_packet_t *cmd)
 	return Hard_ComponenetReset();
 }
 
-void CMD_StartDump(sat_packet_t *cmd)
+int CMD_StartDump(sat_packet_t *cmd)
 {
-	if(cmd == NULL) return;
+	if(cmd == NULL) return -1;
 	unsigned char ackError = 0;
 	if(cmd->length != 9)
 	{
 		ackError = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char*)&ackError, sizeof(ackError));
-		return;
+		return ackError;
 	}
 	dump_arguments_t arg;
 	memcpy((unsigned char*)&arg.dump_type, cmd->data, 1);
@@ -36,15 +36,17 @@ void CMD_StartDump(sat_packet_t *cmd)
 
 	xTaskHandle taskHandle;
 	xTaskGenericCreate(TackDump, (const signed char*) "CMD_StartDump", 4096, &arg, configMAX_PRIORITIES - 2, &taskHandle, NULL, NULL);
+	return 0;
 }
 
-int TackDump(dump_arguments_t *dump)
+void TackDump(void *dump)
 {
-	if(dump == NULL) return -1;
-	int numOfDays = (dump->t_end - dump->t_start) / 24 / 3600;
+	dump_arguments_t dump_arg;
+	memcpy(&dump_arg, dump, sizeof(dump_arguments_t));
+	if(dump == NULL) return;
+	int numOfDays = (dump_arg.t_end - dump_arg.t_start) / 24 / 3600;
 	Time start;
-	timeU2time(dump->t_start, &start);
-	ReadTLMFiles(dump->dump_type, start, numOfDays, dump->cmd.ID);
+	timeU2time(dump_arg.t_start, &start);
+	ReadTLMFiles(dump_arg.dump_type, start, numOfDays, dump_arg.cmd.ID);
 	vTaskDelete(NULL);
-	return 0;
 }

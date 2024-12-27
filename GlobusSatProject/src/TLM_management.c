@@ -309,7 +309,7 @@ int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*
 	stopDump = FALSE;
 	int totalReads=0;
 	int elementsRead=0;
-	for(int i = 0; i < numOfDays; i++){
+	for(int i = 0; i <= numOfDays; i++){
 		elementsRead = ReadTLMFile(tlmType, startDate, i,cmd_id);
 		totalReads+= (elementsRead>0) ? elementsRead : 0;
 		if(stopDump) break;
