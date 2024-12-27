@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 #include <time.h>
+#include "GlobalStandards.h"
+#include <hal/Timing/Time.h>
 
 int logError(int error ,char* msg)
 {
@@ -22,8 +24,8 @@ int logError(int error ,char* msg)
  */
 void timeU2time(time_unix utime, Time *time)
 {
-	struct tm *t = localtime(&utime);
-	time->year = t.tm_year - 100;
+	struct tm *t = localtime((time_t*)&utime);
+	time->year = t->tm_year - 100;
 	time->month = t->tm_mon + 1;
 	time->date = t->tm_mday;
 	time->hours = t->tm_hour;

@@ -35,7 +35,7 @@ void CMD_StartDump(sat_packet_t *cmd)
 	memcpy((unsigned char*)&arg.t_end, cmd->data + 5, sizeof(time_unix));
 
 	xTaskHandle taskHandle;
-	xTaskGenericCreate(TackDump, (const signed char*) "CMD_StartDump", 4096, arg, configMAX_PRIORITIES - 2, &taskHandle, NULL, NULL);
+	xTaskGenericCreate(TackDump, (const signed char*) "CMD_StartDump", 4096, &arg, configMAX_PRIORITIES - 2, &taskHandle, NULL, NULL);
 }
 
 int TackDump(dump_arguments_t *dump)

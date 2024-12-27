@@ -31,12 +31,12 @@ int CMD_GetTimeOfLastElementInFile(sat_packet_t *cmd);
 
 int CMD_GetTimeOfFirstElement(sat_packet_t *cmd);
 
-int CMD_StartDump(sat_packet_t *cmd);
+void CMD_StartDump(sat_packet_t *cmd);
 
 int CMD_SendDumpAbortRequest(sat_packet_t *cmd);
 
 int CMD_ForceDumpAbort(sat_packet_t *cmd);
 
-void TackDump(dump_arguments_t *dump);
+int TackDump(dump_arguments_t *dump);
 
 #endif /* FS_COMMANDS_H_ */
