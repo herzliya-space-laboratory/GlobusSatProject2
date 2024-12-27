@@ -53,11 +53,11 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->electric_current = responseEPS.fields.batt_input.fields.current;
 		wod->mcu_temp = ((double)responseEPS.fields.temp) * 0.01;
 		wod->bat_temp = ((double)responseEPS.fields.temp2) * 0.01;
-		wod->volt_5V = -1; //TODO
-		wod->volt_3V3 = -1; //TODO
+		wod->current_3V3 = responseEPS.fields.vip_obc05.fields.current;
+		wod->current_5V = responseEPS.fields.vip_obc01.fields.current;
+		wod->volt_3V3 = responseEPS.fields.vip_obc05.fields.volt;
+		wod->volt_5V = responseEPS.fields.vip_obc01.fields.volt;
 		wod->charging_power = -1; //TODO
-		wod->current_5V = -1; //TODO
-		wod->current_3V3 = -1; //TODO
 	}
 	else // if have error in the eps put everything in that section to -1
 	{
