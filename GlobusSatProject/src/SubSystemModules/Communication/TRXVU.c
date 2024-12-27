@@ -343,7 +343,7 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 	if(packet == NULL)
 		return -1;
 	size_t place = sizeof(packet->ID) + sizeof(packet->cmd_subtype) + sizeof(packet->cmd_type) + sizeof(packet->length) + packet->length; // Get the length of the data of the packet (including the headers we add)
-	int error = logError(isis_vu_e__send_frame(0, (unsigned char *)packet, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign");  // Transmit packet
+	int error = logError(isis_vu_e__send_frame(0, (unsigned char *)packet, place, &avail), "TRXVU - isis_vu_e__send_frame");  // Transmit packet
 	*avalFrames = (int)avail; // Get avail Frames
 	return error;
 }
@@ -367,7 +367,7 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 		return -1;
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2; // Change the packet for send with the needed info
 	size_t place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length; // Get the length of the data of the packet (including the headers we add)
-	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TRXVU - IsisTrxvu_tcSendAX25DefClSign"); // Transmit packet
+	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TRXVU - isis_vu_e__send_frame"); // Transmit packet
 }
 
 /*
@@ -401,7 +401,7 @@ int BeaconLogic()
 	GetCurrentWODTelemetry(&data); // Gets the telemetry of the beacon and put it in data.
 	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command"); // Create the beacon packet
 	int avalFrames;
-	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign"); // Send the beacon packet
+	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - isis_vu_e__send_frame"); // Send the beacon packet
 	if(error) // if error return it
 		return error;
 	return logError(Time_getUnixEpoch((unsigned int*)&lastTimeSendingBeacon), "TRXVU - Time_getUnixEpoch"); // Check last time we send beacon to now.

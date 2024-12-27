@@ -25,5 +25,5 @@ int SendAckPacket(ack_subtype_t acksubtype, sat_packet_t *cmd, unsigned char *da
 		logError(AssembleCommand(data, length, ack_type, acksubtype, CUBE_SAT_ID, &cmd1), "Packets - Assemble command"); // Assemble new cmd1 struct according to data, length. cmd is null.
 	int avalFrames;
 
-	return logError(TransmitSplPacket(&cmd1, &avalFrames), "TRXVU - IsisTrxvu_tcSendAX25DefClSign"); // Send ack and return error if have else 0
+	return logError(TransmitSplPacket(&cmd1, &avalFrames), "TRXVU - isis_vu_e__send_frame"); // Send ack and return error if have else 0
 }
