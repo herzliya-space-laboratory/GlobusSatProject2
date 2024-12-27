@@ -256,8 +256,8 @@ void TelemetryCollectorLogic()
 		TelemetrySaveTx();
 	if(CheckExecutionTime(lastTimeSave[tlm_rx], periods.fields.trxvu))
 		TelemetrySaveRx();
-	if(CheckExecutionTime(lastTimeSave[tlm_antenna], periods.fields.ants))
-		TelemetrySaveAnt();
+/*	if(CheckExecutionTime(lastTimeSave[tlm_antenna], periods.fields.ants))
+		TelemetrySaveAnt();*/
 	if(CheckExecutionTime(lastTimeSave[tlm_wod], periods.fields.wod))
 		TelemetrySaveWOD();
 	if(CheckExecutionTime(lastTimeSave[tlm_solar], periods.fields.solar_panels))

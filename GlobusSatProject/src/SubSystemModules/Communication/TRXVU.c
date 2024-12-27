@@ -41,6 +41,11 @@ int InitTrxvuAndAnts(){
 	//Initialize the trxvu subsystem
 	rv = ISIS_VU_E_Init(myTRXVU, 1);
 	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
+
+	isis_vu_e__set_tx_freq(0, 436400);
+	isis_vu_e__set_rx_freq(0, 145970);
+	//TODO: transponder set freq
+
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;

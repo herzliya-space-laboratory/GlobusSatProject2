@@ -58,7 +58,6 @@ void taskMain()
 	while(TRUE)
 	{
 		EPS_Conditioning();
-		vTaskDelay(10);
 		TRX_Logic();
 		Maintenance();
 		TelemetryCollectorLogic();
@@ -72,7 +71,7 @@ int main()
 {
 	xTaskHandle taskMainHandle;
 
-	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 2000000, BOARD_MCK);
+	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 	// Enable the Instruction cache of the ARM9 core. Keep the MMU and Data Cache disabled.
 	CP15_Enable_I_Cache();
 
