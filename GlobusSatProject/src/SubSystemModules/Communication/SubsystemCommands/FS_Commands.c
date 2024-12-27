@@ -49,6 +49,8 @@ void TackDump(void *dump)
 	int numOfDays = (dump_arg->t_end - dump_arg->t_start) / 24 / 3600;
 	Time start;
 	timeU2time(dump_arg->t_start, &start);
+	SendAckPacket(ACK_DUMP_START, dump_arg->cmd, NULL, 0);
 	ReadTLMFiles(dump_arg->dump_type, start, numOfDays, dump_arg->cmd.ID);
+	SendAckPacket(ACK_DUMP_FINISHED, dump_arg->cmd, NULL, 0);
 	vTaskDelete(NULL);
 }
