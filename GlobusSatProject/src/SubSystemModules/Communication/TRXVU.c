@@ -46,12 +46,8 @@ int InitTrxvuAndAnts(){
 	isis_vu_e__set_rx_freq(0, 145970);
 	//TODO: transponder set freq
 
-	//Get beacon interval from FRAM
-	setNewBeaconIntervalToPeriod();
-	time_unix timeNow;
-	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "InitTrxvuAndAnts - Time_getUnixEpoch");
-	if(timeNow < getTransponderEndTime())
-		setTransponderOn();
+	InitTxModule();
+
 #ifdef WE_HAVE_ANTS
 	int retValInt = 0;
 	ISIS_ANTS_t myAntennaAddress;
@@ -68,6 +64,22 @@ int InitTrxvuAndAnts(){
 #else
 	return logError(rv, "TRXVU - ISIS_VU_E_Init");
 #endif
+}
+
+/*!
+ * @Brief Initializes data field for transmission - semaphores, parameters from the FRAM
+ * @return
+ */
+void InitTxModule()
+{
+	//Get beacon interval from FRAM
+	setNewBeaconIntervalToPeriod();
+	time_unix timeNow;
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "InitTrxvuAndAnts - Time_getUnixEpoch");
+	if(timeNow < getTransponderEndTime())
+		setTransponderOn();
+	vSemaphoreCreateBinary(semaphorDump);
+
 }
 
 /*

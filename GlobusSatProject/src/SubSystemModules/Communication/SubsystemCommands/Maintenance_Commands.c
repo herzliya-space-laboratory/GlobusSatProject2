@@ -30,14 +30,15 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 int HardTX_ComponenetReset()
 {
 	logError(SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0), "HardTX_ComponenetReset - SendAckPacket");
-	return logError(isis_vu_e__reset_hw_tx(0), "HardTX_ComponenetReset - IsisTrxvu_componentSoftReset");
-	//TODO: maybe on the new drivers needed to do init here and in the rx reset.
+	logError(isis_vu_e__reset_hw_tx(0), "HardTX_ComponenetReset - IsisTrxvu_componentSoftReset");
+	return InitTrxvuAndAnts();
 }
 
 int HardRX_ComponenetReset()
 {
 	logError(SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0), "HardRX_ComponenetReset - SendAckPacket");
-	return logError(isis_vu_e__reset_hw_rx(0), "HardRX_ComponenetReset - IsisTrxvu_componentSoftReset");
+	logError(isis_vu_e__reset_hw_rx(0), "HardRX_ComponenetReset - IsisTrxvu_componentSoftReset");
+	return InitTrxvuAndAnts();
 }
 
 int Soft_ComponenetReset()
