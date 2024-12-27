@@ -45,7 +45,7 @@ void TackDump(void *dump)
 	if(dump == NULL) return;
 	dump_arguments_t *dump_arg = (dump_arguments_t*)dump;
 
-
+	f_enterFS();
 	int numOfDays = (dump_arg->t_end - dump_arg->t_start) / 24 / 3600;
 	Time start;
 	timeU2time(dump_arg->t_start, &start);
