@@ -41,9 +41,18 @@ int CMD_StartDump(sat_packet_t *cmd)
 
 void TackDump(void *dump)
 {
-	dump_arguments_t dump_arg;
-	memcpy(&dump_arg, dump, sizeof(dump_arguments_t));
 	if(dump == NULL) return;
+	dump_arguments_t dump_arg;
+	size_t sizeAdd = 0;
+	memcpy(&dump_arg.cmd, dump + sizeAdd, sizeof(dump_arg.cmd));
+	sizeAdd += sizeof(dump_arg.cmd);
+	memcpy(&dump_arg.dump_type, dump + sizeAdd, sizeof(dump_arg.dump_type));
+	sizeAdd += sizeof(dump_arg.dump_type);
+	memcpy(&dump_arg.t_start, dump + sizeAdd, sizeof(dump_arg.t_start));
+	sizeAdd += sizeof(dump_arg.t_start);
+	memcpy(&dump_arg.t_end, dump + sizeAdd, sizeof(dump_arg.t_end));
+
+
 	int numOfDays = (dump_arg.t_end - dump_arg.t_start) / 24 / 3600;
 	Time start;
 	timeU2time(dump_arg.t_start, &start);
