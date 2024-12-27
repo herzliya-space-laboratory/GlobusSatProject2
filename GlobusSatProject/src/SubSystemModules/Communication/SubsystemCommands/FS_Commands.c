@@ -30,6 +30,7 @@ int CMD_StartDump(sat_packet_t *cmd)
 		return ackError;
 	}
 	dump_arguments_t arg;
+	arg.cmd = *cmd;
 	memcpy((unsigned char*)&arg.dump_type, cmd->data, 1);
 	memcpy((unsigned char*)&arg.t_start, cmd->data + 1, sizeof(time_unix));
 	memcpy((unsigned char*)&arg.t_end, cmd->data + 5, sizeof(time_unix));
