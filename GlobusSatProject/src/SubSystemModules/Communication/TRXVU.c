@@ -326,6 +326,7 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
 	isis_vu_e__get_frame__from_t rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read
 	int error = logError(isis_vu_e__get_frame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"); // Get packet
+	isis_vu_e__remove_frame(0);
 	if(error != E_NO_SS_ERR)
 		return execution_error;
 	error = ParseDataToCommand(rx_frame.data, cmd); // Put the info from the packet in the cmd parameter
