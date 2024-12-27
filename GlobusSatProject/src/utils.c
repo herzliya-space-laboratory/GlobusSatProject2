@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <time.h>
 
 int logError(int error ,char* msg)
 {
@@ -14,4 +15,19 @@ int logError(int error ,char* msg)
 		printf("%s - ERROR %d\r\n", msg, error);
 	}
 	return error;
+}
+
+/*
+ * convert unix time to Time struct
+ */
+void timeU2time(time_unix utime, Time *time)
+{
+	struct tm *t = localtime(&utime);
+	time->year = t.tm_year - 100;
+	time->month = t->tm_mon + 1;
+	time->date = t->tm_mday;
+	time->hours = t->tm_hour;
+	time->minutes = t->tm_min;
+	time->seconds = t->tm_sec;
+	time->day = t->tm_wday;
 }

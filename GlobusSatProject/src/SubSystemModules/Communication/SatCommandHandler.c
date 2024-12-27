@@ -111,22 +111,19 @@ int ActUponCommand(sat_packet_t *cmd)
 	switch(cmd->cmd_type)
 	{
 		case trxvu_cmd_type:
-			return logError(trxvu_command_router(cmd), "Command Dictionary - trxvu_command_router");
+			return logError(trxvu_command_router(cmd), "ActUponCommand - trxvu_command_router");
 		case eps_cmd_type:
-			error = logError(eps_command_router(cmd), "Command Dictionary - eps_command_router");
-			return error;
+			return logError(eps_command_router(cmd), "ActUponCommand - eps_command_router");
 		case filesystem_cmd_type:
-/*			error = logError(filesystem_command_router(cmd), "Command Dictionary - filesystem_command_router");*/
-			return error;
+			return logError(filesystem_command_router(cmd), "ActUponCommand - filesystem_command_router");
 		case managment_cmd_type:
-			error = logError(managment_command_router(cmd), "Command Dictionary - managment_command_router");
-			return error;
+			return logError(managment_command_router(cmd), "ActUponCommand - managment_command_router");
 		case payload_cmd_type:
-/*			error = logError(payload_command_router(cmd), "Command Dictionary - telemetry_command_router");*/
+/*			error = logError(payload_command_router(cmd), "ActUponCommand - payload_command_router");*/
 			return error;
 		default:
 		{
-			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0), "ActUponCommand - SendAckPacket invalid type"); // Send ack that says what written in unknownType_msg
+			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0), "ActUponCommand - SendAckPacket"); // Send ack that says what written in unknownType_msg
 		}
 	}
 }

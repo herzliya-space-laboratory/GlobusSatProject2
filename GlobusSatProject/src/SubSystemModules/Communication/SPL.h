@@ -111,13 +111,13 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 {
 	DELETE_FILE 		= 0xAA,		//0b10101010
-	DELETE_ALL_FILES	= 0xAB,		//0b10101010
+	DELETE_ALL_FILES	= 0x01,		//0b10101010
 	GET_LAST_FS_ERROR	= 0xBB,
 	SET_TLM_PERIOD		= 0xCC,
 	GET_TLM_PERIOD		= 0xCD,
 	GET_IMAGE_INFO		= 0xE1,
-	GET_IMAGE_DATA		= 0xE2
-
+	GET_IMAGE_DATA		= 0xE2,
+	START_DUMP_BY_DAYS	= 0x0E
 }filesystem_subtypes_t;
 
 

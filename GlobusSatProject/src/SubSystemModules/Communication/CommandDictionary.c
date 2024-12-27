@@ -107,6 +107,32 @@ int eps_command_router(sat_packet_t *cmd)
 
 
 /*!
+ * @brief routes the data into the appropriate file-system command according to the command sub type
+ * @param[in] cmd command pertaining to the FS system, to be executed.
+ * @note the type and subtype of the command are already inside cmd
+ * @see sat_packet_t structure
+ * @return errors according to <hal/errors.h>
+ */
+int filesystem_command_router(sat_packet_t *cmd)
+{
+	if(cmd == NULL)
+	{
+		printf("cmd_is_null\r\n");
+		return -1;
+	}
+	switch(cmd->cmd_subtype)
+	{
+		case DELETE_ALL_FILES:
+			return CMD_DeleteAllFiles(cmd);
+		case START_DUMP_BY_DAYS:
+			return CMD_StartDump(cmd);
+		default:
+			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "filesystem_command_router - SendAckPacket"); // Send ack that says what written in unknownSubtype_msg
+	}
+}
+
+
+/*!
  * @brief routes the data into the appropriate obc command according to the command sub type
  * @param[in] cmd command pertaining to the MANAGMENT sub routine, to be executed.
  * @note the type and subtype of the command are already inside cmd
@@ -134,3 +160,4 @@ int managment_command_router(sat_packet_t *cmd)
 			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "managment_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
 	}
 }
+

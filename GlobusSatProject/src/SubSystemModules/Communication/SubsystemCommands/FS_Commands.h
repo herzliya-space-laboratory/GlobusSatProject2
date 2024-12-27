@@ -37,5 +37,6 @@ int CMD_SendDumpAbortRequest(sat_packet_t *cmd);
 
 int CMD_ForceDumpAbort(sat_packet_t *cmd);
 
+void TackDump(dump_arguments_t *dump);
 
 #endif /* FS_COMMANDS_H_ */

@@ -70,6 +70,7 @@ void taskMain()
 int main()
 {
 	xTaskHandle taskMainHandle;
+	xTaskHandle taskTestHandle;
 
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 	// Enable the Instruction cache of the ARM9 core. Keep the MMU and Data Cache disabled.
@@ -82,7 +83,7 @@ int main()
 	//#ifdef TESTING
 		xTaskGenericCreate(taskTesting, (const signed char*) "taskTesting", 4096,
 				NULL,
-				configMAX_PRIORITIES - 2, &taskMainHandle, NULL, NULL);
+				configMAX_PRIORITIES - 2, &taskTestHandle, NULL, NULL);
 	//#else
 		xTaskGenericCreate(taskMain, (const signed char*) "taskMain", 4096, NULL,
 				configMAX_PRIORITIES - 2, &taskMainHandle, NULL, NULL);
