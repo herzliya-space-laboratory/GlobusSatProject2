@@ -43,20 +43,12 @@ int CMD_StartDump(sat_packet_t *cmd)
 void TackDump(void *dump)
 {
 	if(dump == NULL) return;
-	dump_arguments_t dump_arg;
-	size_t sizeAdd = 0;
-	memcpy(&dump_arg.cmd, dump + sizeAdd, sizeof(dump_arg.cmd));
-	sizeAdd += sizeof(dump_arg.cmd);
-	memcpy(&dump_arg.dump_type, dump + sizeAdd, sizeof(dump_arg.dump_type));
-	sizeAdd += sizeof(dump_arg.dump_type);
-	memcpy(&dump_arg.t_start, dump + sizeAdd, sizeof(dump_arg.t_start));
-	sizeAdd += sizeof(dump_arg.t_start);
-	memcpy(&dump_arg.t_end, dump + sizeAdd, sizeof(dump_arg.t_end));
+	dump_arguments_t *dump_arg = (dump_arguments_t*)dump;
 
 
-	int numOfDays = (dump_arg.t_end - dump_arg.t_start) / 24 / 3600;
+	int numOfDays = (dump_arg->t_end - dump_arg->t_start) / 24 / 3600;
 	Time start;
-	timeU2time(dump_arg.t_start, &start);
-	ReadTLMFiles(dump_arg.dump_type, start, numOfDays, dump_arg.cmd.ID);
+	timeU2time(dump_arg->t_start, &start);
+	ReadTLMFiles(dump_arg->dump_type, start, numOfDays, dump_arg->cmd.ID);
 	vTaskDelete(NULL);
 }
