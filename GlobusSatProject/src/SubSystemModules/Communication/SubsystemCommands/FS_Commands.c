@@ -7,6 +7,7 @@
 
 #include "FS_Commands.h"
 #include "String.h"
+dump_arguments_t arg;
 
 int CMD_DeleteAllFiles(sat_packet_t *cmd)
 {
@@ -29,7 +30,6 @@ int CMD_StartDump(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char*)&ackError, sizeof(ackError));
 		return ackError;
 	}
-	dump_arguments_t arg;
 	arg.cmd = *cmd;
 	memcpy((unsigned char*)&arg.dump_type, cmd->data, 1);
 	memcpy((unsigned char*)&arg.t_start, cmd->data + 1, sizeof(time_unix));
