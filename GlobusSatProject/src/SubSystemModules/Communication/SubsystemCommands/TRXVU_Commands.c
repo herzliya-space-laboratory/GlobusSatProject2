@@ -67,7 +67,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 			return error;
 		}
 	}
-	return logError(SendAckPacket(ACK_IDLE_ON , cmd, (unsigned char*)&duration, sizeof(duration)), "CMD_SetOn_dleState - SendAckPacket");
+	return SendAckPacket(ACK_IDLE_ON , cmd, (unsigned char*)&duration, sizeof(duration));
 }
 
 /* set trxvu idle off
@@ -111,7 +111,7 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
 			return error;
 		}
 	}
-	return logError(SendAckPacket(ACK_IDLE_OFF , cmd, NULL, 0), "CMD_SetOff_dleState - SendAckPacket");
+	return SendAckPacket(ACK_IDLE_OFF , cmd, NULL, 0);
 }
 
 /*
@@ -161,7 +161,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
-	logError(SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)), "CMD_SetOn_Transponder - SendAckPacket"); // Send ack of success in turn on transponder and to how much time
+	SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)); // Send ack of success in turn on transponder and to how much time
 	int error = setTransponderOn(); // Set transponder on
 	if(error)
 	{
@@ -209,7 +209,7 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
-	return logError(SendAckPacket(ACK_TRANSPONDER_OFF, cmd, NULL, 0), "CMD_SetOff_Transponder - SendAckPacket"); // Send ack of success in turn off transponder
+	return SendAckPacket(ACK_TRANSPONDER_OFF, cmd, NULL, 0); // Send ack of success in turn off transponder
 }
 
 /*
@@ -243,7 +243,7 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)), "CMD_SetRSSI_Transponder - SendAckPacket"); // Send ack of success in change rssi and to what
+	return SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)); // Send ack of success in change rssi and to what
 }
 
 /*
@@ -300,7 +300,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	memcpy(&muteEndTime, cmd->data, cmd->length);
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
-	logError(SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)), "CMD_MuteTRXVU - SendAckPacket"); // Send ack of success at mute
+	SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)); // Send ack of success at mute
 	int error = setMuteEndTime(muteEndTime);
 	setTransponderOff();
 	if(error == -2)
@@ -339,7 +339,7 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(SendAckPacket(ACK_UNMUTE , cmd, NULL, 0), "CMD_UnMuteTRXVU - SendAckPacket"); // Send ack of success in unmuting the transmitter
+	return SendAckPacket(ACK_UNMUTE , cmd, NULL, 0); // Send ack of success in unmuting the transmitter
 }
 
 /*
@@ -388,7 +388,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	}
 	setNewBeaconIntervalToPeriod();
 
-	return logError(SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)new_interval, sizeof(new_interval)), "CMD_SetBeacon_Interval - SendAckPacket"); // // Send ack with the new_interval with subtype of ACK_UPDATE_BEACON_INTERVAL
+	return SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)new_interval, sizeof(new_interval)); // // Send ack with the new_interval with subtype of ACK_UPDATE_BEACON_INTERVAL
 }
 
 /*
@@ -504,7 +504,7 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0), "CMD_AntCancelDeployment - SendAckPacket");
+	return SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0);
 }
 
 /*

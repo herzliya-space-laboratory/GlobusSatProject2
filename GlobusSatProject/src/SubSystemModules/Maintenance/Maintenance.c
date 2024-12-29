@@ -61,7 +61,7 @@ int WakeupFromResetCMD()
 
 	int flagCMDReset;
 	logError(FRAM_read((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - fram_read");
-	if(!flagCMDReset) return logError(SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time)), "WakeupFromResetCMD - SendAckPacket");
+	if(!flagCMDReset) return SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time));
 
 	flagCMDReset = 0;
 	logError(FRAM_writeAndVerify((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
@@ -71,7 +71,7 @@ int WakeupFromResetCMD()
 	cmdReset += 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&cmdReset, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
-	return logError(SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time)), "WakeupFromResetCMD - SendAckPacket");
+	return SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time));
 
 }
 

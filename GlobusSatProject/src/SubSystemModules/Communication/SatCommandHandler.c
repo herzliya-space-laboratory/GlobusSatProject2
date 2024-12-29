@@ -123,7 +123,7 @@ int ActUponCommand(sat_packet_t *cmd)
 			return error;
 		default:
 		{
-			return logError(SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0), "ActUponCommand - SendAckPacket"); // Send ack that says what written in unknownType_msg
+			return SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0); // Send ack that says what written in unknownType_msg
 		}
 	}
 }

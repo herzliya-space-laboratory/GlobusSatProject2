@@ -63,7 +63,7 @@ int trxvu_command_router(sat_packet_t *cmd)
 		case PING:
 			return CMD_Ping(cmd);
 		default:
-			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "trxvu_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
+			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
 }
 
@@ -102,7 +102,7 @@ int eps_command_router(sat_packet_t *cmd)
 		case RESET_EPS_WDT:
 			return CMD_EPS_ResetWDT(cmd);
 		default:
-			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "eps_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
+			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
 }
 
@@ -132,7 +132,7 @@ int filesystem_command_router(sat_packet_t *cmd)
 		case GET_LAST_FS_ERROR:
 			return CMD_GetLastFS_Error(cmd);
 		default:
-			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "filesystem_command_router - SendAckPacket"); // Send ack that says what written in unknownSubtype_msg
+			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
 }
 
@@ -162,7 +162,7 @@ int managment_command_router(sat_packet_t *cmd)
 		case UPDATE_SAT_TIME:
 			return CMD_UpdateSatTime(cmd);
 		default:
-			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "managment_command_router - SendAckPacket invalid subtype"); // Send ack that says what written in unknownSubtype_msg
+			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
 }
 

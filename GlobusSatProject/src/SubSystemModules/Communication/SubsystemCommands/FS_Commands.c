@@ -98,3 +98,17 @@ int CMD_GetLastFS_Error(sat_packet_t *cmd)
 	int FS_error = fm_getlasterror();
 	return SendAckPacket(ACK_FS_LAST_ERROR, cmd, (unsigned char*)&FS_error, sizeof(FS_error));
 }
+
+
+int CMD_FreeSpace(sat_packet_t *cmd)
+{
+	F_SPACE space; //FS struct
+	int error = logError(f_getfreespace(f_getdrive(), &space), "CMD_FreeSpace - f_getfreespace"); //gets the variables to the struct
+	if(error)
+	{
+		unsigned char ackError = ERROR_GET_FROM_STRUCT;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&space.free, sizeof(space.free)), "CMD_FreeSpace - TransmitDataAsSPL_Packet");
+}

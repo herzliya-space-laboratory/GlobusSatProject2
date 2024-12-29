@@ -29,20 +29,20 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 /*help functions of CMD_ResetComponent*/
 int Payload_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0), "Payload_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0);
 	return logError(payloadSoftReset(), "Payload_ComponenetReset - payloadSoftReset");
 }
 
 int HardTX_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0), "HardTX_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0);
 	logError(isis_vu_e__reset_hw_tx(0), "HardTX_ComponenetReset - IsisTrxvu_componentSoftReset");
 	return InitTrxvuAndAnts();
 }
 
 int HardRX_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0), "HardRX_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0);
 	logError(isis_vu_e__reset_hw_rx(0), "HardRX_ComponenetReset - IsisTrxvu_componentSoftReset");
 	return InitTrxvuAndAnts();
 }
@@ -50,7 +50,7 @@ int HardRX_ComponenetReset()
 int Soft_ComponenetReset()
 {
 	int one = 1;
-	logError(SendAckPacket(ACK_SOFT_RESET, NULL, NULL, 0), "Soft_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_SOFT_RESET, NULL, NULL, 0);
 	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
 	restart();
 	return 0;
@@ -58,7 +58,7 @@ int Soft_ComponenetReset()
 
 int Ants_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_ANTS_RESET, NULL, NULL, 0), "Ants_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_ANTS_RESET, NULL, NULL, 0);
 	int err = logError(isis_ants__reset(0), "Ants_ComponenetReset - isis_ants_rev2__reset");
 	return err;
 }
@@ -68,7 +68,7 @@ int Hard_ComponenetReset()
 	isismepsv2_ivid7_piu__replyheader_t replyheader;
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
-	logError(SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0), "Hard_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0);
 	return logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Hard_ComponenetReset - imepsv2_piu__reset");
 }
 
@@ -79,7 +79,7 @@ int FS_ComponenetReset()
 
 int FRAM_ComponenetReset()
 {
-	logError(SendAckPacket(ACK_FRAM_RESET, NULL, NULL, 0), "FRAM_ComponenetReset - SendAckPacket");
+	SendAckPacket(ACK_FRAM_RESET, NULL, NULL, 0);
 	FRAM_stop();
 	return logError(FRAM_start(), "FRAM_ComponenetReset - FRAM_start");
 }
