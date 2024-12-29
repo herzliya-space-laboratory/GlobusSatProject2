@@ -62,47 +62,47 @@ int WriteDefaultValuesToFRAM()
 	int zero = 0;
 	time_unix param = 0;
 	int error = 0;
-	if(FRAM_writeAndVerify((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE)) error = -1;
-	if(FRAM_writeAndVerify((unsigned char*)&param, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE)) error = -1;
-	if(FRAM_writeAndVerify((unsigned char*)&param, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE)) error = -1;
+	if(FRAM_writeAndVerify((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE)) error += -1;
+	if(FRAM_writeAndVerify((unsigned char*)&param, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE)) error += -1;
+	if(FRAM_writeAndVerify((unsigned char*)&param, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE)) error += -1;
 
 	int beacon_interval = DEFAULT_BEACON_INTERVAL_TIME;
-	if(logError(FRAM_writeAndVerify((unsigned char*)&beacon_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "default to FRAM - beacon")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&beacon_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "default to FRAM - beacon")) error += -1;
 
 	int rssi = DEFAULT_RSSI_VALUE;
-	if(logError(FRAM_writeAndVerify((unsigned char*)&rssi, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "default to FRAM - rssi")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&rssi, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "default to FRAM - rssi")) error += -1;
 
 	float alpha = DEFAULT_ALPHA_VALUE;
-	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error += -1;
 
 #ifdef TESTING
 	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY;
 #else
 	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY*60;
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error += -1;
 
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
 //Need to be written with the firstActivetion that will become 1.
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of resets")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of resets")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "default to FRAM - number of cmd resets")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "default to FRAM - number of cmd resets")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error += -1;
 
 	int arrPeriod[7] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
-	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "default to FRAM - transmission abort flag")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "default to FRAM - changes in mode")) error += -1;
 
 	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 	EpsThreshVolt_t thresh;
-		for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
-			thresh.raw[i] = defaultThershold[i];
-	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "default to FRAM - threshold voltages")) error = -1;
+	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
+		thresh.raw[i] = defaultThershold[i];
+	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "default to FRAM - threshold voltages")) error += -1;
 	//TODO: LAST_COMM_TIME_ADDR
 	return error;
 }
@@ -158,7 +158,6 @@ int FirstActivation()
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
-	Delete_allTMFilesFromSD();
 
 #ifdef WE_HAVE_ANTS
 	int max;
@@ -202,7 +201,7 @@ int InitSubsystems(){
 	if(firstActiveFlag)
 	{
 		WriteDefaultValuesToFRAM();
-		//Move before the delete of all files
+		Delete_allTMFilesFromSD();
 	}
 
 	InitSupervisor();
