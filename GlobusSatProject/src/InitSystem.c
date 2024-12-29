@@ -199,7 +199,11 @@ int InitSubsystems(){
 
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	if(firstActiveFlag) WriteDefaultValuesToFRAM();
+	if(firstActiveFlag)
+	{
+		WriteDefaultValuesToFRAM();
+		//Move before the delete of all files
+	}
 
 	InitSupervisor();
 

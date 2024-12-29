@@ -6,6 +6,7 @@
  */
 
 #include "EPSOperationModes.h"
+#include "utils.h"
 
 Boolean txOff = FALSE;
 EpsState_t satState = OperationalMode;
@@ -16,6 +17,14 @@ EpsState_t satState = OperationalMode;
  */
 int EnterOperationalMode()
 {
+	if(satState != OperationalMode)
+	{
+		logError(payloadTurnOn(), "EnterOperationalMode - payloadTurnOn");
+		int countChange = 0;
+		logError(FRAM_read((unsigned char*)&countChange, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "EnterOperationalMode - FRAM_read");
+		countChange += 1;
+		logError(FRAM_writeAndVerify((unsigned char*)&countChange, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "EnterOperationalMode - FRAM_writeAndVerify");
+	}
 	txOff = FALSE;
 	satState = OperationalMode;
 	printf("entered Operational\r\n");
@@ -29,6 +38,10 @@ int EnterOperationalMode()
  */
 int EnterCruiseMode()
 {
+	if(satState == OperationalMode)
+	{
+		logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
+	}
 	txOff = FALSE;
 	satState = CruiseMode;
 	printf("entered Cruise\r\n");
