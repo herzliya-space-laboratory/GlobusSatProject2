@@ -22,7 +22,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
 	int duration;
@@ -34,31 +34,31 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 		case -1:
 		{
 			error_ack = ERROR_CANT_DO;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -2:
 		{
 			error_ack = ERROR_READ_FROM_FRAM;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -3:
 		{
 			error_ack = ERROR_WRITE_TO_FRAM;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -4:
 		{
 			error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -5:
 		{
 			error_ack = ERROR_CANT_GET_TIME;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		default:
@@ -84,25 +84,25 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
 		case -1:
 		{
 			error_ack = ERROR_CANT_DO;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -2:
 		{
 			error_ack = ERROR_READ_FROM_FRAM;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -3:
 		{
 			error_ack = ERROR_WRITE_TO_FRAM;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		case -4:
 		{
 			error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 		default:
@@ -132,7 +132,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
 	time_unix duration;
@@ -145,20 +145,20 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	if(logError(FRAM_write((unsigned char*)&duration, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOn_Transponder - FRAM_write"))
 	{
 		error_ack = ERROR_WRITE_TO_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -5;
 	}
 	time_unix check = getTransponderEndTime();
 	if(!check)
 	{
 		error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -4;
 	}
 	if(check != duration)
 	{
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
 	logError(SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)), "CMD_SetOn_Transponder - SendAckPacket"); // Send ack of success in turn on transponder and to how much time
@@ -166,7 +166,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_I2C;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return 0;
@@ -181,33 +181,32 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 int CMD_SetOff_Transponder(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
-	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
-	int error = logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
+	int error = setTransponderOff();
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_I2C;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	time_unix timeNow = 1;
 	error = logError(FRAM_write((unsigned char*)&timeNow, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOn_Transponder - FRAM_write");
 	if(error)
 	{
-		int error_ack = ERROR_WRITE_TO_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack));	// Send ack error according to "AckErrors.h"
+		error_ack = ERROR_WRITE_TO_FRAM;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	time_unix check = getTransponderEndTime();
 	if(!check)
 	{
 		error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -4;
 	}
 	if(check != timeNow)
 	{
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack));	// Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
 	return logError(SendAckPacket(ACK_TRANSPONDER_OFF, cmd, NULL, 0), "CMD_SetOff_Transponder - SendAckPacket"); // Send ack of success in turn off transponder
@@ -227,7 +226,7 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 	if(cmd->length != 2)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
 	memcpy(&new_rssi_val, &cmd->data, cmd->length);
@@ -235,13 +234,13 @@ int CMD_SetRSSI_Transponder(sat_packet_t *cmd)
 	if(error == -2)
 	{
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	else if(error)
 	{
 		error_ack = ERROR_CANT_DO;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(SendAckPacket(ACK_UPDATE_RSSI_VALUE , cmd, (unsigned char*)&new_rssi_val, sizeof(new_rssi_val)), "CMD_SetRSSI_Transponder - SendAckPacket"); // Send ack of success in change rssi and to what
@@ -273,7 +272,7 @@ int CMD_GetRSSI_Transponder(sat_packet_t *cmd)
 	if(rssi_val == -1)
 	{
 		unsigned char error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -1;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&rssi_val, TRANSPONDER_RSSI_SIZE), "CMD_GetRSSI_Transponder - TransmitDataAsSPL_Packet"); // Send back the beacon interval
@@ -294,7 +293,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
 	int muteEndTime = 0;
@@ -307,13 +306,13 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	if(error == -2)
 	{
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack));	// Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	else if(error)
 	{
 		error_ack = ERROR_CANT_SET_END_TIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return 0;
@@ -331,13 +330,13 @@ int CMD_UnMuteTRXVU(sat_packet_t *cmd)
 	if(error == -2)
 	{
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	else if(error)
 	{
 		error_ack = ERROR_CANT_SET_END_TIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error that says what written in error_msg (couldn't set new end time)
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(SendAckPacket(ACK_UNMUTE , cmd, NULL, 0), "CMD_UnMuteTRXVU - SendAckPacket"); // Send ack of success in unmuting the transmitter
@@ -356,7 +355,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
 	time_unix new_interval;
@@ -370,7 +369,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	time_unix check;
@@ -378,13 +377,13 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	if(error)
 	{
 		error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	if(check != new_interval) // Check if what we wrote and what have been written is the same
 	{
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	setNewBeaconIntervalToPeriod();
@@ -417,7 +416,7 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 	if(error)
 	{
 		unsigned char error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	if(cmd == NULL)
@@ -437,7 +436,7 @@ int CMD_GetTxUptime(sat_packet_t *cmd)
 	if(error)
 	{
 		unsigned char error_ack = ERROR_GET_UPTIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
@@ -455,7 +454,7 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 	if(error)
 	{
 		unsigned char error_ack = ERROR_GET_UPTIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
@@ -480,7 +479,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 	if(error)
 	{
 		error_ack = ERROR_GET_UPTIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_AntGetUptime - TransmitDataAsSPL_Packet");
@@ -502,7 +501,7 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd)
 	if(error)
 	{
 		error_ack = ERROR_CANT_DO;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0), "CMD_AntCancelDeployment - SendAckPacket");

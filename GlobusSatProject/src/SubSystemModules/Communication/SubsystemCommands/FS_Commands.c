@@ -14,7 +14,7 @@ int CMD_DeleteAllFiles(sat_packet_t *cmd)
 	if(Delete_allTMFilesFromSD())
 	{
 		unsigned char ackError = ERROR_CANT_DO;
-		return SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char*)&ackError, sizeof(ackError));
+		return SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 	}
 	SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
 	return Hard_ComponenetReset();
@@ -27,7 +27,7 @@ int CMD_StartDump(sat_packet_t *cmd)
 	if(cmd->length != 9)
 	{
 		ackError = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char*)&ackError, sizeof(ackError));
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return ackError;
 	}
 	arg.cmd = *cmd;
@@ -38,7 +38,7 @@ int CMD_StartDump(sat_packet_t *cmd)
 	if(xSemaphoreTake(semaphorDump, SECONDS_TO_TICKS(WAIT_TIME_SEM_DUMP)) == pdFALSE)
 	{
 		ackError = ERROR_CANT_DO;
-		SendAckPacket(ACK_ERROR_MSG, cmd, (unsigned char*)&ackError, sizeof(ackError));
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return ackError;
 	}
 	xTaskHandle taskHandle;
@@ -61,4 +61,33 @@ void TackDump(void *dump)
 	f_releaseFS();
 	xSemaphoreGive(semaphorDump);
 	vTaskDelete(NULL);
+}
+
+int CMD_DeleteFilesOfType(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	unsigned char ackError = 0;
+	if(cmd->length != 9)
+	{
+		ackError = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	tlm_type_t type;
+	time_unix start;
+	time_unix end;
+	memcpy((unsigned char*)&type, cmd->data, 1);
+	memcpy((unsigned char*)&start, cmd->data + 1, sizeof(time_unix));
+	memcpy((unsigned char*)&end, cmd->data + 5, sizeof(time_unix));
+	Time start_t;
+	timeU2time(start, &start_t);
+	int numOfDays = (end - start) / 24 / 3600;
+	int error = logError(DeleteTLMFiles(type, start_t, numOfDays), "CMD_DeleteFilesOfType - DeleteTLMFiles");
+	if(error != numOfDays + 1)
+	{
+		ackError = ERROR_COULDNT_DELETE_ALL;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	return SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
 }

@@ -87,6 +87,9 @@ int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*
 int ReadTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
 		int cmd_id/*, int resolution*/);
 
+/*
+ * doing a formating to the sd we are on.
+ * */
 int Delete_allTMFilesFromSD();
 
 /*!

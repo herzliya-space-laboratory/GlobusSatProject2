@@ -20,7 +20,7 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 	if(error)
 	{
 		unsigned char ackError = ERROR_CANT_GET_TIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&timeNow, sizeof(time_unix)), "CMD_GetSatTime - TransmitDataAsSPL_Packet"); //send back the sat time
@@ -84,6 +84,13 @@ int FRAM_ComponenetReset()
 	return logError(FRAM_start(), "FRAM_ComponenetReset - FRAM_start");
 }
 
+int SendErrorCantReset(sat_packet_t *cmd)
+{
+	unsigned char ackError = ERROR_CANT_RESET;
+	SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
+	return ackError;
+}
+
 
 /*!
  * @brief 	starts a reset according to 'reset_type_t'
@@ -97,7 +104,7 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 	if(cmd->length != 1)
 	{
 		ackError = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
 		return ackError;
 	}
 	short type;
@@ -192,7 +199,7 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
 	time_unix newSatTime;
@@ -201,16 +208,10 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 	if(error)
 	{
 		error_ack = ERROR_COULDNT_UPDATE_SAT_TIME;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return 1;
 	}
 	return SendAckPacket(ACK_UPDATE_TIME , cmd, (unsigned char*)&newSatTime, sizeof(newSatTime));
 
 }
 
-int SendErrorCantReset(sat_packet_t *cmd)
-{
-	unsigned char ackError = ERROR_CANT_RESET;
-	SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
-	return ackError;
-}

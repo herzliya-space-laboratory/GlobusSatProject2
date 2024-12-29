@@ -22,7 +22,7 @@ int CMD_UpdateAlpha(sat_packet_t *cmd)
 	if(cmd->length != 4)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
 	float alpha;
@@ -33,25 +33,25 @@ int CMD_UpdateAlpha(sat_packet_t *cmd)
 	 case -1:
 	 {
 		error_ack = ERROR_WRITE_TO_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	 }
 	 case -2:
 	 {
 		error_ack = ERROR_INVALID_ALPHA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	 }
 	 case -4:
 	 {
 		error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	 }
 	 case -5:
 	 {
 		error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	 }
 	 default:
@@ -89,7 +89,7 @@ int CMD_GetAlpha(sat_packet_t *cmd)
 	if(error == -2)
 	{
 		unsigned char error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_SIZE), "CMD_GetSmoothingFactor - TransmitDataAsSPL_Packet"); // Send back the alpha value
@@ -108,7 +108,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd)
 	if(error == -2)
 	{
 		unsigned char error_ack = ERROR_READ_FROM_FRAM;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)threshold.raw, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the threshold voltages
@@ -129,7 +129,7 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd)
 	if(cmd->length != 8)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
 	EpsThreshVolt_t threshold;
@@ -140,25 +140,25 @@ int CMD_UpdateThresholdVoltages(sat_packet_t *cmd)
 		case -1:
 		{
 			error_ack = ERROR_WRITE_TO_FRAM;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error_ack;
 		}
 		case -2:
 		{
 			error_ack = ERROR_INVALID_TRESHOLD;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error_ack;
 		}
 		case -3:
 		{
 			error_ack = ERROR_READ_FROM_FRAM;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error_ack;
 		}
 		case -4:
 		{
 			error_ack = ERROR_WRITTEN_IN_FRAM_WRONG;
-			SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error_ack;
 		}
 		default:
@@ -190,9 +190,7 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd)
 /*
  * Get state of EPS.
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
-* @return type=int; return type of error
-* 										 GetState errors
-* 										 TransmitDataAsSPL_Packet errors
+* @return type=int; return type of error TransmitDataAsSPL_Packet
  * */
 int CMD_GetState(sat_packet_t *cmd)
 {
@@ -209,7 +207,7 @@ int CMD_EPS_ResetWDT(sat_packet_t *cmd)
 	if(error)
 	{
 		unsigned char error_ack = ERROR_CANT_RESET_WDT;
-		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
 	return SendAckPacket(ACK_EPS_RESET_WDT , cmd, NULL, 0);

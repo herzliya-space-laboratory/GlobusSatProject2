@@ -61,7 +61,7 @@ typedef struct
 {
 	int count;
 	int sat_resets_count;
-	int changes_in_mode; //TODO: need to check if only for turn on or off payload or all the modes.
+	int changes_in_mode;
 } payloadSEL_data;
 
 /**

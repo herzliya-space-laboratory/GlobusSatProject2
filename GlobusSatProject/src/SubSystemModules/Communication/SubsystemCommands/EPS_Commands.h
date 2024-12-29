@@ -63,9 +63,7 @@ int CMD_GetAlpha(sat_packet_t *cmd);
 /*
  * Get state of EPS.
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
-* @return type=int; return type of error
-* 										 GetState errors
-* 										 TransmitDataAsSPL_Packet errors
+* @return type=int; return type of error TransmitDataAsSPL_Packet
  * */
 int CMD_GetState(sat_packet_t *cmd);
 
