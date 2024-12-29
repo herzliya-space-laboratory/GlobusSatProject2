@@ -27,6 +27,12 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 }
 
 /*help functions of CMD_ResetComponent*/
+int Payload_ComponenetReset()
+{
+	logError(SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0), "Payload_ComponenetReset - SendAckPacket");
+	return logError(payloadSoftReset(), "Payload_ComponenetReset - payloadSoftReset");
+}
+
 int HardTX_ComponenetReset()
 {
 	logError(SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0), "HardTX_ComponenetReset - SendAckPacket");
@@ -99,57 +105,41 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 	switch(type)
 	{
 		case reset_software:
-		{
 			return Soft_ComponenetReset();
-		}
 		case reset_hardware:
 		{
 			if(Hard_ComponenetReset())
-			{
-				ackError = ERROR_CANT_RESET;
-				SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
-				return ackError;
-			}
+				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_tx_hard:
 		{
 			if(HardTX_ComponenetReset())
-			{
-				ackError = ERROR_CANT_RESET;
-				SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
-				return ackError;
-			}
+				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_rx_hard:
 		{
 			if(HardRX_ComponenetReset())
-			{
-				ackError = ERROR_CANT_RESET;
-				SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
-				return ackError;
-			}
+				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_ants:
 		{
 			if(Ants_ComponenetReset())
-			{
-				ackError = ERROR_CANT_RESET;
-				SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
-				return ackError;
-			}
+				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_fram:
 		{
 			if(FRAM_ComponenetReset())
-			{
-				ackError = ERROR_CANT_RESET;
-				SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
-				return ackError;
-			}
+				return SendErrorCantReset(cmd);
+			return 0;
+		}
+		case reset_payload:
+		{
+			if(Payload_ComponenetReset())
+				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_filesystem:
@@ -218,3 +208,9 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 
 }
 
+int SendErrorCantReset(sat_packet_t *cmd)
+{
+	unsigned char ackError = ERROR_CANT_RESET;
+	SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
+	return ackError;
+}
