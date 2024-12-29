@@ -63,7 +63,7 @@ void TackDump(void *dump)
 	vTaskDelete(NULL);
 }
 
-int CMD_DeleteFilesOfType(sat_packet_t *cmd)
+int CMD_DeleteTLM(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
 	unsigned char ackError = 0;
@@ -90,4 +90,11 @@ int CMD_DeleteFilesOfType(sat_packet_t *cmd)
 		return ackError;
 	}
 	return SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
+}
+
+
+int CMD_GetLastFS_Error(sat_packet_t *cmd)
+{
+	int FS_error = fm_getlasterror();
+	return SendAckPacket(ACK_FS_LAST_ERROR, cmd, (unsigned char*)&FS_error, sizeof(FS_error));
 }

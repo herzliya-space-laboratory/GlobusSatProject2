@@ -140,7 +140,7 @@ int AntDeployment()
 	int rv = isis_ants__start_auto_deploy(0, 10); //todo: need to check redandent
 	if(rv)
 	{
-		//TODO: use the second function for deploy and then if not work try again, when we are with the new drivers
+		//TODO: use the second function for deploy and then if not work try again, when we are with the new drivers - don't find this
 		printf("Ants not deployed\r\n");
 		return -1;
 	}

@@ -127,6 +127,10 @@ int filesystem_command_router(sat_packet_t *cmd)
 			return CMD_DeleteAllFiles(cmd);
 		case START_DUMP_BY_DAYS:
 			return CMD_StartDump(cmd);
+		case DELETE_TLM:
+			return CMD_DeleteTLM(cmd);
+		case GET_LAST_FS_ERROR:
+			return CMD_GetLastFS_Error(cmd);
 		default:
 			return logError(SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0), "filesystem_command_router - SendAckPacket"); // Send ack that says what written in unknownSubtype_msg
 	}

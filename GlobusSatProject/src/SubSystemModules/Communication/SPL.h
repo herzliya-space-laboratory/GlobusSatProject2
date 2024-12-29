@@ -59,7 +59,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_ANT_CANCEL_DEPLOY = 0xA3,
 
 	ACK_DELETE_TLM = 0xC0,					// after deleting TLM file(s)
-
+	ACK_FS_LAST_ERROR = 0xC1,
 	ACK_PING = 0xAA,
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
 	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
@@ -110,12 +110,13 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 {
-	DELETE_ALL_FILES	= 0x01,
-	DELETE_FILE 		= 0xAA,
-	GET_LAST_FS_ERROR	= 0xBB,
-	SET_TLM_PERIOD		= 0xCC,
-	GET_TLM_PERIOD		= 0xCD,
-	START_DUMP_BY_DAYS	= 0x0E
+	DELETE_ALL_FILES		= 0x01,
+	DELETE_TLM				= 0xA1,
+	DELETE_FILE 			= 0xAA,
+	GET_LAST_FS_ERROR		= 0xBB,
+	SET_TLM_PERIOD			= 0xCC,
+	GET_TLM_PERIOD			= 0xCD,
+	START_DUMP_BY_DAYS		= 0x0E
 }filesystem_subtypes_t;
 
 
