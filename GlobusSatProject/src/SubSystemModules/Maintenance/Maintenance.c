@@ -87,6 +87,7 @@ void Maintenance()
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "Maintenance - Time_getUnixEpoch");
 	if(error) return;
 	timeNow -= (30 * 24 * 3600);
+	if(timeNow < UNIX_SECS_FROM_Y1970_TO_Y2000) return; //check we are not pass 2000
 	Time timeTo;
 	timeU2time(timeNow, &timeTo); //To get the time in Time struct
 	char fileName[8] = {0};
@@ -115,5 +116,10 @@ void Maintenance()
 
 	}
 	while(!f_findnext(&find)); //get next file and see if we can
-
+	error = f_findfirst(final, &find); // find the first file
+	if(error) return;
+	do{
+		f_delete(find.filename); //delete
+	}
+	while(!f_findnext(&find));
 }

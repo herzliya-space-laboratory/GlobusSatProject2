@@ -202,6 +202,8 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -3;
 	}
+	time_unix passSatTime;
+	logError(Time_getUnixEpoch(&passSatTime), "CMD_UpdateSatTime - Time_setUnixEpoch");
 	time_unix newSatTime;
 	memcpy((unsigned char*)&newSatTime, cmd->data, cmd->length);
 	int error = logError(Time_setUnixEpoch(newSatTime), "CMD_UpdateSatTime - Time_setUnixEpoch");
@@ -211,6 +213,9 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return 1;
 	}
+	if(newSatTime < passSatTime)
+		Delete_allTMFilesFromSD();
+
 	return SendAckPacket(ACK_UPDATE_TIME , cmd, (unsigned char*)&newSatTime, sizeof(newSatTime));
 
 }
