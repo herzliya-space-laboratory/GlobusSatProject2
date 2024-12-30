@@ -10,6 +10,7 @@
 #include <hal/Timing/WatchDogTimer.h>
 #include "SubSystemModules/Communication/AckHandler.h"
 #include "utils.h"
+#include <String.h>
 
 /*!
  * @brief checks if the period time has passed
@@ -75,10 +76,44 @@ int WakeupFromResetCMD()
 
 }
 
+
 /*!
  * @brief Calls the relevant functions in a serial order
  */
 void Maintenance()
 {
-	//TODO: need to delete old files here.
+	F_FIND find;
+	time_unix timeNow;
+	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "Maintenance - Time_getUnixEpoch");
+	if(error) return;
+	timeNow -= (30 * 24 * 3600);
+	Time timeTo;
+	timeU2time(timeNow, &timeTo); //To get the time in Time struct
+	char fileName[8] = {0};
+	CalculateFileName(timeTo, fileName, "", 0);  //get a fileName without ending but with .
+	char fileTime[6] = {0}; //only take the start of the file without the point or ending.
+	memcpy(fileTime, fileName, 6);
+	char final[8] = {0}; //the string we want to found
+	sprintf(final, "%s.*", fileTime);
+	error = f_findfirst(final, &find); // Search and if doesn't have, exit the function
+	if(error) return;
+	error = f_findfirst("*.*", &find); // find the first file
+	if(error) return;
+	int flagCon;
+	do{
+		flagCon = FALSE;
+		for(int i = 0; i < 6; i++)
+		{
+			if(find.filename[i] != fileName[i])
+			{
+				flagCon = TRUE;
+				break;
+			}
+		}
+		f_delete(find.filename); //delete
+		if(!flagCon) break; //see if that was the last one to check
+
+	}
+	while(!f_findnext(&find)); //get next file and see if we can
+
 }

@@ -71,4 +71,6 @@ channel_t GetSystemChannelState();
  * */
 Boolean GetTxFlag();
 
+Boolean GetPayloadFlag();
+
 #endif /* EPSOPERATIONMODES_H_ */

@@ -95,7 +95,7 @@ int CMD_DeleteTLM(sat_packet_t *cmd)
 
 int CMD_GetLastFS_Error(sat_packet_t *cmd)
 {
-	int FS_error = fm_getlasterror();
+	int FS_error = f_getlasterror();
 	return SendAckPacket(ACK_FS_LAST_ERROR, cmd, (unsigned char*)&FS_error, sizeof(FS_error));
 }
 

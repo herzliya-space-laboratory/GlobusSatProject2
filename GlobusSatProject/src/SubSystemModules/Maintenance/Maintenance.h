@@ -5,6 +5,7 @@
 #include "GlobalStandards.h"
 #include <hcc/api_fat.h>
 
+#include "TLM_management.h"
 
 #define MIN_FREE_SPACE 300000000
 #define DEPLOY_INTRAVAL 1800 //TBD: RBF every 1800 sec (30 minutes)
