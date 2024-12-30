@@ -131,6 +131,10 @@ int filesystem_command_router(sat_packet_t *cmd)
 			return CMD_DeleteTLM(cmd);
 		case GET_LAST_FS_ERROR:
 			return CMD_GetLastFS_Error(cmd);
+		case SET_TLM_PERIOD:
+			return CMD_SetTLMPeriodTimes(cmd);
+		case GET_TLM_PERIOD:
+			return CMD_GetTLMPeriodTimes(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

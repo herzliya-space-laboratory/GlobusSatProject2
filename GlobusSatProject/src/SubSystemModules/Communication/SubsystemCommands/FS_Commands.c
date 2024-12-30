@@ -112,3 +112,111 @@ int CMD_FreeSpace(sat_packet_t *cmd)
 	}
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&space.free, sizeof(space.free)), "CMD_FreeSpace - TransmitDataAsSPL_Packet");
 }
+
+int SaveAndCheck(unsigned int addr, unsigned int saveTime, sat_packet_t* cmd)
+{
+	unsigned char ackError = 0;
+	int error = logError(FRAM_writeAndVerify((unsigned char*)&saveTime, addr, sizeof(saveTime)), "CMD_SetTLMPeriodTimes - FRAM_writeAndVerify");
+	if(error)
+	{
+		ackError = ERROR_WRITE_TO_FRAM;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	unsigned int check = 0;
+	error = logError(FRAM_read((unsigned char*)&check, addr, sizeof(saveTime)), "SaveAndCheck - FRAM_read");
+	if(error)
+	{
+		ackError = ERROR_READ_FROM_FRAM;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	if(check != saveTime)
+	{
+		ackError = ERROR_WRITTEN_IN_FRAM_WRONG;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	return 0;
+}
+
+/**
+ * set a new periodTime
+ */
+int CMD_SetTLMPeriodTimes(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	unsigned char ackError = 0;
+	if(cmd->length != 5)
+	{
+		ackError = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	char type;
+	unsigned int saveTime;
+	memcpy(&type, cmd->data, 1);
+	memcpy(&saveTime, cmd->data + 1, sizeof(int));
+	int error;
+	switch(type)
+	{
+		case 0: //eps
+			error = SaveAndCheck(EPS_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		case 1: //trx
+			error = SaveAndCheck(TRXVU_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		case 2: //ants
+			error = SaveAndCheck(ANT_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		case 3: //sp
+			error = SaveAndCheck(SOLAR_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		case 4: //wod
+			error = SaveAndCheck(WOD_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		case 5: //rad
+			error = SaveAndCheck(RADFET_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		case 6: //seu_sel
+			error = SaveAndCheck(SEU_SEL_SAVE_TLM_PERIOD_ADDR, saveTime, cmd);
+			if(error)
+				return error;
+			break;
+		default:
+			ackError = ERROR_CANT_DO;
+			SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+			return ackError;
+	}
+	SendAckPacket(ACK_SET_NEW_TLM_PERIOD, cmd, NULL, 0);
+	return 0;
+
+}
+
+int CMD_GetTLMPeriodTimes(sat_packet_t *cmd)
+{
+	int error = 0;
+	int arrPeriod[7] = {0};
+	error = logError(FRAM_read((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "CMD_GetTLMPeriodTimes - FRAM_read");
+	if(error)
+	{
+		unsigned char ackError = ERROR_READ_FROM_FRAM;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return error;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)arrPeriod, sizeof(arrPeriod)), "CMD_GetTLMPeriodTimes - TransmitDataAsSPL_Packet");
+}
+
+//TODO: switch sd card. for that I need to create DeInitializeFS (TODO)

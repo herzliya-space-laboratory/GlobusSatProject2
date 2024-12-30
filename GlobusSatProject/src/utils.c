@@ -9,13 +9,16 @@
 #include <time.h>
 #include "GlobalStandards.h"
 #include <hal/Timing/Time.h>
+#include "utils.h"
+#include "TLM_management.h"
 
-int logError(int error ,char* msg)
+int logError(int error ,char* msg) //TODO check
 {
-	if(error != 0 && error != 6)
-	{
-		printf("%s - ERROR %d\r\n", msg, error);
-	}
+	if(error == 0 || error == 6) return 0; //6 in not a real error
+	logData_t data;
+	data.error = error;
+	data.msg = msg;
+	Write2File(data, tlm_log);
 	return error;
 }
 

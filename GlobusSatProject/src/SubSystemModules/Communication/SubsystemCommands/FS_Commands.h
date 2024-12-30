@@ -41,4 +41,13 @@ int CMD_ForceDumpAbort(sat_packet_t *cmd);
 
 void TackDump(void *dump);
 
+
+/**
+ * set a new periodTime
+ */
+int CMD_SetTLMPeriodTimes(sat_packet_t *cmd);
+
+int CMD_GetTLMPeriodTimes(sat_packet_t *cmd);
+
+
 #endif /* FS_COMMANDS_H_ */
