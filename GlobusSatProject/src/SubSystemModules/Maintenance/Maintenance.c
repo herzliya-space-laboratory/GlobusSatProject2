@@ -83,46 +83,22 @@ int WakeupFromResetCMD()
 void Maintenance()
 {
 	F_SPACE space;
-	if(logError(f_getfreespace(f_getdrive(), &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
-
-/*	F_FIND find;
-	time_unix timeNow;
-	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "Maintenance - Time_getUnixEpoch");
-	if(error) return;
-	timeNow -= (30 * 24 * 3600);
-	if(timeNow < UNIX_SECS_FROM_Y1970_TO_Y2000) return; //check we are not pass 2000
-	Time timeTo;
-	timeU2time(timeNow, &timeTo); //To get the time in Time struct
-	char fileName[8] = {0};
-	CalculateFileName(timeTo, fileName, "", 0);  //get a fileName without ending but with .
-	char fileTime[6] = {0}; //only take the start of the file without the point or ending.
-	memcpy(fileTime, fileName, 6);
-	char final[8] = {0}; //the string we want to found
-	sprintf(final, "%s.*", fileTime);
-	error = f_findfirst(final, &find); // Search and if doesn't have, exit the function
-	if(error) return;
-	error = f_findfirst("*.*", &find); // find the first file
-	if(error) return;
-	int flagCon;
-	do{
-		flagCon = FALSE;
-		for(int i = 0; i < 6; i++)
-		{
-			if(find.filename[i] != fileName[i])
-			{
-				flagCon = TRUE;
-				break;
-			}
-		}
+	int sd = f_getdrive();
+	if(sd != 0 && sd != 1)
+	{
+		logError(sd, "Maintenance - f_getdrive");
+		return;
+	}
+	if(logError(f_getfreespace(sd, &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
+	if(space.free >= (space.total * MIN_FREE_SPACE_PERCENTAGE) / 100) return;
+	F_FIND find;
+	f_findfirst("*.*", &find);
+	do
+	{
 		f_delete(find.filename); //delete
-		if(!flagCon) break; //see if that was the last one to check
+		if(logError(f_getfreespace(sd, &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
 
 	}
-	while(!f_findnext(&find)); //get next file and see if we can
-	error = f_findfirst(final, &find); // find the first file
-	if(error) return;
-	do{
-		f_delete(find.filename); //delete
-	}
-	while(!f_findnext(&find));*/
+	while((space.free < (space.total * MIN_FREE_SPACE_PERCENTAGE) / 100) && !f_findnext(&find));
+
 }
