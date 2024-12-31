@@ -49,22 +49,20 @@ int InitTrxvuAndAnts(){
 
 	InitTxModule();
 
-#ifdef WE_HAVE_ANTS
-	int retValInt = 0;
-	ISIS_ANTS_t myAntennaAddress;
-	myAntennaAddress.i2cAddr = ANTS_I2C_ADDR;
-	int errorAnts = ISIS_ANTS_Init(myAntennaAddress, 1);
+	isismepsv2_ivid7_piu__replyheader_t response;
+    logError(isismepsv2_ivid7_piu__outputbuschannelon(0, isismepsv2_ivid7_piu__imeps_channel__channel_5v_sw2, &response), "InitTrxvuAndAnts - isismepsv2_ivid7_piu__outputbuschannelon");
+	ISIS_ANTS_t myAntennaAddress[2];
+	myAntennaAddress[0].i2cAddr = ANTS_SIDE_A_I2C_ADDR;
+	myAntennaAddress[1].i2cAddr = ANTS_SIDE_B_I2C_ADDR;
+	int errorAnts = ISIS_ANTS_Init(myAntennaAddress, 2);
 
-	logError(errorAnts, "Ants - ISIS_ANTS_REV2_Init")
+	logError(errorAnts, "Ants - ISIS_ANTS_Init");
 	logError(rv, "TRXVU - ISIS_VU_E_Init");
 
-
 	//Initialize the AntS system
-	if(rv == 6) return erroAnts;
+	if(rv == 6) return errorAnts;
 	return errorAnts + rv;
-#else
-	return logError(rv, "TRXVU - ISIS_VU_E_Init");
-#endif
+
 }
 
 /*!

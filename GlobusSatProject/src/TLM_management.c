@@ -108,9 +108,15 @@ void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 			*structSize = sizeof(isis_vu_e__get_rx_telemetry__from_t);
 			break;
 		}
-		case tlm_antenna:
+		case tlm_ants0:
 		{
-			memcpy(endFileName,END_FILE_NAME_ANTENNA,sizeof(END_FILE_NAME_ANTENNA));
+			memcpy(endFileName,END_FILE_NAME_ANTENNA_SIDE_ZERO,sizeof(END_FILE_NAME_ANTENNA_SIDE_ZERO));
+			*structSize = sizeof(isis_ants__get_all_telemetry__from_t);
+			break;
+		}
+		case tlm_ants1:
+		{
+			memcpy(endFileName,END_FILE_NAME_ANTENNA_SIDE_ONE,sizeof(END_FILE_NAME_ANTENNA_SIDE_ONE));
 			*structSize = sizeof(isis_ants__get_all_telemetry__from_t);
 			break;
 		}

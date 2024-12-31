@@ -104,7 +104,6 @@ CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char ty
  * */
 int ActUponCommand(sat_packet_t *cmd)
 {
-	int error = 0;
 	if(cmd == NULL)
 		return null_pointer_error;
 	// Go to each type known and according to spl_command_type struct and check if it's equal to the type in the cmd. if equal go the right router
@@ -118,9 +117,8 @@ int ActUponCommand(sat_packet_t *cmd)
 			return logError(filesystem_command_router(cmd), "ActUponCommand - filesystem_command_router");
 		case managment_cmd_type:
 			return logError(managment_command_router(cmd), "ActUponCommand - managment_command_router");
-		case payload_cmd_type:
-/*			error = logError(payload_command_router(cmd), "ActUponCommand - payload_command_router");*/
-			return error;
+		/*case payload_cmd_type:
+			return logError(payload_command_router(cmd), "ActUponCommand - payload_command_router");*/
 		default:
 		{
 			return SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0); // Send ack that says what written in unknownType_msg

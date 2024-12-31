@@ -54,19 +54,19 @@
 
 #define TLM_SAVE_PERIOD_START_ADDR		0x130		//<! start of the save periods in the FRAM
 
-#define DEFAULT_EPS_SAVE_TLM_TIME		5			//<! save EPS TLM every 5 seconds
+#define DEFAULT_EPS_SAVE_TLM_TIME		10			//<! save EPS TLM every 5 seconds
 #define EPS_SAVE_TLM_PERIOD_ADDR		0x130		//<! address where the save tlm period will be
 
-#define DEFAULT_TRXVU_SAVE_TLM_TIME		5			//<! save TRXVU TLM every 5 seconds
+#define DEFAULT_TRXVU_SAVE_TLM_TIME		10			//<! save TRXVU TLM every 5 seconds
 #define TRXVU_SAVE_TLM_PERIOD_ADDR		0x134		//<! address where the save tlm period will be
 
-#define DEFAULT_ANT_SAVE_TLM_TIME		5			//<! save antenna TLM every 5 seconds
+#define DEFAULT_ANT_SAVE_TLM_TIME		10			//<! save antenna TLM every 5 seconds
 #define ANT_SAVE_TLM_PERIOD_ADDR		0x138		//<! address where the save tlm period will be
 
-#define DEFAULT_SOLAR_SAVE_TLM_TIME		5			//<! save solar panel TLM every 5 seconds
+#define DEFAULT_SOLAR_SAVE_TLM_TIME		10			//<! save solar panel TLM every 5 seconds
 #define SOLAR_SAVE_TLM_PERIOD_ADDR		0x142		//<! address where the save tlm period will be
 
-#define DEFAULT_WOD_SAVE_TLM_TIME		5			//<! save WOD TLM every 5 seconds
+#define DEFAULT_WOD_SAVE_TLM_TIME		10			//<! save WOD TLM every 5 seconds
 #define WOD_SAVE_TLM_PERIOD_ADDR		0x146		//<! address where the save tlm period will be
 
 #define DEFAULT_RADFET_SAVE_TLM_TIME	15*60

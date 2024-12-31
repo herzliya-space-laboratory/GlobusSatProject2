@@ -206,9 +206,9 @@ int InitSubsystems(){
 
 	InitSupervisor();
 
-	InitTrxvuAndAnts();
-
 	EPS_And_SP_Init();
+
+	InitTrxvuAndAnts();
 
 	WakeupFromResetCMD();
 

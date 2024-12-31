@@ -20,6 +20,8 @@
 
 #define ERROR_CANT_SET_END_TIME			20
 
+#define ERROR_NOT_VALID_SIDE			23
+
 #define ERROR_GET_UPTIME				24
 
 #define ERROR_CANT_RESET_WDT			26

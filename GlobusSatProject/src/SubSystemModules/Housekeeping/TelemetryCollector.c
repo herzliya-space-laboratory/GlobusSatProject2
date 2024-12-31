@@ -170,15 +170,27 @@ void TelemetrySaveRx()
 	}
 }
 
-void TelemetrySaveAnt()
+void TelemetrySaveAnt0()
 {
 	isis_ants__get_all_telemetry__from_t antsTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(isis_ants__get_all_telemetry(0, &antsTelem), "TelemetrySaveANT - isis_ants__get_all_telemetry"))
+	if(!logError(isis_ants__get_all_telemetry(0, &antsTelem), "TelemetrySaveAnt0 - isis_ants__get_all_telemetry"))
 	{
-		Write2File(&antsTelem, tlm_antenna);
-		lastTimeSave[tlm_antenna] = time;
+		Write2File(&antsTelem, tlm_ants0);
+		lastTimeSave[tlm_ants0] = time;
+	}
+}
+
+void TelemetrySaveAnt1()
+{
+	isis_ants__get_all_telemetry__from_t antsTelem;
+	time_unix time = GetTime();
+	if(time == 0) return;
+	if(!logError(isis_ants__get_all_telemetry(1, &antsTelem), "TelemetrySaveAnt1 - isis_ants__get_all_telemetry"))
+	{
+		Write2File(&antsTelem, tlm_ants1);
+		lastTimeSave[tlm_ants1] = time;
 	}
 }
 
@@ -256,8 +268,10 @@ void TelemetryCollectorLogic()
 		TelemetrySaveTx();
 	if(CheckExecutionTime(lastTimeSave[tlm_rx], periods.fields.trxvu))
 		TelemetrySaveRx();
-/*	if(CheckExecutionTime(lastTimeSave[tlm_antenna], periods.fields.ants))
-		TelemetrySaveAnt();*/
+	if(CheckExecutionTime(lastTimeSave[tlm_ants0], periods.fields.ants))
+		TelemetrySaveAnt0();
+	if(CheckExecutionTime(lastTimeSave[tlm_ants1], periods.fields.ants))
+		TelemetrySaveAnt1();
 	if(CheckExecutionTime(lastTimeSave[tlm_wod], periods.fields.wod))
 		TelemetrySaveWOD();
 	if(CheckExecutionTime(lastTimeSave[tlm_solar], periods.fields.solar_panels))

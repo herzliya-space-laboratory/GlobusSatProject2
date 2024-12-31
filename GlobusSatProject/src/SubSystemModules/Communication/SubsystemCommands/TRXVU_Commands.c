@@ -460,6 +460,24 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
 }
 
+/*
+ * Helper function to get side of ants.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
+ * @param[out] name=side; type=char*; here we left the side for further use.
+ * */
+int GetAntSide(sat_packet_t *cmd, char *side)
+{
+	unsigned char error_ack;
+	if(cmd == NULL) return -1;
+	if(cmd->length != 1)
+	{
+		error_ack = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -2;
+	}
+	*side = cmd->data[0];
+	return 0;
+}
 
 /*
  * Gets Ant uptime according to side.
@@ -473,16 +491,29 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 int CMD_AntGetUptime(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
+	if(cmd == NULL) return -1;
 	int error = 0;
+	char side;
+	error = GetAntSide(cmd, &side);
+	if(error) return error;
 	uint32_t uptime;
-	error = isis_ants__get_uptime(0, &uptime);
+	if(side == '0')
+		error = isis_ants__get_uptime(0, &uptime);
+	else if(side == '1')
+		error = isis_ants__get_uptime(1, &uptime);
+	else
+	{
+		error_ack = ERROR_NOT_VALID_SIDE;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -3;
+	}
 	if(error)
 	{
 		error_ack = ERROR_GET_UPTIME;
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_AntGetUptime - TransmitDataAsSPL_Packet");
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "isis_ants__get_uptime - TransmitDataAsSPL_Packet");
 }
 
 /*
@@ -497,15 +528,30 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 int CMD_AntCancelDeployment(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
-	int error = isis_ants__cancel_deploy(0);
+	if(cmd == NULL) return -1;
+	int error;
+	char side;
+	error = GetAntSide(cmd, &side);
+	if(error) return error;
+	if(side == '0')
+		error = isis_ants__cancel_deploy(0);
+	else if(side == '1')
+		error = isis_ants__cancel_deploy(1);
+	else
+	{
+		error_ack = ERROR_NOT_VALID_SIDE;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -3;
+	}
 	if(error)
 	{
 		error_ack = ERROR_CANT_DO;
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0);
+	return logError(SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0), "isis_ants__cancel_deploy - SendAckPacket");
 }
+
 
 /*
 * Send ack ping

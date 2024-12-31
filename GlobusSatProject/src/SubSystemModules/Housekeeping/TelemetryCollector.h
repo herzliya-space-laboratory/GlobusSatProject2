@@ -93,7 +93,12 @@ void TelemetrySaveRx();
 /*!
  *  @brief saves current Antenna telemetry into file
  */
-void TelemetrySaveAnt();
+void TelemetrySaveAnt0();
+
+/*!
+ *  @brief saves current Antenna telemetry into file
+ */
+void TelemetrySaveAnt1();
 
 /*!
  *  @brief saves current solar panel telemetry (temparture of each panel) into file
