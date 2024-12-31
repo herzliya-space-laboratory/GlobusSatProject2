@@ -91,7 +91,7 @@ int WriteDefaultValuesToFRAM()
 
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
 //Need to be written with the firstActivetion that will become 1.
-	time_unix mostUpdated = UNIX_DATE_JAN_D1_Y2000;
+	time_unix mostUpdated = UNIX_SECS_FROM_Y1970_TO_Y2000;
 	if(logError(FRAM_writeAndVerify((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
@@ -112,6 +112,10 @@ int WriteDefaultValuesToFRAM()
 	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
 		thresh.raw[i] = defaultThershold[i];
 	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
+
+	int lastRadfet[7] = {0};
+	if(logError(FRAM_writeAndVerify((unsigned char*)&lastRadfet, LAST_RADFET_READ_START, sizeof(lastRadfet)), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
+
 	//TODO: LAST_COMM_TIME_ADDR
 	return error;
 }
@@ -198,6 +202,7 @@ int InitSubsystems(){
 
 	StartFRAM();
 
+	StartTIME();
 
 	InitializeFS();
 	//TODO: DELETE THE LINES OF THE FRAM WRITE BELOW. ONLY TO CHECK FIRST ACTIVETION!!!!!
@@ -209,7 +214,6 @@ int InitSubsystems(){
 	if(firstActiveFlag)
 	{
 		WriteDefaultValuesToFRAM();
-		StartTIME();
 		Delete_allTMFilesFromSD();
 	}
 	else

@@ -64,40 +64,52 @@
 #define ANT_SAVE_TLM_PERIOD_ADDR		0x138		//<! address where the save tlm period will be
 
 #define DEFAULT_SOLAR_SAVE_TLM_TIME		10			//<! save solar panel TLM every 5 seconds
-#define SOLAR_SAVE_TLM_PERIOD_ADDR		0x142		//<! address where the save tlm period will be
+#define SOLAR_SAVE_TLM_PERIOD_ADDR		0x13C		//<! address where the save tlm period will be //TODO it's need to be in hex right because it dosen't look like that
 
 #define DEFAULT_WOD_SAVE_TLM_TIME		10			//<! save WOD TLM every 5 seconds
-#define WOD_SAVE_TLM_PERIOD_ADDR		0x146		//<! address where the save tlm period will be
+#define WOD_SAVE_TLM_PERIOD_ADDR		0x140		//<! address where the save tlm period will be
 
 #define DEFAULT_RADFET_SAVE_TLM_TIME	15*60
-#define RADFET_SAVE_TLM_PERIOD_ADDR		0x150
+#define RADFET_SAVE_TLM_PERIOD_ADDR		0x144
 
 #define DEFAULT_SEU_SEL_SAVE_TLM_TIME	20
-#define SEU_SEL_SAVE_TLM_PERIOD_ADDR	0x154
+#define SEU_SEL_SAVE_TLM_PERIOD_ADDR	0x148
 
 
 #define NUMBER_OF_CMD_RESETS_ADDR		0x160		//<! counts how many restarts did the satellite endure from ground command
 #define NUMBER_OF_CMD_RESETS_SIZE		4			//<! size of the parameter in bytes
 
-#define DELAYED_CMD_FRAME_COUNT_ADDR	0X200		//<! Address where amount of frames in delayed buffer is held
+#define DELAYED_CMD_FRAME_COUNT_ADDR	0x200		//<! Address where amount of frames in delayed buffer is held
 #define DELAYED_CMD_FRAME_COUNT_SIZE	1			//<! number of bytes describing the frame count of delayed buffer
 
-#define DEL_OLD_FILES_NUM_DAYS_ADDR		0X210		//<! Address where amount of frames in delayed buffer is held
-#define DEL_OLD_FILES_NUM_DAYS_SIZE		4			//<! number of bytes describing the frame count of delayed buffer
+#define LAST_RADFET_READ_START			0x210
+
+#define LAST_RADFET_ONE_VALUE_ADDR		0x210		//<! the first value of the fram need to keep after get telemetry.
+#define LAST_RADFET_ONE_VALUE_SIZE		4			//<! number of bytes describing the frame count of delayed buffer
+
+#define LAST_RADFET_TWO_VALUE_ADDR		0x214
+#define LAST_RADFET_TWO_VALUE_SIZE		4
+
+#define LAST_RADFET_TEMP_ADDR			0x218
+#define LAST_RADFET_TEMP_SIZE			16
+
+#define	TIME_LAST_RADFET_READ_ADDR		0x228
+#define	TIME_LAST_RADFET_READ_SIZE		4
+
 
 #define TRANS_ABORT_FLAG_ADDR			0x500		//<! transmission abort request flag
 #define TRANS_ABORT_FLAG_SIZE			1			//<! size of mute flag in bytes
 
-#define EPS_THRESH_VOLTAGES_ADDR		0x666		//<! starting address for eps threshold voltages array
-#define EPS_THRESH_VOLTAGES_SIZE (NUMBER_OF_THRESHOLD_VOLTAGES * sizeof(voltage_t)) //<! number of bytes in eps threshold voltages array
+#define EPS_ALPHA_FILTER_VALUE_ADDR 	0x550			//<! filtering value in the LPF formula
+#define EPS_ALPHA_FILTER_VALUE_SIZE 	sizeof(float)	//<! size of double (alpha)
 
-#define EPS_ALPHA_FILTER_VALUE_ADDR 0x550			//<! filtering value in the LPF formula
-#define EPS_ALPHA_FILTER_VALUE_SIZE sizeof(float)	//<! size of double (alpha)
+#define EPS_THRESH_VOLTAGES_ADDR		0x666		//<! starting address for eps threshold voltages array
+#define EPS_THRESH_VOLTAGES_SIZE 		(NUMBER_OF_THRESHOLD_VOLTAGES * sizeof(voltage_t)) //<! number of bytes in eps threshold voltages array
 
 #define BEACON_INTERVAL_TIME_ADDR 		0x4590		//<! address of value of the delay between 2 beacons
 #define BEACON_INTERVAL_TIME_SIZE 		4			//<! size of parameter in bytes
 
-#define LAST_COMM_TIME_ADDR 			0X9485		//<! saves the last unix time at which communication has occured
+#define LAST_COMM_TIME_ADDR 			0x9485		//<! saves the last unix time at which communication has occured
 #define LAST_COMM_TIME_SIZE				4			//<! size of last communication time in bytes
 
 #define DEFAULT_BEACON_INTERVAL_TIME 	20			//<! how many seconds between two beacons [sec]

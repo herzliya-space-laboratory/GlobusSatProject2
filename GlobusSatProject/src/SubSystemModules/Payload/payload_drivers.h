@@ -28,10 +28,15 @@ typedef enum {
  * @struct PayloadEnvironmentData
  * @brief Structure to hold RADFET and temperature readings.
  */
-typedef struct {
-    int adc_conversion_radfet1; /**< ADC conversion result for RADFET 1 */
-    int adc_conversion_radfet2; /**< ADC conversion result for RADFET 2 */
-    double temperature;            /**< Temperature measurement in degrees Celsius */
+typedef union __attribute__ ((__packed__)) _PayloadEnvironmentData
+{
+    unsigned char raw[sizeof(int)*2 + sizeof(double)];
+    struct __attribute__ ((__packed__))
+    {
+		int adc_conversion_radfet1; /**< ADC conversion result for RADFET 1 */
+		int adc_conversion_radfet2; /**< ADC conversion result for RADFET 2 */
+		double temperature;            /**< Temperature measurement in degrees Celsius */
+    } fields;
 } PayloadEnvironmentData;
 
 /**

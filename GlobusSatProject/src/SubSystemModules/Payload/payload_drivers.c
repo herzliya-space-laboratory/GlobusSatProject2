@@ -58,10 +58,10 @@ SoreqResult payloadReadEnvironment(PayloadEnvironmentData *environment_data) {
     if (res != PAYLOAD_SUCCESS) {
         return res;
     }
-    memcpy(&environment_data->adc_conversion_radfet1, buffer + 4, 4);
-    memcpy(&environment_data->adc_conversion_radfet2, buffer + 8, 4);
-    CHANGE_ENDIAN(environment_data->adc_conversion_radfet1);
-    CHANGE_ENDIAN(environment_data->adc_conversion_radfet2);
+    memcpy(&environment_data->fields.adc_conversion_radfet1, buffer + 4, 4);
+    memcpy(&environment_data->fields.adc_conversion_radfet2, buffer + 8, 4);
+    CHANGE_ENDIAN(environment_data->fields.adc_conversion_radfet1);
+    CHANGE_ENDIAN(environment_data->fields.adc_conversion_radfet2);
 
     // Read temperature ADC value
     int raw_temperature_adc;
@@ -76,7 +76,7 @@ SoreqResult payloadReadEnvironment(PayloadEnvironmentData *environment_data) {
     int remove_extra_bits = (raw_temperature_adc & (~(1 << 29))) >> 5; // Mask and shift to remove redundant bits
     double voltage = ADC_TO_VOLTAGE(remove_extra_bits); // Convert ADC value to voltage
     double temperature = VOLTAGE_TO_TEMPERATURE(voltage); // Convert voltage to temperature
-    environment_data->temperature = temperature;
+    environment_data->fields.temperature = temperature;
 
     return PAYLOAD_SUCCESS;
 }

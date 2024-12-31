@@ -53,6 +53,13 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 	unsigned int number_of_resets;	///< counts the number of resets the satellite has gone through [#]
 	time_unix sat_uptime;			///< Sat uptime
 	unsigned int num_of_cmd_resets;///< counts the number of resets the satellite has gone through due to ground station command [#]
+	int sel_counter;
+	int seu_counter;
+	int sensor_one_radfet;
+	int sensor_two_radfet;
+	double radfet_temp;
+	time_unix last_radfet_read_time;
+
 } WOD_Telemetry_t;
 
 

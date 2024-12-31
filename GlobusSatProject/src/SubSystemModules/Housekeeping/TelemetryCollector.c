@@ -57,7 +57,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->current_5V = responseEPS.fields.vip_obc01.fields.current;
 		wod->volt_3V3 = responseEPS.fields.vip_obc05.fields.volt;
 		wod->volt_5V = responseEPS.fields.vip_obc01.fields.volt;
-		wod->charging_power = -1; //TODO
+		wod->charging_power = responseEPS.fields.batt_input.fields.power * 10; //TODO to check
 	}
 	else // if have error in the eps put everything in that section to -1
 	{
@@ -121,6 +121,39 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	if(logError(FRAM_read((unsigned char*)&numberOfCMDResets, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "GetCurrentWODTelemetry - FRAM_read cmd resets")) wod->num_of_cmd_resets = -1;
 	else wod->num_of_cmd_resets = numberOfCMDResets;
 
+	PayloadEventData eventsData;
+	if(!logError(payloadReadEvents(&eventsData), "GetCurrentWODTelemetry - payloadReadEvents"))
+	{
+		wod->sel_counter = eventsData.sel_count;
+		wod->seu_counter = eventsData.seu_count;
+	}
+	else
+	{
+		wod->sel_counter = -1;
+		wod->seu_counter = -1;
+	}
+
+	PayloadEnvironmentData radfetData;
+	if(!logError(FRAM_read(radfetData.raw, LAST_RADFET_READ_START, sizeof(radfetData.raw)), "GetCurrentWODTelemetry - FRAM_read"))
+	{
+		wod->sensor_one_radfet = radfetData.fields.adc_conversion_radfet1;
+		wod->sensor_two_radfet = radfetData.fields.adc_conversion_radfet2;
+		wod->radfet_temp = radfetData.fields.temperature;
+
+	}
+	else
+	{
+		wod->sensor_one_radfet = -1;
+		wod->sensor_two_radfet = -1;
+		wod->radfet_temp = -1;
+	}
+	time_unix lastTime;
+	if(!logError(FRAM_read((unsigned char*)&lastTime, TIME_LAST_RADFET_READ_ADDR, TIME_LAST_RADFET_READ_SIZE), "GetCurrentWODTelemetry - FRAM_read"))
+		wod->last_radfet_read_time = lastTime;
+	else
+		wod->last_radfet_read_time = -1;
+
+	//TODO: add the flag of the payload (if permanently off)
 	return 0;
 }
 
@@ -230,6 +263,8 @@ void TelemetrySavePayloadRADFET()
 	if(logError(payloadReadEnvironment(&radfetData), "TelemetrySavePayloadRADFET - payloadReadEnvironment")) return;
 	Write2File(&radfetData, tlm_radfet);
 	lastTimeSave[tlm_radfet] = time;
+	logError(FRAM_writeAndVerify(radfetData.raw, LAST_RADFET_READ_START, sizeof(radfetData.raw)), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
+	logError(FRAM_writeAndVerify((unsigned char*)&time, TIME_LAST_RADFET_READ_ADDR, TIME_LAST_RADFET_READ_SIZE), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
 }
 
 void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
