@@ -74,7 +74,7 @@ void InitTxModule()
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
 	time_unix timeNow;
-	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "InitTrxvuAndAnts - Time_getUnixEpoch");
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "InitTxModule - Time_getUnixEpoch");
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 	vSemaphoreCreateBinary(semaphorDump);
@@ -96,7 +96,7 @@ int setTransponderOn()
  * */
 int setTransponderOff()
 {
-	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_off), "CMD_SetOff_Transponder - isis_vu_e__set_tx_mode"); // Set transponder off
+	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_off), "setOff_Transponder - isis_vu_e__set_tx_mode"); // Set transponder off
 }
 
 /*
@@ -149,14 +149,14 @@ int setMuteEndTime(time_unix endTime)
 	time_unix timeNow;
 	if(endTime > MAX_MUTE_TIME) // check we are in range and if not round it.
 		endTime = MAX_MUTE_TIME;
-	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch"))
+	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "setMuteEndTime - Time_getUnixEpoch"))
 		return -1;
 	endTime += timeNow;
 	if(logError(FRAM_write((unsigned char*)&endTime, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE), "setMuteEndTime - FRAM_write"))
 		return -1;
 	time_unix check = getMuteEndTime(); //TODO: need explanation for what to do if can't read
 	if(check != endTime)
-		return logError(-2, "setMuteEndTime - Not written what needed to be");
+		return logError(-2, "setMuteEndTime - Not written right");
 	return 0;
 }
 
@@ -229,17 +229,14 @@ int setTransponderRSSIinFRAM(short val)
 		val = 0;
 	else if(val > 4095) //max according to TRXVU Transponder Mode Addendum (in drive)
 		val = 4095;
-	/*unsigned char data[] = {0x52, val,0};
-	if(logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 3), "setTransponderRSSIinFRAM - I2C_write"))
-			return -3;*/
-	if(logError(isis_vu_e__set_tx_thr_rssi(0, val), "setTransponderRSSIinFRAM - I2C_write"))
+	if(logError(isis_vu_e__set_tx_thr_rssi(0, val), "setTransponderRSSIinFRAM - isis_vu_e__set_tx_thr_rssi"))
 		return -3;
 	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))
 		return -1;
 	short check = 0;
 	logError(FRAM_read((unsigned char*)&check, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_read");
 	if(check != val)
-		return logError(-2, "setTransponderRSSIinFRAM - Not written what needed to be");
+		return logError(-2, "setTransponderRSSIinFRAM - Not written right");
 	return 0;
 }
 
@@ -261,7 +258,7 @@ short getTransponderRSSIFromFRAM()
  * */
 int setNewBeaconIntervalToPeriod()
 {
-	return logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read");
+	return logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "setNewBeaconIntervalToPeriod - FRAM_read");
 }
 
 /*
@@ -280,7 +277,7 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 {
 	if(state == isis_vu_e__onoff__on)
 	{
-		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__on), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
+		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__on), "SetIdleState - isis_vu_e__set_idle_state"))
 			return -1;
 		if(duration > MAX_IDLE_TIME)
 			duration = MAX_IDLE_TIME;
@@ -294,12 +291,12 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 		if(logError(FRAM_read((unsigned char*)&check, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_read"))
 			return -2;
 		if(check != duration)
-			return logError(-4, "SetIdleState - Not written what needed to be");
+			return logError(-4, "SetIdleState - Not written right");
 	}
 
 	if(state == isis_vu_e__onoff__off)
 	{
-		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__off), "SetIdleState - IsisTrxvu_tcSetIdlestate"))
+		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__off), "SetIdleState - isis_vu_e__set_idle_state"))
 				return -1;
 		duration = 0;
 		if(logError(FRAM_write((unsigned char*)&duration, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_write"))
@@ -308,7 +305,7 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 		if(logError(FRAM_read((unsigned char*)&check, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_read"))
 			return -2;
 		if(check != duration)
-			return logError(-4, "SetIdleState - Not written what needed to be");
+			return logError(-4, "SetIdleState - Not written right");
 	}
 
 	return -6;
@@ -322,7 +319,7 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 int GetNumberOfFramesInBuffer()
 {
 	unsigned short frameCount;
-	int err = logError(isis_vu_e__get_frame_count(0, &frameCount), "TRXVU - IsisTrxvu_rcGetFrameCount"); // Get number of packets in buffer
+	int err = logError(isis_vu_e__get_frame_count(0, &frameCount), "GetNumberOfFramesInBuffer - isis_vu_e__get_frame_count"); // Get number of packets in buffer
 	if(err != E_NO_SS_ERR)
 		return -1;
 	return frameCount;
@@ -338,8 +335,8 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 {
 	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
 	isis_vu_e__get_frame__from_t rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read
-	int error = logError(isis_vu_e__get_frame(0, &rx_frame), "TRXVU - IsisTrxvu_rcGetCommandFrame"); // Get packet
-	isis_vu_e__remove_frame(0);
+	int error = logError(isis_vu_e__get_frame(0, &rx_frame), "GetOnlineCommand - isis_vu_e__get_frame"); // Get packet
+	error += logError(isis_vu_e__remove_frame(0), "GetOnlineCommand - isis_vu_e__remove_frame");
 	if(error != E_NO_SS_ERR)
 		return execution_error;
 	error = ParseDataToCommand(rx_frame.data, cmd); // Put the info from the packet in the cmd parameter
@@ -362,7 +359,7 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 	if(packet == NULL)
 		return -1;
 	size_t place = sizeof(packet->ID) + sizeof(packet->cmd_subtype) + sizeof(packet->cmd_type) + sizeof(packet->length) + packet->length; // Get the length of the data of the packet (including the headers we add)
-	int error = logError(isis_vu_e__send_frame(0, (unsigned char *)packet, place, &avail), "TRXVU - isis_vu_e__send_frame");  // Transmit packet
+	int error = logError(isis_vu_e__send_frame(0, (unsigned char *)packet, place, &avail), "TransmitSplPacket - isis_vu_e__send_frame");  // Transmit packet
 	*avalFrames = (int)avail; // Get avail Frames
 	return error;
 }
@@ -386,7 +383,7 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 		return -1;
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2; // Change the packet for send with the needed info
 	size_t place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length; // Get the length of the data of the packet (including the headers we add)
-	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TRXVU - isis_vu_e__send_frame"); // Transmit packet
+	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TransmitDataAsSPL_Packet - isis_vu_e__send_frame"); // Transmit packet
 }
 
 /*
@@ -398,7 +395,7 @@ Boolean CheckTransmitionAllowed()
 {
 	if(GetTxFlag()) return FALSE;
 	time_unix timeNow;
-	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CMD_UnMuteTRXVU - Time_getUnixEpoch");
+	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CheckTransmitionAllowed - Time_getUnixEpoch");
 	if(timeNow < getMuteEndTime()) // check we are after the mute end time.
 		return FALSE;
 	return TRUE;
@@ -418,12 +415,12 @@ int BeaconLogic()
 	short length = sizeof(WOD_Telemetry_t);
 	WOD_Telemetry_t data;
 	GetCurrentWODTelemetry(&data); // Gets the telemetry of the beacon and put it in data.
-	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "Beacon - Assemble command"); // Create the beacon packet
+	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "BeaconLogic - AssembleCommand"); // Create the beacon packet
 	int avalFrames;
-	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "TRXVU - isis_vu_e__send_frame"); // Send the beacon packet
+	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "BeaconLogic - TransmitSplPacket"); // Send the beacon packet
 	if(error) // if error return it
 		return error;
-	return logError(Time_getUnixEpoch((unsigned int*)&lastTimeSendingBeacon), "TRXVU - Time_getUnixEpoch"); // Check last time we send beacon to now.
+	return logError(Time_getUnixEpoch((unsigned int*)&lastTimeSendingBeacon), "BeaconLogic - Time_getUnixEpoch"); // Check last time we send beacon to now.
 
 }
 
@@ -442,7 +439,7 @@ int TRX_Logic()
 	{ // if so
 		error = GetOnlineCommand(&cmd); // Get the packet and put her in the sat_packet_t struct (in the param cmd)
 		if(error != command_success) // Check if have error
-			return logError(error, "GetOnlineCommand");
+			return logError(error, "TRX_Logic - GetOnlineCommand");
 		SendAckPacket(ACK_RECEIVE_COMM, &cmd, NULL, 0); // Send ack of receiving the packet
 		ActUponCommand(&cmd); // Go to do the command
 	}

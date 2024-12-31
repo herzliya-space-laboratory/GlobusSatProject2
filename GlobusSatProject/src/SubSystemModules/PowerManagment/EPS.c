@@ -17,12 +17,13 @@
 voltage_t lastVoltage;
 EpsThreshVolt_t threshold_volts;
 float Alpha;
+
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
 	ISISMEPSV2_IVID7_PIU_t stract_1;
 	stract_1.i2cAddr = EPS_I2C_ADDR;
-	errorEPS = logError(ISISMEPSV2_IVID7_PIU_Init(&stract_1, 1), "EPS - IMEPSV2_PIU_Init");
+	errorEPS = logError(ISISMEPSV2_IVID7_PIU_Init(&stract_1, 1), "EPS_And_SP_Init - ISISMEPSV2_IVID7_PIU_Init");
 	if(!errorEPS)
 	{
 		GetThresholdVoltages(&threshold_volts);
@@ -30,9 +31,9 @@ int EPS_And_SP_Init(){
 		GetAlpha(&Alpha);
 	}
 #ifdef WE_HAVE_SP
-	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "Solar panels - IsisSolarPanelv2_initialize");
+	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "EPS_And_SP_Init - IsisSolarPanelv2_initialize");
 	if(errorSP == 0)
-		errorSP = logError(IsisSolarPanelv2_sleep(), "Solar panels - sleep");
+		errorSP = logError(IsisSolarPanelv2_sleep(), "EPS_And_SP_Init - IsisSolarPanelv2_sleep");
 #endif
 	if(errorSP || errorEPS)
 			return -1;
@@ -48,7 +49,7 @@ int EPS_And_SP_Init(){
 int GetBatteryVoltage(voltage_t *vbat)
 {
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
-	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetBatteryVoltage - imepsv2_piu__gethousekeepingeng"); //Get struct and get kind of error
+	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetBatteryVoltage - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(error_eps) return error_eps;
 	*vbat = (voltage_t)responseEPS.fields.batt_input.fields.volt;
 	return 0;
@@ -86,7 +87,7 @@ int GetAlpha(float *alpha)
 int UpdateAlpha(float alpha)
 {
 	if(alpha < 0 || alpha > 1) return -2;
-	if(logError(FRAM_write((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE),"UpdateAlpha - FRAM write")) return -1;
+	if(logError(FRAM_write((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE),"UpdateAlpha - FRAM_write")) return -1;
 	Alpha = alpha;
 	float writtenAlpha;
 	if(logError(GetAlpha(&writtenAlpha), "UpdateAlpha - GetAlpha")) return -4;

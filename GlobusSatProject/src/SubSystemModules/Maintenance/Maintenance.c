@@ -56,19 +56,19 @@ int WakeupFromResetCMD()
 	logError(Time_getUnixEpoch((unsigned int*)&time), "WakeupFromResetCMD - Time_getUnixEpoch");
 
 	int reset = 0;
-	logError(FRAM_read((unsigned char*)&reset, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WakeupFromResetCMD - fram_read");
+	logError(FRAM_read((unsigned char*)&reset, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WakeupFromResetCMD - FRAM_read");
 	reset += 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&reset, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
 	int flagCMDReset;
-	logError(FRAM_read((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - fram_read");
+	logError(FRAM_read((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_read");
 	if(!flagCMDReset) return SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time));
 
 	flagCMDReset = 0;
 	logError(FRAM_writeAndVerify((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
 	int cmdReset = 0;
-	logError(FRAM_read((unsigned char*)&cmdReset, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "WakeupFromResetCMD - fram_read");
+	logError(FRAM_read((unsigned char*)&cmdReset, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "WakeupFromResetCMD - FRAM_read");
 	cmdReset += 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&cmdReset, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
@@ -82,7 +82,10 @@ int WakeupFromResetCMD()
  */
 void Maintenance()
 {
-	F_FIND find;
+	F_SPACE space;
+	if(logError(f_getfreespace(f_getdrive(), &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
+
+/*	F_FIND find;
 	time_unix timeNow;
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "Maintenance - Time_getUnixEpoch");
 	if(error) return;
@@ -121,5 +124,5 @@ void Maintenance()
 	do{
 		f_delete(find.filename); //delete
 	}
-	while(!f_findnext(&find));
+	while(!f_findnext(&find));*/
 }

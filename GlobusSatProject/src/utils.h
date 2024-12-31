@@ -32,7 +32,7 @@
 
 #define MAX_ERRORS       				 10 // max errors we want to log from the same type toghether
 #define MAX_TIME_BETWEEN_ERRORS          60 // max seconds we allow between errors
-#define MAX_LOG_STR				100
+#define MAX_LOG_STR				66
 
 typedef struct data
 {

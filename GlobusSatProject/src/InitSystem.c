@@ -34,27 +34,27 @@ int antsOn = 1;
 int deploy = 1;
 
 int StartFRAM(){
-	return logError(FRAM_start(), "FRAM - FRAM_start");
+	return logError(FRAM_start(), "StartFRAM - FRAM_start");
 }
 
 int StartI2C(){
-	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "I2C - I2C_start");
+	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "StartI2C - I2C_start");
 }
 
 int StartSPI(){
-	return logError(SPI_start(bus1_spi, slave1_spi), "SPI - SPI_start");
+	return logError(SPI_start(bus1_spi, slave1_spi), "StartSPI - SPI_start");
 }
 
 int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
-	return logError(Time_start(&time, TIME_SYNCINTERVAL), "Time - Time_start");
+	return logError(Time_start(&time, TIME_SYNCINTERVAL), "StartTIME - Time_start");
 }
 
 int InitSupervisor()
 {
 	uint8_t po = SUPERVISOR_SPI_INDEX;
 	int error = Supervisor_start(&po, 0);
-	return logError(error, "Supervisor - Supervisor_start");
+	return logError(error, "InitSupervisor - Supervisor_start");
 }
 
 int WriteDefaultValuesToFRAM()
@@ -67,42 +67,42 @@ int WriteDefaultValuesToFRAM()
 	if(FRAM_writeAndVerify((unsigned char*)&param, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE)) error += -1;
 
 	int beacon_interval = DEFAULT_BEACON_INTERVAL_TIME;
-	if(logError(FRAM_writeAndVerify((unsigned char*)&beacon_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "default to FRAM - beacon")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&beacon_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	int rssi = DEFAULT_RSSI_VALUE;
-	if(logError(FRAM_writeAndVerify((unsigned char*)&rssi, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "default to FRAM - rssi")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&rssi, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	float alpha = DEFAULT_ALPHA_VALUE;
-	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "default to FRAM - alpha")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 #ifdef TESTING
 	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY;
 #else
 	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY*60;
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "default to FRAM - deploy time")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
 //Need to be written with the firstActivetion that will become 1.
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "default to FRAM - number of resets")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "default to FRAM - number of cmd resets")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "default to FRAM - cmd reset flag")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	int arrPeriod[7] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
-	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "default to FRAM - save TLM periods")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "default to FRAM - transmission abort flag")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, TRANS_ABORT_FLAG_ADDR, TRANS_ABORT_FLAG_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "default to FRAM - changes in mode")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 	EpsThreshVolt_t thresh;
 	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
 		thresh.raw[i] = defaultThershold[i];
-	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "default to FRAM - threshold voltages")) error += -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 	//TODO: LAST_COMM_TIME_ADDR
 	return error;
 }
@@ -154,7 +154,7 @@ int FirstActivation()
 	int zero = 0;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy");
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify");
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
@@ -169,7 +169,7 @@ int FirstActivation()
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
 		TelemetryCollectorLogic();
-		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - seconds since deploy")) error = -1;
+		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
 #endif
@@ -178,7 +178,7 @@ int FirstActivation()
 	while(AntArm() == -1);
 	while(AntDeployment() == -1);
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - first activation flag = 0")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - FRAM_writeAndVerify - flag = 0")) error = -1;
 	return error;
 }
 

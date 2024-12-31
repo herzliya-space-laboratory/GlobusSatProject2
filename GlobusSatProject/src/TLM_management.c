@@ -50,9 +50,9 @@ FileSystemResult InitializeFS(){
 	if (err != E_NO_SS_ERR){
 	// error init SD 0 so de-itnit and init SD 1
 	//printf("f_initvolume primary error:%d\n",err);
-		logError(hcc_mem_init(), "FS - hcc_mem_init - 2");
-		logError(fs_init(), "FS - fs_init - 2");
-		logError(f_enterFS(), "FS - fs_enterFS - 2");
+		hcc_mem_init();
+		fs_init();
+		f_enterFS();
 		err = f_initvolume( 0, atmel_mcipdc_initfunc, 1 );
 		if (err != E_NO_SS_ERR){
 				//printf("f_initvolume secondary error:%d\n",err);
@@ -249,10 +249,10 @@ int Delete_allTMFilesFromSD()
 	if(sd == 0 || sd == 1)
 	{
 		printf("SD: %d\r\n", sd);
-		if(logError(f_format(sd, F_FAT32_MEDIA), "Delete_allTMFilesFromSD - Formating SD Card")) error = -1;
+		if(logError(f_format(sd, F_FAT32_MEDIA), "Delete_allTMFilesFromSD - f_format")) error = -1;
 	}
 	else
-		if(logError(sd, "Delete_allTMFilesFromSD - in get which SD we are using")) error = -2;
+		if(logError(sd, "Delete_allTMFilesFromSD - f_getdrive")) error = -2;
 	return error;
 }
 

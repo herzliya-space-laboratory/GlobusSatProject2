@@ -20,7 +20,7 @@ PeriodTimes periods;
 time_unix GetTime()
 {
 	time_unix time = 0;
-	logError(Time_getUnixEpoch((unsigned int*)&time), "TelemetryCollector - Time_getUnixEpoch");
+	logError(Time_getUnixEpoch((unsigned int*)&time), "GetTime - Time_getUnixEpoch");
 	return time;
 }
 
@@ -45,7 +45,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	F_SPACE space; //same just to SD
 	int ret = logError(f_getfreespace(f_getdrive(), &space), "GetCurrentWODTelemetry - f_getfreespace"); //gets the variables to the struct
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
-	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetCurrentWODTelemetry - imepsv2_piu__gethousekeepingeng"); //Get struct and get kind of error
+	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetCurrentWODTelemetry - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(!error_eps)
 	{
 		wod->voltBattery = responseEPS.fields.batt_input.fields.volt;
@@ -110,7 +110,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->total_memory = -1;
 		wod->used_bytes = -1;
 	}
-	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "TelemetryCollector - Time_getUnixEpoch")) // if have error in geting the sat time put the time to -1
+	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "GetCurrentWODTelemetry - Time_getUnixEpoch")) // if have error in geting the sat time put the time to -1
 		wod->sat_time = -1;
 
 	unsigned int numberOfResets;
@@ -138,7 +138,7 @@ void TelemetrySaveEPS()
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - imepsv2_piu__gethousekeepingeng"))
+	if(!logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - isismepsv2_ivid7_piu__gethousekeepingeng"))
 	{
 		Write2File(&responseEPS, tlm_eps); //Get struct and get kind of error
 		lastTimeSave[tlm_eps] = time;
@@ -151,7 +151,7 @@ void TelemetrySaveTx()
 	isis_vu_e__get_tx_telemetry__from_t txTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(isis_vu_e__get_tx_telemetry(0, &txTelem), "TelemetrySaveTRXVU - isis_vu_e__get_tx_telemetry"))
+	if(!logError(isis_vu_e__get_tx_telemetry(0, &txTelem), "TelemetrySaveTx - isis_vu_e__get_tx_telemetry"))
 	{
 		Write2File(&txTelem, tlm_tx);
 		lastTimeSave[tlm_tx] = time;
@@ -163,7 +163,7 @@ void TelemetrySaveRx()
 	isis_vu_e__get_rx_telemetry__from_t rxTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
-	if(!logError(isis_vu_e__get_rx_telemetry(0, &rxTelem), "TelemetrySaveTRXVU - isis_vu_e__get_rx_telemetry"))
+	if(!logError(isis_vu_e__get_rx_telemetry(0, &rxTelem), "TelemetrySaveRx - isis_vu_e__get_rx_telemetry"))
 	{
 		Write2File(&rxTelem, tlm_rx);
 		lastTimeSave[tlm_rx] = time;
@@ -204,11 +204,12 @@ void TelemetrySaveSolarPanels()
 	int32_t paneltemp = 0;
 	float conv_temp;
 	solar_tlm_t tempSolar;
-	for(int panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ ) //Go for the count of solar panels we have.
+	for(int panel = 0; panel < NUMBER_OF_SOLAR_PANELS; panel++ ) //Go for the count of solar panels we have.
 	{
 		error_sp = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //Gets the temperature of each panel and the error message.
 		if(error_sp) //if there is error
 		{
+			logError(error_sp, "TelemetrySaveSolarPanels - IsisSolarPanelv2_getTemperature " + (char)panel);
 			tempSolar.values[panel] = -1;
 			continue;
 		}
@@ -234,7 +235,7 @@ void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
 {
 	selData->count = eventsData.sel_count;
 	if(logError(FRAM_read((unsigned char*)&selData->sat_resets_count, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->sat_resets_count = -1;
-	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->changes_in_mode = -1;
+	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read change in mode")) selData->changes_in_mode = -1;
 }
 
 void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time)

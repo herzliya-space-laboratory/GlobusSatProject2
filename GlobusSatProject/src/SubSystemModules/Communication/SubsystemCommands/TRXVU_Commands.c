@@ -189,7 +189,7 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 		return error;
 	}
 	time_unix timeNow = 1;
-	error = logError(FRAM_write((unsigned char*)&timeNow, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOn_Transponder - FRAM_write");
+	error = logError(FRAM_write((unsigned char*)&timeNow, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE), "CMD_SetOff_Transponder - FRAM_write");
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_FRAM;
@@ -365,7 +365,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		new_interval = MAX_BEACON_INTERVAL;
 	else if(new_interval <= MIN_BEACON_INTERVAL) // Same only to min interval
 		new_interval = MIN_BEACON_INTERVAL;
-	error = logError(FRAM_write((unsigned char*)&new_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_write"); // Write the new interval to FRAM
+	error = logError(FRAM_write((unsigned char*)&new_interval, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "CMD_SetBeacon_Interval - FRAM_write"); // Write the new interval to FRAM
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_FRAM;
@@ -373,7 +373,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		return error;
 	}
 	time_unix check;
-	error = logError(FRAM_read((unsigned char*)&check, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read"); // Read from FRAM in the place we wrote to for check
+	error = logError(FRAM_read((unsigned char*)&check, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "CMD_SetBeacon_Interval - FRAM_read"); // Read from FRAM in the place we wrote to for check
 	if(error)
 	{
 		error_ack = ERROR_READ_FROM_FRAM;
@@ -412,7 +412,7 @@ int CMD_SetBeacon_Interval_DEFAULT(sat_packet_t *cmd)
 int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 {
 	time_unix period;
-	int error = logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "InitTrxvu - FRAM_read"); // Read the beacon interval from FRAM
+	int error = logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "CMD_GetBeacon_Interval - FRAM_read"); // Read the beacon interval from FRAM
 	if(error)
 	{
 		unsigned char error_ack = ERROR_READ_FROM_FRAM;
@@ -432,7 +432,7 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 int CMD_GetTxUptime(sat_packet_t *cmd)
 {
 	uint32_t uptime;
-	int error = isis_vu_e__tx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
+	int error = logError(isis_vu_e__tx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime), "CMD_GetTxUptime - isis_vu_e__tx_uptime");
 	if(error)
 	{
 		unsigned char error_ack = ERROR_GET_UPTIME;
@@ -450,14 +450,14 @@ int CMD_GetTxUptime(sat_packet_t *cmd)
 int CMD_GetRxUptime(sat_packet_t *cmd)
 {
 	uint32_t uptime;
-	int error = isis_vu_e__rx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime);
+	int error = logError(isis_vu_e__rx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime), "CMD_GetRxUptime - isis_vu_e__rx_uptime");
 	if(error)
 	{
 		unsigned char error_ack = ERROR_GET_UPTIME;
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetRxUptime - TransmitDataAsSPL_Packet");
 }
 
 /*
@@ -498,9 +498,9 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 	if(error) return error;
 	uint32_t uptime;
 	if(side == '0')
-		error = isis_ants__get_uptime(0, &uptime);
+		error = logError(isis_ants__get_uptime(0, &uptime), "CMD_AntGetUptime - isis_ants__get_uptime - 0");
 	else if(side == '1')
-		error = isis_ants__get_uptime(1, &uptime);
+		error = logError(isis_ants__get_uptime(1, &uptime), "CMD_AntGetUptime - isis_ants__get_uptime - 1");
 	else
 	{
 		error_ack = ERROR_NOT_VALID_SIDE;
@@ -513,7 +513,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "isis_ants__get_uptime - TransmitDataAsSPL_Packet");
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_AntGetUptime - TransmitDataAsSPL_Packet");
 }
 
 /*
@@ -534,9 +534,9 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd)
 	error = GetAntSide(cmd, &side);
 	if(error) return error;
 	if(side == '0')
-		error = isis_ants__cancel_deploy(0);
+		error = logError(isis_ants__cancel_deploy(0), "CMD_AntCancelDeployment - isis_ants__cancel_deploy - 0");
 	else if(side == '1')
-		error = isis_ants__cancel_deploy(1);
+		error = logError(isis_ants__cancel_deploy(1), "CMD_AntCancelDeployment - isis_ants__cancel_deploy - 1");
 	else
 	{
 		error_ack = ERROR_NOT_VALID_SIDE;

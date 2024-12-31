@@ -204,7 +204,7 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 		return -3;
 	}
 	time_unix passSatTime;
-	logError(Time_getUnixEpoch(&passSatTime), "CMD_UpdateSatTime - Time_setUnixEpoch");
+	logError(Time_getUnixEpoch(&passSatTime), "CMD_UpdateSatTime - Time_getUnixEpoch");
 	time_unix newSatTime;
 	memcpy((unsigned char*)&newSatTime, cmd->data, cmd->length);
 	int error = logError(Time_setUnixEpoch(newSatTime), "CMD_UpdateSatTime - Time_setUnixEpoch");
