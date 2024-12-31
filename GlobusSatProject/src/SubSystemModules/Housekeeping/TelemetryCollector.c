@@ -110,6 +110,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->total_memory = -1;
 		wod->used_bytes = -1;
 	}
+	wod->lastFS_error = f_getlasterror();
 	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "GetCurrentWODTelemetry - Time_getUnixEpoch")) // if have error in geting the sat time put the time to -1
 		wod->sat_time = -1;
 

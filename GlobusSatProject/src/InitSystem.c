@@ -50,6 +50,13 @@ int StartTIME(){
 	return logError(Time_start(&time, TIME_SYNCINTERVAL), "StartTIME - Time_start");
 }
 
+int UpdateTime()
+{
+	time_unix mostUpdated;
+	if(logError(FRAM_read((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "UpdateTime - FRAM_read")) return -1;
+	return logError(Time_setUnixEpoch((unsigned int)mostUpdated), "updateTime - Time_setUnixEpoch");
+}
+
 int InitSupervisor()
 {
 	uint8_t po = SUPERVISOR_SPI_INDEX;
@@ -84,6 +91,8 @@ int WriteDefaultValuesToFRAM()
 
 	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
 //Need to be written with the firstActivetion that will become 1.
+	time_unix mostUpdated = UNIX_DATE_JAN_D1_Y2000;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
@@ -189,7 +198,6 @@ int InitSubsystems(){
 
 	StartFRAM();
 
-	StartTIME();
 
 	InitializeFS();
 	//TODO: DELETE THE LINES OF THE FRAM WRITE BELOW. ONLY TO CHECK FIRST ACTIVETION!!!!!
@@ -201,8 +209,11 @@ int InitSubsystems(){
 	if(firstActiveFlag)
 	{
 		WriteDefaultValuesToFRAM();
+		StartTIME();
 		Delete_allTMFilesFromSD();
 	}
+	else
+		UpdateTime();
 
 	InitSupervisor();
 

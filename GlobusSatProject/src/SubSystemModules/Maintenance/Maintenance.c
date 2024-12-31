@@ -76,12 +76,20 @@ int WakeupFromResetCMD()
 
 }
 
+void MostCurrentTimeToFRAM()
+{
+	time_unix timeNow = 0;
+	if(logError(Time_getUnixEpoch((unsigned int*)timeNow), "MostCurrentTimeToFRAM - Time_getUnixEpoch")) return;
+	logError(FRAM_writeAndVerify((unsigned char*)&timeNow, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "MostCurrentTimeToFRAM - FRAM_writeAndVerify");
+}
 
 /*!
  * @brief Calls the relevant functions in a serial order
  */
 void Maintenance()
 {
+	MostCurrentTimeToFRAM();
+
 	F_SPACE space;
 	int sd = f_getdrive();
 	if(sd != 0 && sd != 1)

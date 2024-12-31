@@ -110,6 +110,7 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 	}
 	short type;
 	memcpy(&type, cmd->data, cmd->length);
+	MostCurrentTimeToFRAM();
 	switch(type)
 	{
 		case reset_software:
