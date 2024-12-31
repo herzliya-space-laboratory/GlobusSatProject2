@@ -6,6 +6,7 @@
  */
 
 #include "Maintenance_Commands.h"
+#include "SubSystemModules/Maintenance/Maintenance.h"
 #include <string.h>
 
 /*

@@ -81,4 +81,6 @@ int WakeupFromResetCMD();
  */
 void Maintenance();
 
+void MostCurrentTimeToFRAM();
+
 #endif /* MAINTENANCE_H_ */
