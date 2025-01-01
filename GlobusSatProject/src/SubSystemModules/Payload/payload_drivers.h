@@ -30,7 +30,7 @@ typedef enum {
  */
 typedef union __attribute__ ((__packed__)) _PayloadEnvironmentData
 {
-    unsigned char raw[sizeof(int)*2 + sizeof(double)];
+    unsigned char raw[16];
     struct __attribute__ ((__packed__))
     {
 		int adc_conversion_radfet1; /**< ADC conversion result for RADFET 1 */

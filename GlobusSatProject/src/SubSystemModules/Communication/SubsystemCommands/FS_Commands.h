@@ -5,6 +5,7 @@
 #include "SubSystemModules/Communication/SatCommandHandler.h"
 #include "TLM_management.h"
 #include "SubSystemModules/Communication/AckHandler.h"
+#include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 #include "Maintenance_Commands.h"
 
 

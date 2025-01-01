@@ -111,7 +111,7 @@ int WriteDefaultValuesToFRAM()
 		thresh.raw[i] = defaultThershold[i];
 	if(logError(FRAM_writeAndVerify((unsigned char*)&thresh, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
-	int lastRadfet[7] = {0};
+	int lastRadfet[5] = {0};
 	if(logError(FRAM_writeAndVerify((unsigned char*)&lastRadfet, LAST_RADFET_READ_START, sizeof(lastRadfet)), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
 	//TODO: LAST_COMM_TIME_ADDR
