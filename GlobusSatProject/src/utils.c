@@ -13,7 +13,7 @@
 #include "TLM_management.h"
 #include <string.h>
 
-int logError(int error ,char* msg) //TODO check
+int logError(int error ,char msg[MAX_LOG_STR]) //TODO check
 {
 	if(error == 0 || error == 6) return 0; //6 in not a real error
 	logData_t data;

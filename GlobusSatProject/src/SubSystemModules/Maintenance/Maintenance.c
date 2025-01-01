@@ -79,7 +79,7 @@ int WakeupFromResetCMD()
 void MostCurrentTimeToFRAM()
 {
 	time_unix timeNow = 0;
-	if(logError(Time_getUnixEpoch((unsigned int*)timeNow), "MostCurrentTimeToFRAM - Time_getUnixEpoch")) return;
+	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "MostCurrentTimeToFRAM - Time_getUnixEpoch")) return;
 	logError(FRAM_writeAndVerify((unsigned char*)&timeNow, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "MostCurrentTimeToFRAM - FRAM_writeAndVerify");
 }
 
