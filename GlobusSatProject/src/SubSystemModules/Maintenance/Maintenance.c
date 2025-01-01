@@ -83,13 +83,8 @@ void MostCurrentTimeToFRAM()
 	logError(FRAM_writeAndVerify((unsigned char*)&timeNow, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "MostCurrentTimeToFRAM - FRAM_writeAndVerify");
 }
 
-/*!
- * @brief Calls the relevant functions in a serial order
- */
-void Maintenance()
+void DeleteOldFiles()
 {
-	MostCurrentTimeToFRAM();
-
 	F_SPACE space;
 	int sd = f_getdrive();
 	if(sd != 0 && sd != 1)
@@ -109,4 +104,14 @@ void Maintenance()
 	}
 	while((space.free < (space.total * MIN_FREE_SPACE_PERCENTAGE) / 100) && !f_findnext(&find));
 
+}
+
+/*!
+ * @brief Calls the relevant functions in a serial order
+ */
+void Maintenance()
+{
+	MostCurrentTimeToFRAM();
+
+	DeleteOldFiles();
 }

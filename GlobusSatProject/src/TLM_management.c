@@ -285,11 +285,10 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 
 			logError(TransmitSplPacket(&dump_tlm, NULL), "ReadTLMFile - TransmitSplPacket");
 			numOfElementsSent++;
-			/*if(CheckDumpAbort()){ //TODO: need to do that
+			if(CheckDumpAbort()){
 				stopDump = TRUE;
 				break;
-
-			}*/
+			}
 		}
 		if(stopDump){
 			break;

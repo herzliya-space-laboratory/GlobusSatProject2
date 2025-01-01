@@ -30,6 +30,7 @@
 #define DEFAULT_RSSI_VALUE 10
 
 xSemaphoreHandle semaphorDump;
+xQueueHandle queueAbortDump;
 
 typedef struct __attribute__ ((__packed__))
 {

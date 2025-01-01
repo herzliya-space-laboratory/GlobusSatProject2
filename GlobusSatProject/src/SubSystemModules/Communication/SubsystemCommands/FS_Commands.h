@@ -20,7 +20,7 @@ int CMD_DeleteFilesOfType(sat_packet_t *cmd); //we have
 
 int CMD_DeleteAllFiles(sat_packet_t *cmd); //we have
 
-int CMD_GetNumOfFilesInTimeRange(sat_packet_t *cmd);
+/*int CMD_GetNumOfFilesInTimeRange(sat_packet_t *cmd);*/
 
 int CMD_GetNumOfFilesByType(sat_packet_t *cmd);
 
@@ -28,21 +28,22 @@ int CMD_GetLastFS_Error(sat_packet_t *cmd); //we have
 
 int CMD_FreeSpace(sat_packet_t *cmd); //we have
 
-int CMD_GetFileLengthByTime(sat_packet_t *cmd);
+/*int CMD_GetFileLengthByTime(sat_packet_t *cmd);*/
 
-int CMD_GetTimeOfLastElementInFile(sat_packet_t *cmd);
+/*int CMD_GetTimeOfLastElementInFile(sat_packet_t *cmd);*/
 
-int CMD_GetTimeOfFirstElement(sat_packet_t *cmd);
+/*int CMD_GetTimeOfFirstElement(sat_packet_t *cmd);*/
 
 int CMD_StartDump(sat_packet_t *cmd); //we have
 
-int CMD_SendDumpAbortRequest(sat_packet_t *cmd); //TODO
+int CMD_SendDumpAbortRequest();
 
-int CMD_ForceDumpAbort(sat_packet_t *cmd); //TODO
+/*int CMD_ForceDumpAbort(sat_packet_t *cmd); */
 
 void TackDump(void *dump); //we have
 
 int CMD_SwitchSD_card(sat_packet_t *cmd);
+
 
 /**
  * set a new periodTime

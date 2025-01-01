@@ -46,6 +46,12 @@ int CMD_StartDump(sat_packet_t *cmd)
 	return 0;
 }
 
+int CMD_SendDumpAbortRequest()
+{
+	Boolean true = TRUE;
+	return xQueueSend(queueAbortDump, &true, (portTickType) 10);
+}
+
 void TackDump(void *dump)
 {
 	if(dump == NULL) return;

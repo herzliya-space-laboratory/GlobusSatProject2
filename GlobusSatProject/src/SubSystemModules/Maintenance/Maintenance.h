@@ -23,7 +23,7 @@ int HardResetMCU();
  * minFreeSpace - the minimum free space in bytes we want to keep in the SD in all times.
  * If free space<minFreeSpace we start deleting old TLM files
  */
-int DeleteOldFiles(int minFreeSpace);
+void DeleteOldFiles();
 
 /*!
  * @brief checks if the period time has passed

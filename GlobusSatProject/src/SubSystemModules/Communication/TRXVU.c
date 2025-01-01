@@ -78,7 +78,7 @@ void InitTxModule()
 	if(timeNow < getTransponderEndTime())
 		setTransponderOn();
 	vSemaphoreCreateBinary(semaphorDump);
-
+	queueAbortDump = xQueueCreate(1, sizeof(Boolean));
 }
 
 /*
@@ -384,6 +384,17 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2; // Change the packet for send with the needed info
 	size_t place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length; // Get the length of the data of the packet (including the headers we add)
 	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TransmitDataAsSPL_Packet - isis_vu_e__send_frame"); // Transmit packet
+}
+
+Boolean CheckDumpAbort()
+{
+	Boolean recive = FALSE;
+	int err = xQueueReceive(queueAbortDump, &recive, (portTickType) 10);
+	if(!err)
+		return FALSE;
+	if(recive == TRUE)
+		return TRUE;
+	return FALSE;
 }
 
 /*
