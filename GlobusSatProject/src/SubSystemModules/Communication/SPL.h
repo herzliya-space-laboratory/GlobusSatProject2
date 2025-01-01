@@ -117,7 +117,8 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 	GET_LAST_FS_ERROR		= 0xBB,
 	SET_TLM_PERIOD			= 0xCC,
 	GET_TLM_PERIOD			= 0xCD,
-	START_DUMP_BY_DAYS		= 0x0E
+	START_DUMP_BY_DAYS		= 0x0E,
+	GET_FREE_SPACE			= 0x0B
 }filesystem_subtypes_t;
 
 
