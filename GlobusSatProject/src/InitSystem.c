@@ -212,6 +212,8 @@ int InitSubsystems(){
 	else
 		UpdateTime();
 
+	InitSavePeriodTimes();
+
 	InitSupervisor();
 
 	EPS_And_SP_Init();

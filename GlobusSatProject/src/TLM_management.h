@@ -11,6 +11,7 @@
 #include <hal/Boolean.h>
 #include <GlobalStandards.h>
 #include "SubSystemModules/Housekeeping/TelemetryFiles.h"
+#include "SubSystemModules/Housekeeping/TelemetryCollector.h"
 #include <hal/Timing/Time.h>
 #include <time.h>
 #include "SubSystemModules/Communication/SatCommandHandler.h"
