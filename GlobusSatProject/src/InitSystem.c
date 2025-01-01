@@ -129,12 +129,15 @@ int AntArm(uint8_t side)
 		printf("Ants not armed\r\n");
 		return -1;
 	}
+#else
+	printf("Armed (test)\r\n");
 #endif
 	return 0;
 }
 
 int AntDeployment(uint8_t side)
 {
+
 #ifdef FIRST_ACTIVE_DEPLOY
 	isis_ants__get_status__from_t status;
 	if(logError(isis_ants__get_status(side, &status)), "AntDeployment - isis_ants__get_status") return -1;
@@ -145,6 +148,8 @@ int AntDeployment(uint8_t side)
 		printf("Ants not deployed\r\n");
 		return -1;
 	}
+#else
+	printf("Deploy (test)\r\n");
 #endif
 
 	return 0;
@@ -185,6 +190,7 @@ int FirstActivation()
 	}
 #endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - FRAM_writeAndVerify - flag = 0")) error = -1;
+	SendAckPacket(ACK_FINISH_FIRST_ACTIVE, NULL, NULL, 0);
 	return error;
 }
 
@@ -202,7 +208,7 @@ int InitSubsystems(){
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
 
-	int firstActiveFlag;
+	int firstActiveFlag = 0;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
 	if(firstActiveFlag)
 	{
