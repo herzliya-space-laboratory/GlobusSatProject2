@@ -232,6 +232,12 @@ int CMD_SwitchSD_card(sat_packet_t *cmd)
 	}
 	uint8_t newSD = cmd->data[0];
 	uint8_t oldSD;
+	if(newSD != 1 && newSD != 0)
+	{
+		unsigned char ackError = ERROR_NOT_VALID_SD;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return -4;
+	}
 	if(logError(FRAM_read((unsigned char*)oldSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_read"))
 	{
 		unsigned char ackError = ERROR_READ_FROM_FRAM;

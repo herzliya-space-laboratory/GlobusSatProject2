@@ -39,5 +39,6 @@
 
 #define ERROR_COULDNT_DELETE_ALL		60
 
+#define ERROR_NOT_VALID_SD				69
 #define ERROR_SAME_SD_WE_USE			70
 #endif /* ACKERRORS_H_ */
