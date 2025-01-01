@@ -98,7 +98,7 @@ void Maintenance()
 		return;
 	}
 	if(logError(f_getfreespace(sd, &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
-	if(space.free >= (space.total * MIN_FREE_SPACE_PERCENTAGE) / 100) return;
+	if(space.free >= (space.total * MIN_FREE_SPACE_PERCENTAGE) / 100) return; //todo need really really small small place to use for check that mean percentage be like 99.995 (we could use up to 100,000 bytes) or something like that
 	F_FIND find;
 	f_findfirst("*.*", &find);
 	do

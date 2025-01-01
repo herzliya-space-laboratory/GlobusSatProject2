@@ -24,14 +24,12 @@
 #include "InitSystem.h"
 #include "utils.h"
 
-#define TESTING
+//#define FIRST_ACTIVE
+//#define FIRST_ACTIVE_DEPLOY
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
 #define TIME_SYNCINTERVAL  60
-
-int antsOn = 1;
-int deploy = 1;
 
 int StartFRAM(){
 	return logError(FRAM_start(), "StartFRAM - FRAM_start");
@@ -119,18 +117,13 @@ int WriteDefaultValuesToFRAM()
 	//TODO: LAST_COMM_TIME_ADDR
 	return error;
 }
-int AntArm()
+int AntArm(uint8_t side)
 {
-#ifdef TESTING
-	antsOn = 0;
-	if(antsOn)
-	{
-		printf("Ants not armed\r\n");
-		return -1;
-	}
-	printf("ants: %d\r\n", !antsOn);
-#else
-	int rv = isis_ants__arm(0);
+#ifdef FIRST_ACTIVE_DEPLOY
+	isis_ants__get_status__from_t status;
+	if(logError(isis_ants__get_status(side, &status), "AntArm - isis_ants__get_status")) return -1;
+	if(status.fields.arm_state) return 0;
+	int rv = logError(isis_ants__arm(side), "AntArm - isis_ants__arm");
 	if(rv)
 	{
 		printf("Ants not armed\r\n");
@@ -139,21 +132,16 @@ int AntArm()
 #endif
 	return 0;
 }
-int AntDeployment()
+
+int AntDeployment(uint8_t side)
 {
-#ifdef TESTING
-	deploy = 0;
-	if(deploy)
-	{
-		printf("Ants not deployed\r\n");
-		return -1;
-	}
-	printf("ants: %d\r\n", !deploy);
-#else
-	int rv = isis_ants__start_auto_deploy(0, 10); //todo: need to check redandent
+#ifdef FIRST_ACTIVE_DEPLOY
+	isis_ants__get_status__from_t status;
+	if(logError(isis_ants__get_status(side, &status)), "AntDeployment - isis_ants__get_status") return -1;
+	if(!status.fields.arm_state) return -1;
+	int rv = logError(isis_ants__start_auto_deploy(side, 10), "AntDeployment - isis_ants__start_auto_deploy");
 	if(rv)
 	{
-		//TODO: use the second function for deploy and then if not work try again, when we are with the new drivers - don't find this
 		printf("Ants not deployed\r\n");
 		return -1;
 	}
@@ -172,7 +160,7 @@ int FirstActivation()
 		return 0;
 	int error = 0;
 
-#ifdef WE_HAVE_ANTS
+#ifdef FIRST_ACTIVE
 	int max;
 	int time = 0;
 	FRAM_read((unsigned char*)&max, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE);
@@ -188,8 +176,13 @@ int FirstActivation()
 #endif
 	}
 	while(max > time);
-	while(AntArm() == -1);
-	while(AntDeployment() == -1);
+	while(AntArm(0));
+	while(AntArm(1));
+	for(int i = 0; i < 10; i++)
+	{
+		AntDeployment(0);
+		AntDeployment(1);
+	}
 #endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - FRAM_writeAndVerify - flag = 0")) error = -1;
 	return error;
