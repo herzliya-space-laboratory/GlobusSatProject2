@@ -243,7 +243,7 @@ void TelemetrySaveSolarPanels()
 		error_sp = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //Gets the temperature of each panel and the error message.
 		if(error_sp) //if there is error
 		{
-			logError(error_sp, "TelemetrySaveSolarPanels - IsisSolarPanelv2_getTemperature " + (char)panel);
+			logError(error_sp, "TelemetrySaveSolarPanels - IsisSolarPanelv2_getTemperature");
 			tempSolar.values[panel] = -1;
 			continue;
 		}
