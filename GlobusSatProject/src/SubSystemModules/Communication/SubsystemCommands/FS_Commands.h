@@ -42,7 +42,7 @@ int CMD_ForceDumpAbort(sat_packet_t *cmd); //TODO
 
 void TackDump(void *dump); //we have
 
-int CMD_SwitchSD_card(sat_packet_t *cmd); //TODO
+int CMD_SwitchSD_card(sat_packet_t *cmd);
 
 /**
  * set a new periodTime

@@ -137,6 +137,8 @@ int filesystem_command_router(sat_packet_t *cmd)
 			return CMD_GetTLMPeriodTimes(cmd);
 		case GET_FREE_SPACE:
 			return CMD_FreeSpace(cmd);
+		case SWITCH_SD_CARD:
+			return CMD_SwitchSD_card(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

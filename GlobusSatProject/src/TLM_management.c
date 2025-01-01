@@ -21,6 +21,8 @@
 static char buffer[MAX_COMMAND_DATA_LENGTH * NUM_ELEMENTS_READ_AT_ONCE]; // buffer for data coming from SD (time+size of data struct)
 
 FileSystemResult InitializeFS(){
+	uint8_t sd;
+	if(FRAM_read((unsigned char*)&sd, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE)) return FS_FAIL;
 	int flag = 0;
 	// in FS init we don't want to use a log file !
 		// Initialize the memory for the FS
@@ -46,18 +48,7 @@ FileSystemResult InitializeFS(){
 	}
 
 	// Initialize the volume of SD card 0 (A)
-	err = f_initvolume( 0, atmel_mcipdc_initfunc, 0 );
-	if (err != E_NO_SS_ERR){
-	// error init SD 0 so de-itnit and init SD 1
-	//printf("f_initvolume primary error:%d\n",err);
-		hcc_mem_init();
-		fs_init();
-		f_enterFS();
-		err = f_initvolume( 0, atmel_mcipdc_initfunc, 1 );
-		if (err != E_NO_SS_ERR){
-				//printf("f_initvolume secondary error:%d\n",err);
-		}
-	}
+	err = f_initvolume( 0, atmel_mcipdc_initfunc, sd );
 	if(flag)
 		return FS_FAIL;
 

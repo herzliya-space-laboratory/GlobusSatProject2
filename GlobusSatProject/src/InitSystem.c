@@ -105,6 +105,8 @@ int WriteDefaultValuesToFRAM()
 
 	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
 
+	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "WriteDefaultValuesToFRAM - FRAM_writeAndVerify")) error += -1;
+
 	voltage_t defaultThershold[NUMBER_OF_THRESHOLD_VOLTAGES] = DEFAULT_EPS_THRESHOLD_VOLTAGES;
 	EpsThreshVolt_t thresh;
 	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
@@ -160,7 +162,7 @@ int FirstActivation()
 	int zero = 0;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify");
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify"); //TODO: need to be written before not here (like firstActiveFlag)
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
@@ -203,7 +205,6 @@ int InitSubsystems(){
 
 	StartTIME();
 
-	InitializeFS();
 	//TODO: DELETE THE LINES OF THE FRAM WRITE BELOW. ONLY TO CHECK FIRST ACTIVETION!!!!!
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
@@ -211,13 +212,13 @@ int InitSubsystems(){
 	int firstActiveFlag = 0;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
 	if(firstActiveFlag)
-	{
 		WriteDefaultValuesToFRAM();
-		Delete_allTMFilesFromSD();
-	}
 	else
 		UpdateTime();
 
+	InitializeFS();
+
+	if(firstActiveFlag) Delete_allTMFilesFromSD();
 	InitSavePeriodTimes();
 
 	InitSupervisor();

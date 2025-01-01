@@ -61,6 +61,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 	ACK_FINISH_FIRST_ACTIVE = 0x35,
 
+	ACK_SWITCHING_SD_CARD = 0x30,
+
 	ACK_DELETE_TLM = 0xC0,					// after deleting TLM file(s)
 	ACK_FS_LAST_ERROR = 0xC1,
 	ACK_PING = 0xAA,
@@ -120,7 +122,8 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 	SET_TLM_PERIOD			= 0xCC,
 	GET_TLM_PERIOD			= 0xCD,
 	START_DUMP_BY_DAYS		= 0x0E,
-	GET_FREE_SPACE			= 0x0B
+	GET_FREE_SPACE			= 0x0B,
+	SWITCH_SD_CARD			= 0x0A
 }filesystem_subtypes_t;
 
 

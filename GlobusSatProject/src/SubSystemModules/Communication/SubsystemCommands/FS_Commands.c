@@ -220,4 +220,36 @@ int CMD_GetTLMPeriodTimes(sat_packet_t *cmd)
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)arrPeriod, sizeof(arrPeriod)), "CMD_GetTLMPeriodTimes - TransmitDataAsSPL_Packet");
 }
 
-//TODO: switch sd card. for that I need to create DeInitializeFS (TODO)
+int CMD_SwitchSD_card(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	unsigned char ackError = 0;
+	if(cmd->length != 1)
+	{
+		ackError = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	uint8_t newSD = cmd->data[0];
+	uint8_t oldSD;
+	if(logError(FRAM_read((unsigned char*)oldSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_read"))
+	{
+		unsigned char ackError = ERROR_READ_FROM_FRAM;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return -2;
+	}
+	if(oldSD == newSD)
+	{
+		unsigned char ackError = ERROR_SAME_SD_WE_USE;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return 0;
+	}
+	if(logError(FRAM_writeAndVerify((unsigned char*)newSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_writeAndVerify"))
+	{
+		unsigned char ackError = ERROR_WRITE_TO_FRAM;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return -3;
+	}
+	SendAckPacket(ACK_SWITCHING_SD_CARD, cmd, NULL, 0);
+	return Hard_ComponenetReset();
+}

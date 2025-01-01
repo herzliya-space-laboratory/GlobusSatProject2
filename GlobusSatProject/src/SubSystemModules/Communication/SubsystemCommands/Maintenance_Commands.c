@@ -71,7 +71,7 @@ int Hard_ComponenetReset()
 	int one = 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
 	SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0);
-	return logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Hard_ComponenetReset - imepsv2_piu__reset");
+	return logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Hard_ComponenetReset - isismepsv2_ivid7_piu__reset");
 }
 
 int FS_ComponenetReset()
