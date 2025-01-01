@@ -13,12 +13,13 @@
 #include "TLM_management.h"
 #include <string.h>
 
-int logError(int error ,char msg[MAX_LOG_STR]) //TODO check
+int logError(int error ,char* msg) //TODO check
 {
 	if(error == 0 || error == 6) return 0; //6 in not a real error
 	logData_t data;
 	data.error = error;
-	memcpy(data.msg, msg, MAX_LOG_STR);
+	memset(data.msg, 0, MAX_LOG_STR);
+	sprintf(data.msg, "%s", msg);
 	Write2File(&data, tlm_log);
 	return error;
 }
