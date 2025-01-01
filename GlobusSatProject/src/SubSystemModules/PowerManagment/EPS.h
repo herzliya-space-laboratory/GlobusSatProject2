@@ -25,12 +25,12 @@
 			  _____|	|_____
  	 	 	 |				  |
  	 	 	 |OPERATIONAL MODE|
- 	 	 	 |- - - - - - -	- |	-> OPERATIONAL UP = 7500
- 	 	 	 |- - - - - - - - |	-> OPERATIONAL DOWN = 7400
+ 	 	 	 |- - - - - - -	- |	-> OPERATIONAL UP = 7400
+ 	 	 	 |- - - - - - - - |	-> OPERATIONAL DOWN = 7300
  	 	 	 |				  |
  	 	 	 |	 CRUISE MODE  |
- 	 	 	 |- - - - - - -	- |	-> CRUISE UP = 7100
- 	 	 	 |- - - - - - - - |	-> CRUISE DOWN = 7000
+ 	 	 	 |- - - - - - -	- |	-> CRUISE UP = 7000
+ 	 	 	 |- - - - - - - - |	-> CRUISE DOWN = 6900
  	 	 	 |				  |
  	 	 	 |POWER SAFE MODE |
  	 	 	 |________________|
@@ -39,8 +39,8 @@
 
 #define NUMBER_OF_SOLAR_PANELS			6
 #define NUMBER_OF_THRESHOLD_VOLTAGES 	4 		///< first 2 are charging voltages, last 2 are discharging voltages
-#define DEFAULT_EPS_THRESHOLD_VOLTAGES 	{(voltage_t)7000, (voltage_t)7400,	 \
-										  (voltage_t)7100, (voltage_t)7500}
+#define DEFAULT_EPS_THRESHOLD_VOLTAGES 	{(voltage_t)6900, (voltage_t)7300,	 \
+										  (voltage_t)7000, (voltage_t)7400}
 
 typedef enum __attribute__ ((__packed__)){
 	INDEX_DOWN_CRUISE,
