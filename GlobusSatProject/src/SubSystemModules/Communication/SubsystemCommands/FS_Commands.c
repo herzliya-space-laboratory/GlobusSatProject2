@@ -137,6 +137,7 @@ int SaveAndCheck(unsigned int addr, unsigned int saveTime, sat_packet_t* cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return ackError;
 	}
+	InitSavePeriodTimes();
 	return 0;
 }
 
