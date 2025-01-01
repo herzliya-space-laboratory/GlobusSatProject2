@@ -238,7 +238,7 @@ int CMD_SwitchSD_card(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return -4;
 	}
-	if(logError(FRAM_read((unsigned char*)oldSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_read"))
+	if(logError(FRAM_read((unsigned char*)&oldSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_read"))
 	{
 		unsigned char ackError = ERROR_READ_FROM_FRAM;
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
@@ -250,7 +250,7 @@ int CMD_SwitchSD_card(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return 0;
 	}
-	if(logError(FRAM_writeAndVerify((unsigned char*)newSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_writeAndVerify"))
+	if(logError(FRAM_writeAndVerify((unsigned char*)&newSD, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE), "CMD_SwitchSD_card - FRAM_writeAndVerify"))
 	{
 		unsigned char ackError = ERROR_WRITE_TO_FRAM;
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
