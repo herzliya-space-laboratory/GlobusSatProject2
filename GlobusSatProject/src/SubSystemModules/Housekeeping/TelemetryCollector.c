@@ -80,7 +80,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	uint8_t status = 0;
 	int32_t paneltemp = 0;
 	float conv_temp;
-	for(int panel = 0; panel < NUMBER_OF_SOLAR_PANELS; panel++ ) //Go for the count of solar panels we have.
+	for(int panel = 0; panel < NUMBER_OF_SOLAR_PANELS; panel++) //Go for the count of solar panels we have.
 	{
 		error_sp = IsisSolarPanelv2_getTemperature(panel, &paneltemp, &status); //Gets the temperature of each panel and the error message.
 		if( error_sp ) //if there is error

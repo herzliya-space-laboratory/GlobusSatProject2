@@ -13,7 +13,7 @@
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
 #define MIN_VOLTAGE_TO_STATES {6000, 6500, 6100, 6600}
 
-#define PIN_RESET PIN_GPIO06
+#define PIN_RESET PIN_GPIO08
 #define PIN_INT   PIN_GPIO00
 
 voltage_t lastVoltage;

@@ -65,7 +65,7 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 } WOD_Telemetry_t;
 
 
-typedef struct solar_tlm { int32_t values[ISIS_SOLAR_PANEL_COUNT]; } solar_tlm_t;
+typedef struct solar_tlm { float values[ISIS_SOLAR_PANEL_COUNT]; } solar_tlm_t;
 
 typedef struct
 {

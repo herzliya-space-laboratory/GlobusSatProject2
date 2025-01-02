@@ -250,6 +250,7 @@ int InitSubsystems(){
 
 	FirstActivation();
 
+	logError(SAT_RESET, "InitSubsystems - reset");
 	printf("Did init\r\n");
 	return 0;
 }
