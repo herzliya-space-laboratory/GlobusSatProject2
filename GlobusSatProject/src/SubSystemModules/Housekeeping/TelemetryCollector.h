@@ -59,7 +59,7 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 	int sensor_two_radfet;
 	double radfet_temp;
 	time_unix last_radfet_read_time;
-	voltage_t power_payload;
+	power_t power_payload;
 	Boolean payload_flag;
 
 } WOD_Telemetry_t;
