@@ -8,11 +8,13 @@
 #include "EPS.h"
 
 
-//#define WE_HAVE_SP 1
 
 #define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage)))
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
 #define MIN_VOLTAGE_TO_STATES {6000, 6500, 6100, 6600}
+
+#define PIN_RESET PIN_GPIO06
+#define PIN_INT   PIN_GPIO00
 
 voltage_t lastVoltage;
 EpsThreshVolt_t threshold_volts;
@@ -30,11 +32,10 @@ int EPS_And_SP_Init(){
 		GetBatteryVoltage(&lastVoltage);
 		GetAlpha(&Alpha);
 	}
-#ifdef WE_HAVE_SP
-	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi), "EPS_And_SP_Init - IsisSolarPanelv2_initialize");
+	Pin solarpanelv2_pins[2] = {PIN_RESET, PIN_INT};
+	errorSP = logError(IsisSolarPanelv2_initialize(slave0_spi, &solarpanelv2_pins[0], &solarpanelv2_pins[1]), "EPS_And_SP_Init - IsisSolarPanelv2_initialize");
 	if(errorSP == 0)
 		errorSP = logError(IsisSolarPanelv2_sleep(), "EPS_And_SP_Init - IsisSolarPanelv2_sleep");
-#endif
 	if(errorSP || errorEPS)
 			return -1;
 		return 0;
