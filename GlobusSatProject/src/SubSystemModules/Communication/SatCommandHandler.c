@@ -49,6 +49,9 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 		return null_pointer_error;
 	plusPlace += sizeof(cmd->length);
 
+	if(cmd->length > MAX_COMMAND_DATA_LENGTH)
+		return index_out_of_bound;
+
 	if(cmd->length != 0){
 		if(memcpy(&cmd->data, data + plusPlace, cmd->length) == NULL) // same just to the data which is the length that equal to the value of the variable length.
 			return null_pointer_error;

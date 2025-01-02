@@ -12,6 +12,8 @@
 #include "utils.h"
 #include <String.h>
 
+Boolean flag = FALSE;
+
 /*!
  * @brief checks if the period time has passed
  * @param[in] prev_exec_time last sample time (last execution time)
@@ -131,6 +133,21 @@ void DeleteOldFiles()
 
 }
 
+void NeedToKillPayload()
+{
+	if(flag == TRUE) return;
+	uint8_t zero = 0;
+	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
+	int err = logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "NeedToKillPayload - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
+	if(err) return;
+	if(mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS > 60)
+	{
+		logError(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "NeedToKillPayload - FRAM_writeAndVerify");
+		flag = TRUE;
+	}
+}
+
+
 /*!
  * @brief Calls the relevant functions in a serial order
  */
@@ -139,6 +156,8 @@ void Maintenance()
 	MostCurrentTimeToFRAM();
 
 	DeleteOldFiles();
+
+	NeedToKillPayload();
 
 	if(IsGroundCommunicationWDTReset())
 	{

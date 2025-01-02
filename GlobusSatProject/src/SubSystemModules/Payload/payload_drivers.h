@@ -21,7 +21,8 @@ typedef enum {
 	EPS_ERROR,              /**< General error in the EPS system */
     PAYLOAD_I2C_WRITE_ERROR,/**< Error during I2C write operation */
     PAYLOAD_I2C_READ_ERROR, /**< Error during I2C read operation */
-    PAYLOAD_TIMEOUT         /**< Operation timed out */
+    PAYLOAD_TIMEOUT,       /**< Operation timed out */
+    FLAG_ON
 } SoreqResult;
 
 /**

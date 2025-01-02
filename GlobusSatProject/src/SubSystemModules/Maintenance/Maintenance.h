@@ -80,4 +80,6 @@ void Maintenance();
 
 void MostCurrentTimeToFRAM();
 
+void NeedToKillPayload();
+
 #endif /* MAINTENANCE_H_ */

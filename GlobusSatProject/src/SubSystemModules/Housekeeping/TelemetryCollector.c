@@ -58,6 +58,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->volt_3V3 = responseEPS.fields.vip_obc05.fields.volt;
 		wod->volt_5V = responseEPS.fields.vip_obc01.fields.volt;
 		wod->charging_power = responseEPS.fields.batt_input.fields.power * 10; //TODO to check
+		wod->power_payload = responseEPS.fields.vip_obc04.fields.power * 10;
 	}
 	else // if have error in the eps put everything in that section to -1
 	{
@@ -71,6 +72,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->charging_power = -1;
 		wod->current_5V = -1;
 		wod->current_3V3 = -1;
+		wod->power_payload = -1;
 	}
 
 	IsisSolarPanelv2_wakeup();
@@ -153,7 +155,11 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	else
 		wod->last_radfet_read_time = -1;
 
-	//TODO: add the flag of the payload (if permanently off)
+	uint8_t flagPayload;
+	if(!logError(FRAM_read((unsigned char*)&flagPayload, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "GetCurrentWODTelemetry - FRAM_read"))
+		wod->payload_flag = flagPayload;
+	else
+		wod->payload_flag = -1;
 	return 0;
 }
 
@@ -297,6 +303,16 @@ void TelemetrySavePayloadEvents()
 		TelemetrySavePayloadSEL(eventsData, time);
 }
 
+Boolean IsThePayloadOn()
+{
+	isismepsv2_ivid7_piu__gethousekeepingeng__from_t response; //Create a variable that is the struct we need from EPS_isis
+	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&response), "GetCurrentWODTelemetry - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
+	if(error_eps) return FALSE;
+	if(response.fields.vip_obc04.fields.volt == 0)
+		return FALSE;
+	return TRUE;
+}
+
 void TelemetryCollectorLogic()
 {
 	if(CheckExecutionTime(lastTimeSave[tlm_eps], periods.fields.eps))
@@ -313,7 +329,7 @@ void TelemetryCollectorLogic()
 		TelemetrySaveWOD();
 	if(CheckExecutionTime(lastTimeSave[tlm_solar], periods.fields.solar_panels))
 		TelemetrySaveSolarPanels();
-	if(!GetPayloadFlag())
+	if(!IsThePayloadOn())
 	{
 		if(CheckExecutionTime(lastTimeSave[tlm_radfet], periods.fields.radfet))
 			TelemetrySavePayloadRADFET();

@@ -5,7 +5,7 @@
 #include <string.h>
 #include <hal/Timing/Time.h>
 #include <satellite-subsystems/isismepsv2_ivid7_piu.h>
-
+#include "FRAM_FlightParameters.h"
 
 #define PAYLOAD_I2C_ADDRESS 0x55
 #define CLEAR_WDT 0x3F
@@ -112,6 +112,9 @@ SoreqResult payloadTurnOff() {
 }
 
 SoreqResult payloadTurnOn() {
+	uint8_t flag;
+	FRAM_read((unsigned char*)&flag, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE);
+	if(flag) return FLAG_ON;
 	isismepsv2_ivid7_piu__replyheader_t response;
     return isismepsv2_ivid7_piu__outputbuschannelon(EPS_INDEX, PAYLOAD_BUS_CHANNEL, &response) ? EPS_ERROR : PAYLOAD_SUCCESS;
 }

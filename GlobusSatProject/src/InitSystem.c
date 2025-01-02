@@ -122,6 +122,10 @@ int WriteDefaultValuesToFRAM()
 	unsigned int defaultTime = DEFAULT_NO_COMM_WDT_KICK_TIME;
 	if(FRAM_writeAndVerify((unsigned char*)&defaultTime, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE)) error += -1;
 
+	if(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE)) error += -1;
+
+	if(FRAM_writeAndVerify((unsigned char*)&zero, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1;
+
 	return error;
 }
 int AntArm(uint8_t side)
@@ -201,6 +205,24 @@ int FirstActivation()
 	return error;
 }
 
+void payloadKillOrInit()
+{
+	uint8_t checkPayloadFlag;
+	logError(FRAM_read((unsigned char*)&checkPayloadFlag, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "payloadKillOrInit - FRAM_read");
+	if(checkPayloadFlag) return;
+	int one = 1;
+	uint8_t flagReset;
+	logError(FRAM_read((unsigned char*)&flagReset, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "payloadKillOrInit - FRAM_read");
+	if(!flagReset)
+	{
+		payloadInit();
+		logError(FRAM_writeAndVerify((unsigned char*)&one, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "payloadKillOrInit - FRAM_writeAndVerify");
+	}
+	else
+		logError(FRAM_writeAndVerify((unsigned char*)&one, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "payloadKillOrInit - FRAM_writeAndVerify");
+
+}
+
 int InitSubsystems(){
 	StartI2C();
 
@@ -234,7 +256,7 @@ int InitSubsystems(){
 
 	WakeupFromResetCMD();
 
-	payloadInit();
+	payloadKillOrInit();
 
 	FirstActivation();
 

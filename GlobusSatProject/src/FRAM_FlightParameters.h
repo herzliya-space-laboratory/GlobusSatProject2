@@ -99,6 +99,11 @@
 #define	TIME_LAST_RADFET_READ_ADDR		0x220
 #define	TIME_LAST_RADFET_READ_SIZE		4
 
+#define HAD_RESET_IN_A_MINUTE_ADDR		0x230
+#define HAD_RESET_IN_A_MINUTE_SIZE		1
+
+#define PAYLOAD_IS_DEAD_ADDR			0x240
+#define PAYLOAD_IS_DEAD_SIZE			1
 
 #define TRANS_ABORT_FLAG_ADDR			0x500		//<! transmission abort request flag
 #define TRANS_ABORT_FLAG_SIZE			1			//<! size of mute flag in bytes

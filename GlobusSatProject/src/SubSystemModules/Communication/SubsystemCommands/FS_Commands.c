@@ -372,7 +372,7 @@ int CMD_DeleteFilesOfType(sat_packet_t *cmd)
 	}
 	uint8_t type;
 	memcpy(&type, cmd->data, 1);
-	if(type < 0 || type > 10)
+	if(type > sizeof(tlm_type_t) - 1)
 	{
 		ackError = ERROR_CANT_DO;
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
