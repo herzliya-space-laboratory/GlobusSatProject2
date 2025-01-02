@@ -51,7 +51,6 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_IDLE_OFF = 0xA2,
 
 	ACK_DUMP_START = 0x90,
-	ACK_DUMP_ABORT = 0x91, //TODO: maybe send that when we do abort
 	ACK_DUMP_FINISHED = 0x92,
 
 	ACK_GENERIC_I2C_CMD = 0x93,
@@ -67,6 +66,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_DELETE_TLM = 0xC0,					// after deleting TLM file(s)
 	ACK_FS_LAST_ERROR = 0xC1,
 	ACK_PING = 0xAA,
+
+	ACK_SET_GWDT = 0xA5,
 
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
 	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
@@ -108,7 +109,7 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 	UPDATE_THRESHOLD	       = 0x05,
 	UPDATE_THRESHOLD_DEFAULT   = 0x06,
 	GET_THRESHOLD	           = 0x07,
-//	GET_HEATER_VALUES   	   = 0x0C,
+	GET_HEATER_VALUES   	   = 0x0C,
 	GET_STATE				   = 0x0E,
 
 }eps_subtypes_t;
@@ -139,6 +140,8 @@ typedef enum __attribute__ ((__packed__)) management_subtypes_t
 	EPS_RESET_SUBTYPE =			0xBB,		//0b10111011
 	FS_RESET_SUBTYPE =			0xCC,		//0b11001100
 */
+	GET_PERIOD_GROUND_WDT = 	0x01,
+	SET_PERIOD_GROUND_WDT = 	0x02,
 	UPDATE_SAT_TIME =           0xDD,       //0b‭11011101‬
 	GENERIC_I2C_CMD =           0xDF,       //0b‭11011111‬
 	RESET_COMPONENT =           0xDE,       //0b‭11011110

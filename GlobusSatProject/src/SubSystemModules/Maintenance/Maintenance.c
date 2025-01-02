@@ -22,7 +22,7 @@
 Boolean CheckExecutionTime(time_unix prev_time, time_unix period)
 {
 	unsigned int timeNow;
-	int error = logError(Time_getUnixEpoch(&timeNow), "Maintenance - Time_getUnixEpoch");
+	int error = logError(Time_getUnixEpoch(&timeNow), "CheckExecutionTime - Time_getUnixEpoch");
 	if(error)
 		return FALSE;
 	if(timeNow - prev_time >= period)
@@ -42,6 +42,31 @@ Boolean IsFS_Corrupted()
 	if(ret) return TRUE;
 	if(space.bad) return TRUE;
 	return FALSE;
+}
+
+/*!
+ * @brief resets the ground station communication WDT because communication took place.
+*/
+void KickGroundCommWDT()
+{
+	time_unix timeNow;
+	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "KickGroundCommWDT - Time_getUnixEpoch")) return;
+	FRAM_writeAndVerify((unsigned char*)&timeNow, LAST_COMM_TIME_ADDR, LAST_COMM_TIME_SIZE);
+}
+
+/*!
+ * @brief 	Checks if last GS communication time has exceeded its maximum allowed time.
+ * @see		NO_COMMUNICATION_WDT_KICK_TIME
+ * @return 	TRUE if a comm reset is needed- no communication for a long time
+ * 			FALSE no need for a reset. last communication is within range
+*/
+Boolean IsGroundCommunicationWDTReset()
+{
+	time_unix lastComm = 0;
+	if(logError(FRAM_read((unsigned char*)&lastComm, LAST_COMM_TIME_ADDR, LAST_COMM_TIME_SIZE), "IsGroundCommunicationWDTReset - FRAM_read")) return FALSE;
+	unsigned int WDTime = 0;
+	if(logError(FRAM_read((unsigned char*)&WDTime, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE), "IsGroundCommunicationWDTReset - FRAM_read")) return FALSE;
+	return CheckExecutionTime(lastComm, WDTime);
 }
 
 /*!
@@ -114,4 +139,13 @@ void Maintenance()
 	MostCurrentTimeToFRAM();
 
 	DeleteOldFiles();
+
+	if(IsGroundCommunicationWDTReset())
+	{
+		KickGroundCommWDT();
+		logError(isis_vu_e__reset_hw_rx(0), "Maintenance - isis_vu_e__reset_hw_rx");
+		logError(isis_vu_e__reset_hw_tx(0), "Maintenance - isis_vu_e__reset_hw_tx");
+		isismepsv2_ivid7_piu__replyheader_t replyheader;
+		logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Maintenance - isismepsv2_ivid7_piu__reset");
+	}
 }

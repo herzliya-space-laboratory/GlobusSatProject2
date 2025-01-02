@@ -69,4 +69,18 @@ int CMD_GetState(sat_packet_t *cmd);
 
 int CMD_EPS_ResetWDT(sat_packet_t *cmd);
 
+/**
+ * get heater values from the config parameters.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int; return error according to isismepsv2_ivid7_piu__getconfigurationparameter or TransmitDataAsSPL_Packet
+ * */
+int CMD_GetHeaterVal(sat_packet_t *cmd);
+
+/**  DO NOT USE!!!
+ * set heater values from the config parameters.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and the threshold)
+ * @return type=int; return error according to isismepsv2_ivid7_piu__getconfigurationparameter or TransmitDataAsSPL_Packet
+ * */
+int CMD_SetHeaterVal(sat_packet_t* cmd);
+
 #endif /* EPS_COMMANDS_H_ */

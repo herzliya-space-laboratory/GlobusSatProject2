@@ -451,6 +451,7 @@ int TRX_Logic()
 		error = GetOnlineCommand(&cmd); // Get the packet and put her in the sat_packet_t struct (in the param cmd)
 		if(error != command_success) // Check if have error
 			return logError(error, "TRX_Logic - GetOnlineCommand");
+		KickGroundCommWDT();
 		SendAckPacket(ACK_RECEIVE_COMM, &cmd, NULL, 0); // Send ack of receiving the packet
 		ActUponCommand(&cmd); // Go to do the command
 	}

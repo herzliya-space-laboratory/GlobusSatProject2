@@ -48,25 +48,22 @@ void SaveSatTimeInFRAM(unsigned int time_addr, unsigned int time_size);
  */
 Boolean IsFS_Corrupted();
 
-/*
-!
+
+/*!
  * @brief resets the ground station communication WDT because communication took place.
+*/
 
-void ResetGroundCommWDT();
+void KickGroundCommWDT();
 
-!
+/*!
  * @brief 	Checks if last GS communication time has exceeded its maximum allowed time.
  * @see		NO_COMMUNICATION_WDT_KICK_TIME
  * @return 	TRUE if a comm reset is needed- no communication for a long time
  * 			FALSE no need for a reset. last communication is within range
-
-Boolean IsGroundCommunicationWDTKick();
-
-
-int SetGsWdtKickTime(time_unix new_gs_wdt_kick_time);
-
-time_unix GetGsWdtKickTime();
 */
+Boolean IsGroundCommunicationWDTReset();
+
+
 
 /*!
  * @brief 	if a reset has been commanded and executed, SW reset or otherwise, this function will be active.

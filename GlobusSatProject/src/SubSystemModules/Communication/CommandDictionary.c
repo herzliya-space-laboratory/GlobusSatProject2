@@ -101,6 +101,8 @@ int eps_command_router(sat_packet_t *cmd)
 			return CMD_GetState(cmd);
 		case RESET_EPS_WDT:
 			return CMD_EPS_ResetWDT(cmd);
+		case GET_HEATER_VALUES:
+			return CMD_GetHeaterVal(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
@@ -165,6 +167,10 @@ int managment_command_router(sat_packet_t *cmd)
 	}
 	switch(cmd->cmd_subtype)
 	{
+		case GET_PERIOD_GROUND_WDT:
+			return CMD_GetGsWdtKickTime(cmd);
+		case SET_PERIOD_GROUND_WDT:
+			return CMD_SetGsWdtKickTime(cmd);
 		case GET_SAT_TIME:
 			return CMD_GetSatTime(cmd);
 		case RESET_COMPONENT:

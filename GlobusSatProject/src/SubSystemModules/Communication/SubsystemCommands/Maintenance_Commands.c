@@ -37,14 +37,14 @@ int Payload_ComponenetReset()
 int HardTX_ComponenetReset()
 {
 	SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0);
-	logError(isis_vu_e__reset_hw_tx(0), "HardTX_ComponenetReset - IsisTrxvu_componentSoftReset");
+	logError(isis_vu_e__reset_hw_tx(0), "HardTX_ComponenetReset - isis_vu_e__reset_hw_tx");
 	return InitTrxvuAndAnts();
 }
 
 int HardRX_ComponenetReset()
 {
 	SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0);
-	logError(isis_vu_e__reset_hw_rx(0), "HardRX_ComponenetReset - IsisTrxvu_componentSoftReset");
+	logError(isis_vu_e__reset_hw_rx(0), "HardRX_ComponenetReset - isis_vu_e__reset_hw_rx");
 	return InitTrxvuAndAnts();
 }
 
@@ -223,3 +223,42 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 
 }
 
+int CMD_SetGsWdtKickTime(sat_packet_t* cmd)
+{
+	if(cmd == NULL) return -1;
+	unsigned char error_ack = 0;
+	if(cmd->length != 4)
+	{
+		error_ack = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -2;
+	}
+	unsigned int newGroundWDT;
+	memcpy((unsigned char*)&newGroundWDT, cmd->data, cmd->length);
+	if(newGroundWDT < MIN_GROUND_WDT)
+	{
+		error_ack = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -3;
+	}
+	if(logError(FRAM_writeAndVerify((unsigned char*)&newGroundWDT, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE), "CMD_SetGsWdtKickTime - FRAM_writeAndVerify"))
+	{
+		error_ack = ERROR_WRITE_TO_FRAM;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
+		return -4;
+	}
+	return SendAckPacket(ACK_SET_GWDT, cmd, NULL, 0);
+}
+
+int CMD_GetGsWdtKickTime(sat_packet_t* cmd)
+{
+	unsigned int groundWDT = 0;
+	if(logError(FRAM_read((unsigned char*)&groundWDT, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE), "CMD_GetGsWdtKickTime - FRAM_read"))
+	{
+		unsigned char ackError = ERROR_READ_FROM_FRAM;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
+		return -1;
+	}
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&groundWDT, sizeof(groundWDT)), "CMD_GetGsWdtKickTime - TransmitDataAsSPL_Packet");
+
+}

@@ -212,3 +212,47 @@ int CMD_EPS_ResetWDT(sat_packet_t *cmd)
 	}
 	return SendAckPacket(ACK_EPS_RESET_WDT , cmd, NULL, 0);
 }
+
+/**
+ * get heater values from the config parameters.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int; return error according to isismepsv2_ivid7_piu__getconfigurationparameter or TransmitDataAsSPL_Packet
+ * */
+int CMD_GetHeaterVal(sat_packet_t* cmd)
+{
+	isismepsv2_ivid7_piu__getconfigurationparameter__from_t response;
+	//threshold low (when to start)
+	int err = logError(isismepsv2_ivid7_piu__getconfigurationparameter(0, 0x3000, &response), "CMD_GetHeaterVal - isismepsv2_ivid7_piu__getconfigurationparameter"); ///gets the data structure of the parameter to response according to the id of the parameter
+	if(err)
+	{
+		unsigned char ackErr = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &ackErr, sizeof(ackErr)); // Send ack error according to "AckErrors.h"
+		return err;
+	}
+	//threshold high (when to end)
+	isismepsv2_ivid7_piu__getconfigurationparameter__from_t response2;
+	err = logError(isismepsv2_ivid7_piu__getconfigurationparameter(0, 0x3003, &response2), "CMD_GetHeaterVal - isismepsv2_ivid7_piu__getconfigurationparameter"); ///gets the data structure of the parameter to response according to the id of the parameter
+	if(err)
+	{
+		unsigned char ackErr = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG , cmd, &ackErr, sizeof(ackErr)); // Send ack error according to "AckErrors.h"
+		return err;
+	}
+
+	short respones[2] = {0, 0};
+	memcpy(&respones[0], response.fields.par_val, 2);
+	memcpy(&respones[1], response2.fields.par_val, 2);
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)respones, sizeof(respones)), "CMD_GetHeaterVal - TransmitDataAsSPL_Packet"); // Send back the alpha value
+}
+
+/**
+ * set heater values from the config parameters. DO NOT USE!!!
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and the threshold)
+ * @return type=int; return error according to isismepsv2_ivid7_piu__getconfigurationparameter or TransmitDataAsSPL_Packet
+ * */
+int CMD_SetHeaterVal(sat_packet_t* cmd)
+{
+	//TODO
+	return 0;
+}
+

@@ -10,6 +10,8 @@
 #include <hal/Timing/Time.h>
 #include <hal/supervisor.h>
 
+#define MIN_GROUND_WDT (3*24*3600) //3 days
+
 typedef enum __attribute__ ((__packed__)) reset_type_t
 {
 	reset_software, //from eps
@@ -76,5 +78,11 @@ int FS_ComponenetReset();
  * 			Error code according to <hal/errors.h>
  */
 int CMD_ResetComponent(sat_packet_t *cmd);
+
+
+
+int CMD_SetGsWdtKickTime(sat_packet_t* cmd);
+
+int CMD_GetGsWdtKickTime(sat_packet_t* cmd);
 
 #endif /* MAINTENANCE_COMMANDS_H_ */

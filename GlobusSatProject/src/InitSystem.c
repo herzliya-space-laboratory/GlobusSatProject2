@@ -118,6 +118,10 @@ int WriteDefaultValuesToFRAM()
 	if(FRAM_writeAndVerify((unsigned char*)&lastRadfet, LAST_RADFET_READ_START, sizeof(lastRadfet))) error += -1;
 
 	if(FRAM_writeAndVerify((unsigned char*)&mostUpdated, LAST_COMM_TIME_ADDR, LAST_COMM_TIME_SIZE)) error += -1;
+
+	unsigned int defaultTime = DEFAULT_NO_COMM_WDT_KICK_TIME;
+	if(FRAM_writeAndVerify((unsigned char*)&defaultTime, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE)) error += -1;
+
 	return error;
 }
 int AntArm(uint8_t side)
