@@ -240,9 +240,10 @@ int CMD_GetHeaterVal(sat_packet_t* cmd)
 	}
 
 	short respones[2] = {0, 0};
-	memcpy(&respones[0], response.fields.par_val, 2);
-	memcpy(&respones[1], response2.fields.par_val, 2);
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)respones, sizeof(respones)), "CMD_GetHeaterVal - TransmitDataAsSPL_Packet"); // Send back the alpha value
+	memcpy((unsigned char*)&respones[0], response.fields.par_val, 2);
+	memcpy((unsigned char*)&respones[1], response2.fields.par_val, 2);
+	float respones_float[2] = {(respones[0] * 0.01), (respones[1] * 0.01)};
+	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)respones_float, sizeof(respones_float)), "CMD_GetHeaterVal - TransmitDataAsSPL_Packet"); // Send back the alpha value
 }
 
 /**
