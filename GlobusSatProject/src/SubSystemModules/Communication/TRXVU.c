@@ -9,7 +9,7 @@
 #include <string.h>
 #include <hal/Drivers/I2C.h>
 #include "SubSystemModules/Housekeeping/TelemetryCollector.h"
-
+#include "InitSystem.h"
 #include "SatCommandHandler.h"
 #include "TRXVU.h"
 #include "SysI2CAddr.h"

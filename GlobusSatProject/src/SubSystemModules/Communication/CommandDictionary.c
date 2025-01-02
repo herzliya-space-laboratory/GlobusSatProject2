@@ -9,6 +9,7 @@
 #include "SubsystemCommands/EPS_Commands.h"
 #include "SubsystemCommands/Maintenance_Commands.h"
 #include "SubsystemCommands/FS_Commands.h"
+#include "SubsystemCommands/Payload_Commands.h"
 #include "CommandDictionary.h"
 #include <stdio.h>
 
@@ -62,6 +63,8 @@ int trxvu_command_router(sat_packet_t *cmd)
 			return CMD_AntCancelDeployment(cmd);
 		case PING:
 			return CMD_Ping(cmd);
+		case OFF_ANTS_DEPLOY:
+			return CMD_OffAntsDeploy(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

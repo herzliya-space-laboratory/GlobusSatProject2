@@ -104,6 +104,8 @@ short getTransponderRSSIFromFRAM();
  */
 void InitTxModule();
 
+void SetNeedToStopAntDeploy();
+
 /*!
  * @brief initializes the TRXVU subsystem
  * @return	0 on successful init
