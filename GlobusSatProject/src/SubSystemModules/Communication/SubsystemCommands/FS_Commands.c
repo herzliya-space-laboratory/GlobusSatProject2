@@ -9,6 +9,11 @@
 #include "String.h"
 dump_arguments_t arg;
 
+/*
+ * formating the SD card.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int; return type of error according to SendAckPacket and Hard_ComponenetReset errors
+ * */
 int CMD_DeleteAllFiles(sat_packet_t *cmd)
 {
 	if(Delete_allTMFilesFromSD())
@@ -20,6 +25,15 @@ int CMD_DeleteAllFiles(sat_packet_t *cmd)
 	return Hard_ComponenetReset();
 }
 
+/*
+ * start dump according to days and create the task of dump
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and tlmType, start date, end date)
+ * @return type=int; -1 cmd null
+ * 					 17 wrong data length
+ * 					 30 Already have a dump active (can't do two at the same time)
+ * 					 0 on success
+ *
+ * */
 int CMD_StartDump(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
@@ -30,11 +44,13 @@ int CMD_StartDump(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return ackError;
 	}
+	//get the param to give to dump task
 	arg.cmd = *cmd;
 	memcpy((unsigned char*)&arg.dump_type, cmd->data, 1);
 	memcpy((unsigned char*)&arg.t_start, cmd->data + 1, sizeof(time_unix));
 	memcpy((unsigned char*)&arg.t_end, cmd->data + 5, sizeof(time_unix));
 
+	//check we not already in dump
 	if(xSemaphoreTake(semaphorDump, SECONDS_TO_TICKS(WAIT_TIME_SEM_DUMP)) == pdFALSE)
 	{
 		ackError = ERROR_CANT_DO;
@@ -42,33 +58,51 @@ int CMD_StartDump(sat_packet_t *cmd)
 		return ackError;
 	}
 	xTaskHandle taskHandle;
-	xTaskGenericCreate(TackDump, (const signed char*) "CMD_StartDump", 4096, &arg, configMAX_PRIORITIES - 2, &taskHandle, NULL, NULL);
+	xTaskGenericCreate(TackDump, (const signed char*) "CMD_StartDump", 4096, &arg, configMAX_PRIORITIES - 2, &taskHandle, NULL, NULL); //create dump task
 	return 0;
 }
 
+/*
+ * abort dump. (stops the dump)
+ * @return type=int; according to xQueueSend errors
+ * */
 int CMD_SendDumpAbortRequest()
 {
 	Boolean true = TRUE;
-	return xQueueSend(queueAbortDump, &true, (portTickType) 10);
+	return xQueueSend(queueAbortDump, &true, (portTickType) 10); //enter to the queue true for the dump to stop
 }
 
+/*
+ * the function start dump call for the task. have the dump final logic.
+ * @param[in] name=dump; type=void*; have the parameters we need for the dump.
+ * */
 void TackDump(void *dump)
 {
 	if(dump == NULL) return;
 	dump_arguments_t *dump_arg = (dump_arguments_t*)dump;
 
 	f_enterFS();
-	int numOfDays = (dump_arg->t_end - dump_arg->t_start) / 24 / 3600;
+	int numOfDays = (dump_arg->t_end - dump_arg->t_start) / 24 / 3600; //get num of days
 	Time start;
-	timeU2time(dump_arg->t_start, &start);
+	timeU2time(dump_arg->t_start, &start); //change from time_unix to Time
 	SendAckPacket(ACK_DUMP_START, &dump_arg->cmd, NULL, 0);
-	ReadTLMFiles(dump_arg->dump_type, start, numOfDays, dump_arg->cmd.ID);
+	ReadTLMFiles(dump_arg->dump_type, start, numOfDays, dump_arg->cmd.ID); //sends the dump packets
 	SendAckPacket(ACK_DUMP_FINISHED, &dump_arg->cmd, NULL, 0);
 	f_releaseFS();
-	xSemaphoreGive(semaphorDump);
-	vTaskDelete(NULL);
+	xSemaphoreGive(semaphorDump); //release the dump semaphor
+	vTaskDelete(NULL); //Delete the task
 }
 
+/*
+ * Delete tlm files from sd according to tlmType, start date, end date
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and tlmType, start date, end date)
+ * @return type=int; -1 cmd null
+ * 					 17 wrong data length
+ * 					 60 didn't delete all files
+ * 					 according to SendAckPacket errors.
+ * 					 0 on success
+ *
+ * */
 int CMD_DeleteTLM(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
@@ -98,14 +132,23 @@ int CMD_DeleteTLM(sat_packet_t *cmd)
 	return SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
 }
 
-
+/*
+ * Get last FS error
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int; according to SendAckPacket
+ * */
 int CMD_GetLastFS_Error(sat_packet_t *cmd)
 {
 	int FS_error = f_getlasterror();
 	return SendAckPacket(ACK_FS_LAST_ERROR, cmd, (unsigned char*)&FS_error, sizeof(FS_error));
 }
 
-
+/*
+ * Get free space on the sd in bytes <- it's not precise but it's the best we got
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int;	27 on error get from struct
+ * 						according to TransmitDataAsSPL_Packet
+ * */
 int CMD_FreeSpace(sat_packet_t *cmd)
 {
 	F_SPACE space; //FS struct
@@ -119,6 +162,16 @@ int CMD_FreeSpace(sat_packet_t *cmd)
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&space.free, sizeof(space.free)), "CMD_FreeSpace - TransmitDataAsSPL_Packet");
 }
 
+/*
+ * Help function to CMD_SetTLMPeriodTimes. sets the new one according to the params we got
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @param[in] name=addr; type=unsigned int; get the place in FRAM we need to write to.
+ * @param[in] name=saveTime; type=unsigned int; the new period time we want to save.
+ * @return type=int;	1 on read from FRAM
+ * 						2 on write to FRAM
+ * 						3 on written wrong in FRAM
+ * 						0 on success
+ * */
 int SaveAndCheck(unsigned int addr, unsigned int saveTime, sat_packet_t* cmd)
 {
 	unsigned char ackError = 0;
@@ -147,9 +200,14 @@ int SaveAndCheck(unsigned int addr, unsigned int saveTime, sat_packet_t* cmd)
 	return 0;
 }
 
-/**
- * set a new periodTime
- */
+/*
+ * Set new period of saving telemetry according to tlmPeriod and new period
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and tlmPeriod, new period)
+ * @return type=int; -1 cmd null
+ * 					 17 wrong data length
+ * 					 error according to SaveAndCheck
+ * 					 30 invalid tlmPeriod
+ * */
 int CMD_SetTLMPeriodTimes(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
@@ -212,6 +270,31 @@ int CMD_SetTLMPeriodTimes(sat_packet_t *cmd)
 
 }
 
+/*
+ * Set default period of saving telemetry
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int;	according to FRAM_writeAndVerify
+ * */
+int CMD_SetTLMPeriodTimes_default(sat_packet_t *cmd)
+{
+	int arrPeriod[7] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
+	int error = logError(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod)), "CMD_SetTLMPeriodTimes_default - FRAM_writeAndVerify");
+	if(error)
+	{
+		unsigned char ackError = ERROR_WRITE_TO_FRAM;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return error;
+	}
+	InitSavePeriodTimes();
+	SendAckPacket(ACK_SET_NEW_TLM_PERIOD, cmd, NULL, 0);
+	return 0;
+}
+
+/*
+ * Get telemetry period times from FRAM
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int;	according to FRAM_read and TransmitDataAsSPL_Packet
+ * */
 int CMD_GetTLMPeriodTimes(sat_packet_t *cmd)
 {
 	int error = 0;
@@ -226,6 +309,16 @@ int CMD_GetTLMPeriodTimes(sat_packet_t *cmd)
 	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)arrPeriod, sizeof(arrPeriod)), "CMD_GetTLMPeriodTimes - TransmitDataAsSPL_Packet");
 }
 
+/*
+ * Switch between the sd cards.
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and sd to switch to)
+ * @return type=int;	-1 cmd null
+ * 						27 wrong data length
+ * 						-4 invalid sd
+ * 						-2 read from FRAM
+ * 						-3 write to FRAM
+ * 						according to Hard_ComponenetReset
+ * */
 int CMD_SwitchSD_card(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;

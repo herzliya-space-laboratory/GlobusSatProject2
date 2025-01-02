@@ -141,6 +141,8 @@ int filesystem_command_router(sat_packet_t *cmd)
 			return CMD_SwitchSD_card(cmd);
 		case ABORT_DUMP:
 			return CMD_SendDumpAbortRequest();
+		case SET_DEFAULT_TLM_PERIOD:
+			return CMD_SetTLMPeriodTimes_default(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

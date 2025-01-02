@@ -30,16 +30,17 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_HARD_RESET = 		0x82,			// before starting hardware reset
 	ACK_FRAM_RESET =		0x83,
 
+	ACK_UPDATE_TIME = 0x12,					// after updating time
+
 	ACK_MEMORY_DELETE = 0x84,				// when memory delete is completed success
 	ACK_SET_NEW_TLM_PERIOD = 0x85,
 
-	ACK_UPDATE_TIME = 0x12,					// after updating time
 	ACK_UPDATE_BEACON_BIT_RATE = 0x13,
 	ACK_UPDATE_BEACON_INTERVAL = 0x14,
+
 	ACK_UPDATE_RSSI_VALUE = 0x18,
 	ACK_UPDATE_EPS_VOLTAGES = 0x16,
 	ACK_UPDATE_EPS_ALPHA = 0x17,
-
 	ACK_EPS_RESET_WDT = 0x15,
 
 	ACK_MUTE = 0x8D,
@@ -50,7 +51,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_IDLE_OFF = 0xA2,
 
 	ACK_DUMP_START = 0x90,
-	ACK_DUMP_ABORT = 0x91,
+	ACK_DUMP_ABORT = 0x91, //TODO: maybe send that when we do abort
 	ACK_DUMP_FINISHED = 0x92,
 
 	ACK_GENERIC_I2C_CMD = 0x93,
@@ -66,6 +67,7 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_DELETE_TLM = 0xC0,					// after deleting TLM file(s)
 	ACK_FS_LAST_ERROR = 0xC1,
 	ACK_PING = 0xAA,
+
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
 	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
 	ACK_ERROR_MSG = 0XFF 					// send this ACK when error has occurred
@@ -106,7 +108,6 @@ typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 	UPDATE_THRESHOLD	       = 0x05,
 	UPDATE_THRESHOLD_DEFAULT   = 0x06,
 	GET_THRESHOLD	           = 0x07,
-//	GET_STATE_CHANGES_OVERTIME = 0x0B,
 //	GET_HEATER_VALUES   	   = 0x0C,
 	GET_STATE				   = 0x0E,
 
@@ -119,6 +120,7 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 	DELETE_TLM				= 0xA1,
 	GET_LAST_FS_ERROR		= 0xBB,
 	SET_TLM_PERIOD			= 0xCC,
+	SET_DEFAULT_TLM_PERIOD	= 0xCE,
 	GET_TLM_PERIOD			= 0xCD,
 	START_DUMP_BY_DAYS		= 0x0E,
 	GET_FREE_SPACE			= 0x0B,
