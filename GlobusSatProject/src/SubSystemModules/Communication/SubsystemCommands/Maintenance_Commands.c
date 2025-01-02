@@ -34,6 +34,13 @@ int Payload_ComponenetReset()
 	return logError(payloadSoftReset(), "Payload_ComponenetReset - payloadSoftReset");
 }
 
+int HardPayload_ComponenetReset()
+{
+	SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0);
+	payloadOff();
+	return payloadOn();
+}
+
 int HardTX_ComponenetReset()
 {
 	SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0);
@@ -78,7 +85,9 @@ int Hard_ComponenetReset()
 
 int FS_ComponenetReset()
 {
-	return 0; //TODO later
+	SendAckPacket(ACK_FS_RESET, NULL, NULL, 0);
+	DeInitializeFS();
+	return InitializeFS();
 }
 
 int FRAM_ComponenetReset()
@@ -142,20 +151,28 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
-		case reset_fram:
-		{
-			if(FRAM_ComponenetReset())
-				return SendErrorCantReset(cmd);
-			return 0;
-		}
 		case reset_payload:
 		{
 			if(Payload_ComponenetReset())
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
+		case reset_payload_hard:
+		{
+			if(HardPayload_ComponenetReset())
+				return SendErrorCantReset(cmd);
+			return 0;
+		}
+		case reset_fram:
+		{
+			if(FRAM_ComponenetReset())
+				return SendErrorCantReset(cmd);
+			return 0;
+		}
 		case reset_filesystem:
 		{
+			if(FS_ComponenetReset())
+				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		default:

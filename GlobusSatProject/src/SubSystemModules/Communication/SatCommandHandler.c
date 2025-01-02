@@ -120,8 +120,8 @@ int ActUponCommand(sat_packet_t *cmd)
 			return logError(filesystem_command_router(cmd), "ActUponCommand - filesystem_command_router");
 		case managment_cmd_type:
 			return logError(managment_command_router(cmd), "ActUponCommand - managment_command_router");
-		/*case payload_cmd_type:
-			return logError(payload_command_router(cmd), "ActUponCommand - payload_command_router");*/
+		case payload_cmd_type:
+			return logError(payload_command_router(cmd), "ActUponCommand - payload_command_router");
 		default:
 		{
 			return SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0); // Send ack that says what written in unknownType_msg

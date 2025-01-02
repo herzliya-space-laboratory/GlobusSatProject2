@@ -341,3 +341,19 @@ void PrintTLM(void* element, tlm_type_t tlmType)
 		printf("bus_volt: %d\n ",data.fields.voltage);
 	}
 }
+
+void DeInitializeFS()
+{
+	uint8_t sd;
+	if(FRAM_read((unsigned char*)&sd, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE)) return;
+	f_delvolume(sd); /* delete the volID */
+
+	f_releaseFS();
+
+	fs_delete(); /* delete the filesystem */
+
+	hcc_mem_delete(); /* free the memory used by the filesystem */
+
+
+
+}

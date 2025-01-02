@@ -186,3 +186,24 @@ int managment_command_router(sat_packet_t *cmd)
 	}
 }
 
+/*!
+ * @brief routes the data into the appropriate payload command according to the command sub type
+ * @param[in] cmd command pertaining to the payload sub routine, to be executed.
+ * @note the type and subtype of the command are already inside cmd
+ * @see sat_packet_t structure
+ * @return errors according to <hal/errors.h>
+ */
+int payload_command_router(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	CMD_TurnOnKillPayloadFlag(cmd);
+	switch(cmd->cmd_subtype)
+	{
+		case TURN_ON_KILL_PAYLOAD:
+			return CMD_TurnOnKillPayloadFlag(cmd);
+		case TURN_OFF_KILL_PAYLOAD:
+			return CMD_TurnOffKillPayloadFlag(cmd);
+		default:
+			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
+	}
+}

@@ -69,6 +69,9 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 	ACK_SET_GWDT = 0xA5,
 
+	ACK_KILL_PAYLOAD = 0x50,
+	ACK_TURN_ON_PAYLOAD = 0x51,
+
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
 	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
 	ACK_ERROR_MSG = 0XFF 					// send this ACK when error has occurred
@@ -154,8 +157,8 @@ typedef enum __attribute__ ((__packed__)) management_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) payload_subtypes_t
 {
-	TURN_ON_PAYLOAD = 	0x11,
-	TURN_OFF_PAYLOAD = 	0x20
+	TURN_ON_KILL_PAYLOAD = 	0x11,
+	TURN_OFF_KILL_PAYLOAD = 0x20
 
 }payload_subtypes_t;
 #endif /* SPL_H_ */

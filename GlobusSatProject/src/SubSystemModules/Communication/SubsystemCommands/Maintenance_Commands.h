@@ -20,6 +20,7 @@ typedef enum __attribute__ ((__packed__)) reset_type_t
 	reset_rx_hard,
 	reset_ants,
 	reset_payload,
+	reset_payload_hard,
 	reset_fram,
 	reset_filesystem
 
@@ -55,6 +56,8 @@ int CMD_GetSatUptime(sat_packet_t *cmd);
 
 
 /*help functions of CMD_ResetComponent*/
+int HardPayload_ComponenetReset();
+
 int Payload_ComponenetReset();
 
 int HardTX_ComponenetReset();

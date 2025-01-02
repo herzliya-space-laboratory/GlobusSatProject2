@@ -107,7 +107,7 @@ FileSystemResult InitializeFS();
 /*!
  * DeInitializes the file system.
  */
-void DeInitializeFS(int sd_card);
+void DeInitializeFS();
 
 void PrintTLM(void* element, tlm_type_t tlmType);
 
