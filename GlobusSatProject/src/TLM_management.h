@@ -73,6 +73,8 @@ int DeleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays);
  */
 int DeleteTLMFile(tlm_type_t tlmType, Time date, int days2Add);
 
+void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize);
+
 void CalculateFileName(Time date, char* file_name, char* endFileName,
 		int days2Add);
 /*

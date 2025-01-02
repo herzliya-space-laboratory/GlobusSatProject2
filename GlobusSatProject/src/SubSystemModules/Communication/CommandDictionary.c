@@ -145,6 +145,8 @@ int filesystem_command_router(sat_packet_t *cmd)
 			return CMD_SendDumpAbortRequest();
 		case SET_DEFAULT_TLM_PERIOD:
 			return CMD_SetTLMPeriodTimes_default(cmd);
+		case DELETE_TLM_BY_TYPE:
+			return CMD_DeleteFilesOfType(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

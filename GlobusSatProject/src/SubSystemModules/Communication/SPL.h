@@ -119,6 +119,7 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 {
 	DELETE_ALL_FILES		= 0x01,
 	DELETE_TLM				= 0xA1,
+	DELETE_TLM_BY_TYPE		= 0xB1,
 	GET_LAST_FS_ERROR		= 0xBB,
 	SET_TLM_PERIOD			= 0xCC,
 	SET_DEFAULT_TLM_PERIOD	= 0xCE,

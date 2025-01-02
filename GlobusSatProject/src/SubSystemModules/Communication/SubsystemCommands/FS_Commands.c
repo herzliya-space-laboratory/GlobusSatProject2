@@ -358,3 +358,37 @@ int CMD_SwitchSD_card(sat_packet_t *cmd)
 	SendAckPacket(ACK_SWITCHING_SD_CARD, cmd, NULL, 0);
 	return Hard_ComponenetReset();
 }
+
+
+int CMD_DeleteFilesOfType(sat_packet_t *cmd)
+{
+	if(cmd == NULL) return -1;
+	unsigned char ackError = 0;
+	if(cmd->length != 1)
+	{
+		ackError = ERROR_WRONG_LENGTH_DATA;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	uint8_t type;
+	memcpy(&type, cmd->data, 1);
+	if(type < 0 || type > 10)
+	{
+		ackError = ERROR_CANT_DO;
+		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
+		return ackError;
+	}
+	char endFile[3] = {0};
+	int structNotNeeded;
+	GetTlmTypeInfo(type, endFile, &structNotNeeded);
+	F_FIND find;
+	char fileFind[5] = {0};
+	sprintf(fileFind, "*.%s", endFile);
+	f_findfirst(fileFind, &find);
+	do
+	{
+		f_delete(find.filename);
+	}
+	while(!f_findnext(&find));
+	return 0;
+}
