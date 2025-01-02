@@ -112,7 +112,7 @@ SoreqResult payloadTurnOff() {
 }
 
 SoreqResult payloadTurnOn() {
-	uint8_t flag;
+	Boolean flag;
 	FRAM_read((unsigned char*)&flag, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE);
 	if(flag) return FLAG_ON;
 	isismepsv2_ivid7_piu__replyheader_t response;

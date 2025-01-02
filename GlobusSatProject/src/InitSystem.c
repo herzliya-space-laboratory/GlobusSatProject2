@@ -5,22 +5,6 @@
  *      Author: maayan
  */
 
-#include <hal/Storage/FRAM.h>
-#include <hal/Drivers/I2C.h>
-#include <hal/Drivers/SPI.h>
-#include <hal/Timing/Time.h>
-#include <hal/Utility/util.h>
-#include <hal/supervisor.h>
-
-#include <hcc/api_fat.h>
-
-#include "SubSystemModules/Communication/TRXVU.h"
-#include "SubSystemModules/PowerManagment/EPS.h"
-#include "SubSystemModules/Maintenance/Maintenance.h"
-
-#include "TLM_management.h"
-
-#include "GlobalStandards.h"
 #include "InitSystem.h"
 #include "utils.h"
 
@@ -124,7 +108,10 @@ int WriteDefaultValuesToFRAM()
 
 	if(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1;
+	if(FRAM_writeAndVerify((unsigned char*)&zero, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1; //need to be in ground
+
+	Boolean true = TRUE;
+	if(FRAM_writeAndVerify((unsigned char*)&true, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) error += -1; //need to be in ground
 
 	return error;
 }
@@ -175,7 +162,6 @@ int FirstActivation()
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
-
 #ifdef FIRST_ACTIVE
 	int max;
 	int time = 0;
@@ -186,14 +172,18 @@ int FirstActivation()
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
 		TelemetryCollectorLogic();
+		Maintenance();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
 #endif
 	}
 	while(max > time);
-	while(AntArm(0));
-	while(AntArm(1));
+	for(int i = 0; i < 10; i++)
+	{
+		AntArm(0);
+		AntArm(1);
+	}
 	for(int i = 0; i < 10; i++)
 	{
 		AntDeployment(0);
@@ -207,19 +197,19 @@ int FirstActivation()
 
 void payloadKillOrInit()
 {
-	uint8_t checkPayloadFlag;
+	Boolean checkPayloadFlag;
 	logError(FRAM_read((unsigned char*)&checkPayloadFlag, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "payloadKillOrInit - FRAM_read");
 	if(checkPayloadFlag) return;
-	int one = 1;
-	uint8_t flagReset;
+	Boolean true = TRUE;
+	Boolean flagReset;
 	logError(FRAM_read((unsigned char*)&flagReset, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "payloadKillOrInit - FRAM_read");
 	if(!flagReset)
 	{
+		logError(FRAM_writeAndVerify((unsigned char*)&true, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "payloadKillOrInit - FRAM_writeAndVerify");
 		payloadInit();
-		logError(FRAM_writeAndVerify((unsigned char*)&one, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "payloadKillOrInit - FRAM_writeAndVerify");
 	}
 	else
-		logError(FRAM_writeAndVerify((unsigned char*)&one, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "payloadKillOrInit - FRAM_writeAndVerify");
+		logError(FRAM_writeAndVerify((unsigned char*)&true, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "payloadKillOrInit - FRAM_writeAndVerify");
 
 }
 

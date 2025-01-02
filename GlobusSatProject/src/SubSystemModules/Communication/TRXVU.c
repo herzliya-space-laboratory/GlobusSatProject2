@@ -16,7 +16,7 @@
 #include "AckHandler.h"
 #include "SPL.h"
 
-
+Boolean continueDeploy;
 time_unix lastTimeSendingBeacon;
 time_unix period;
 
@@ -65,6 +65,22 @@ int InitTrxvuAndAnts(){
 
 }
 
+void IsNeededToContinueAntDeploy()
+{
+	Boolean flagAnts = FALSE;
+	if(FRAM_read((unsigned char*)&flagAnts, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) return;
+	if(flagAnts == 0) return;
+	continueDeploy = flagAnts;
+	return;
+}
+
+void SetNeedToStopAntDeploy()
+{
+	continueDeploy = 0;
+	if(FRAM_writeAndVerify((unsigned char*)&continueDeploy, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) return;
+}
+
+
 /*!
  * @Brief Initializes data field for transmission - semaphores, parameters from the FRAM
  * @return
@@ -73,6 +89,7 @@ void InitTxModule()
 {
 	//Get beacon interval from FRAM
 	setNewBeaconIntervalToPeriod();
+	IsNeededToContinueAntDeploy();
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "InitTxModule - Time_getUnixEpoch");
 	if(timeNow < getTransponderEndTime())
@@ -435,6 +452,17 @@ int BeaconLogic()
 
 }
 
+void DeployAnts()
+{
+	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
+	if(logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "DeployAnts - Supervisor_getHousekeeping")) return; //gets the variables to the struct and also check error.
+	if(((mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS) % (30*60)) != 0) return;
+	AntArm(0);
+	AntArm(1);
+	AntDeployment(0);
+	AntDeployment(1);
+}
+
 /*
  * Have the TRXVU logic. (Beacon send, check if have packets, read packet etc.)
  *@return type=int; return error if have and command_succsess if not
@@ -446,6 +474,7 @@ int TRX_Logic()
 	turnOffTransponder();
 	turnOffIdle();
 	BeaconLogic(); // do the beacon logic
+	if(continueDeploy) DeployAnts();
 	if(GetNumberOfFramesInBuffer() > 0) // Check if we have packets waiting
 	{ // if so
 		error = GetOnlineCommand(&cmd); // Get the packet and put her in the sat_packet_t struct (in the param cmd)

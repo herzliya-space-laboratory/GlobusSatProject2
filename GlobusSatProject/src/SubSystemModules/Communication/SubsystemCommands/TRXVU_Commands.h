@@ -156,5 +156,7 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd);
  * */
 int CMD_Ping(sat_packet_t *cmd);
 
+int CMD_OffAntsDeploy(sat_packet_t *cmd);
+
 #endif
 /*COMMANDS_H_ */

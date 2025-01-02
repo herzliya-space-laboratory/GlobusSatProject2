@@ -155,7 +155,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	else
 		wod->last_radfet_read_time = -1;
 
-	uint8_t flagPayload;
+	Boolean flagPayload;
 	if(!logError(FRAM_read((unsigned char*)&flagPayload, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "GetCurrentWODTelemetry - FRAM_read"))
 		wod->payload_flag = flagPayload;
 	else

@@ -100,10 +100,13 @@
 #define	TIME_LAST_RADFET_READ_SIZE		4
 
 #define HAD_RESET_IN_A_MINUTE_ADDR		0x230
-#define HAD_RESET_IN_A_MINUTE_SIZE		1
+#define HAD_RESET_IN_A_MINUTE_SIZE		4
 
 #define PAYLOAD_IS_DEAD_ADDR			0x240
-#define PAYLOAD_IS_DEAD_SIZE			1
+#define PAYLOAD_IS_DEAD_SIZE			4
+
+#define TRY_TO_DEPLOY_ADDR				0x250 		//zero will be stop trys to deploy
+#define TRY_TO_DEPLOY_SIZE				4
 
 #define TRANS_ABORT_FLAG_ADDR			0x500		//<! transmission abort request flag
 #define TRANS_ABORT_FLAG_SIZE			1			//<! size of mute flag in bytes

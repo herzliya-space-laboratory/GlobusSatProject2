@@ -8,6 +8,23 @@
 #ifndef INITSYSTEM_H_
 #define INITSYSTEM_H_
 
+#include <hal/Storage/FRAM.h>
+#include <hal/Drivers/I2C.h>
+#include <hal/Drivers/SPI.h>
+#include <hal/Timing/Time.h>
+#include <hal/Utility/util.h>
+#include <hal/supervisor.h>
+
+#include <hcc/api_fat.h>
+
+#include "SubSystemModules/Communication/TRXVU.h"
+#include "SubSystemModules/PowerManagment/EPS.h"
+#include "SubSystemModules/Maintenance/Maintenance.h"
+
+#include "TLM_management.h"
+
+#include "GlobalStandards.h"
+
 
 #define MIN_2_WAIT_BEFORE_DEPLOY 45 // how many minutes to wait before we open the Ants TODO: before flight change to 60 and use in the right place
 #define RESTART_TIME 3 // how much time does it take to restart the SAT
@@ -56,6 +73,9 @@ int InitSupervisor();
  * @return	0
  */
 int InitSubsystems();
+
+int AntArm(uint8_t side);
+int AntDeployment(uint8_t side);
 
 /*!
  * @brief	deployment procedure

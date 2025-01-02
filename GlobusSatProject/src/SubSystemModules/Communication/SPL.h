@@ -99,6 +99,7 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 	ANT_GET_UPTIME =	        	0x10,	//0b10110011 = //long int
 	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//delete before fllght
 	PING = 				        	0x13,
+	OFF_ANTS_DEPLOY = 				0x15
 
 }trxvu_subtypes_t;
 

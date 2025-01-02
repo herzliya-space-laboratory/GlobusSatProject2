@@ -37,8 +37,8 @@ int Payload_ComponenetReset()
 int HardPayload_ComponenetReset()
 {
 	SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0);
-	payloadOff();
-	return payloadOn();
+	payloadTurnOff();
+	return payloadTurnOn();
 }
 
 int HardTX_ComponenetReset()

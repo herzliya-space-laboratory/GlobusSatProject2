@@ -563,3 +563,10 @@ int CMD_Ping(sat_packet_t *cmd)
 	unsigned char pong_msg[] = "pong";
 	return SendAckPacket(ACK_PING , cmd, pong_msg, sizeof(pong_msg)); // send ack ping (says pong)
 }
+
+
+int CMD_OffAntsDeploy(sat_packet_t *cmd)
+{
+	SetNeedToStopAntDeploy();
+	return SendAckPacket(ACK_COMD_EXEC, cmd, NULL, 0);
+}
