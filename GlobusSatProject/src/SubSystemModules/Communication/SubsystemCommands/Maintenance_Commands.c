@@ -120,7 +120,7 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
 		return ackError;
 	}
-	short type;
+	uint8_t type;
 	memcpy(&type, cmd->data, cmd->length);
 	MostCurrentTimeToFRAM();
 	switch(type)
