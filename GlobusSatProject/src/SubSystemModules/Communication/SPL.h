@@ -72,6 +72,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_KILL_PAYLOAD = 0x50,
 	ACK_TURN_ON_PAYLOAD = 0x51,
 
+	ACK_CHANGE_HEATER_THRESHOLDS = 0x55,
+
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
 	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
 	ACK_ERROR_MSG = 0XFF 					// send this ACK when error has occurred
@@ -106,15 +108,16 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) eps_subtypes_t
 {
-	RESET_EPS_WDT	 	       = 0x01,
-	UPDATE_ALPHA 		       = 0x02,
-	UPDATE_ALPHA_DEFAULT       = 0x03,
-	GET_ALPHA	    	       = 0x04,
-	UPDATE_THRESHOLD	       = 0x05,
-	UPDATE_THRESHOLD_DEFAULT   = 0x06,
-	GET_THRESHOLD	           = 0x07,
-	GET_HEATER_VALUES   	   = 0x0C,
-	GET_STATE				   = 0x0E,
+	RESET_EPS_WDT	 	       	= 0x01,
+	UPDATE_ALPHA 		       	= 0x02,
+	UPDATE_ALPHA_DEFAULT       	= 0x03,
+	GET_ALPHA	    	       	= 0x04,
+	UPDATE_THRESHOLD	       	= 0x05,
+	UPDATE_THRESHOLD_DEFAULT   	= 0x06,
+	GET_THRESHOLD	           	= 0x07,
+	GET_HEATER_VALUES   	   	= 0x0C,
+	SET_HEATER_VALUES			= 0x0D,
+	GET_STATE				   	= 0x0E,
 
 }eps_subtypes_t;
 

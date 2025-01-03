@@ -106,6 +106,8 @@ int eps_command_router(sat_packet_t *cmd)
 			return CMD_EPS_ResetWDT(cmd);
 		case GET_HEATER_VALUES:
 			return CMD_GetHeaterVal(cmd);
+		case SET_HEATER_VALUES:
+			return CMD_SetHeaterVal(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
