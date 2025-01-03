@@ -31,6 +31,8 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 	int error = SetIdleState(isis_vu_e__onoff__on, duration);
 	switch(error)
 	{
+		case 0:
+			break;
 		case -1:
 		{
 			error_ack = ERROR_CANT_DO;
@@ -81,6 +83,8 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
 	int error = SetIdleState(isis_vu_e__onoff__off, 0);
 	switch(error)
 	{
+		case 0:
+			break;
 		case -1:
 		{
 			error_ack = ERROR_CANT_DO;

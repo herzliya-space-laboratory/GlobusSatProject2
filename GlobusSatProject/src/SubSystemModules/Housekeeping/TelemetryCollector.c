@@ -169,7 +169,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	else
 		wod->payload_flag = -1;
 
-	wod->eps_state = GetSystemState;
+	wod->eps_state = GetSystemState();
 
 	return 0;
 }
