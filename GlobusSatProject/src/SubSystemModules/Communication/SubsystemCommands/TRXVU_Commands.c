@@ -173,6 +173,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
+	vTaskDelay(30);
 	return 0;
 
 }
@@ -186,6 +187,7 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
 	int error = setTransponderOff();
+	vTaskDelay(30);
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_I2C;
