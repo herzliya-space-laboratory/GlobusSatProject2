@@ -65,7 +65,8 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 		}
 		default:
 		{
-			SendAckPacket(ACK_ERROR_MSG , cmd, NULL, 0);
+			error_ack = UNKNOWN_ERROR;
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack));
 			return error;
 		}
 	}
@@ -111,7 +112,8 @@ int CMD_SetOff_IdleState(sat_packet_t *cmd)
 		}
 		default:
 		{
-			SendAckPacket(ACK_ERROR_MSG , cmd, NULL, 0);
+			error_ack = ERROR_CANT_GET_TIME;
+			SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 			return error;
 		}
 	}

@@ -41,4 +41,6 @@
 
 #define ERROR_NOT_VALID_SD				69
 #define ERROR_SAME_SD_WE_USE			70
+
+#define UNKNOWN_ERROR					255
 #endif /* ACKERRORS_H_ */
