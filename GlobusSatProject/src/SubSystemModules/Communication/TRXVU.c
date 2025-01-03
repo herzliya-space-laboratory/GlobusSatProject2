@@ -111,7 +111,8 @@ void InitTxModule()
  * */
 int setTransponderOn()
 {
-	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_on), "setTransponderOn - isis_vu_e__set_tx_mode"); // Set transponder off
+	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on
 }
 
 /*
@@ -120,7 +121,8 @@ int setTransponderOn()
  * */
 int setTransponderOff()
 {
-	return logError(isis_vu_e__set_tx_mode(0, trxvu_transponder_off), "setOff_Transponder - isis_vu_e__set_tx_mode"); // Set transponder off
+	unsigned char data[] = {0x38, trxvu_transponder_off}; // 0x38 - number of commend to change the transmitter mode.
+	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "CMD_SetOff_Transponder - I2C_write"); // Set transponder off
 }
 
 /*
