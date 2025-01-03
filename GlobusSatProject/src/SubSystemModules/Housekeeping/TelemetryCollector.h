@@ -61,7 +61,7 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 	time_unix last_radfet_read_time;
 	power_t power_payload;
 	Boolean payload_flag;
-
+	EpsState_t eps_state;
 } WOD_Telemetry_t;
 
 

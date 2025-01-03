@@ -22,6 +22,14 @@ time_unix period;
 
 #define NEED_TO_DEPLOY(uptime, add) ((uptime + add) % (30*60)) != 0
 
+void SetTRXVU_config_param()
+{
+	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
+
+	isis_vu_e__set_tx_freq(0, 436400);
+	isis_vu_e__set_rx_freq(0, 145970);
+	isis_vu_e__set_tx_pll_powerout(0, 0xCFEF);
+}
 
 /*
  * Initialize the TRXVU and ants.
@@ -43,11 +51,7 @@ int InitTrxvuAndAnts(){
 
 	//Initialize the trxvu subsystem
 	rv = ISIS_VU_E_Init(myTRXVU, 1);
-	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
-
-	isis_vu_e__set_tx_freq(0, 436400);
-	isis_vu_e__set_rx_freq(0, 145970);
-	isis_vu_e__set_tx_pll_powerout(0, 0xCFEF);
+	SetTRXVU_config_param();
 	//TODO: transponder set freq
 
 	InitTxModule();
@@ -448,6 +452,7 @@ int BeaconLogic()
 	GetCurrentWODTelemetry(&data); // Gets the telemetry of the beacon and put it in data.
 	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "BeaconLogic - AssembleCommand"); // Create the beacon packet
 	int avalFrames;
+	SetTRXVU_config_param();
 	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "BeaconLogic - TransmitSplPacket"); // Send the beacon packet
 	if(error) // if error return it
 		return error;

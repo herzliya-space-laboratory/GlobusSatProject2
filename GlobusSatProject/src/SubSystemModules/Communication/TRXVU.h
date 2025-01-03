@@ -113,6 +113,8 @@ void SetNeedToStopAntDeploy();
  */
 int InitTrxvuAndAnts();
 
+void SetTRXVU_config_param();
+
 void checkTransponderFinish();
 
 int CMD_SetBeaconInterval(sat_packet_t *cmd);
