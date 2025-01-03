@@ -20,6 +20,9 @@ int logError(int error ,char* msg) //TODO check
 	data.error = error;
 	memset(data.msg, 0, MAX_LOG_STR);
 	sprintf(data.msg, "%s", msg);
+
+	printf("%t ERROR - %s", error, data.msg);
+
 	Write2File(&data, tlm_log);
 	return error;
 }
