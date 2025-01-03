@@ -123,7 +123,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	if(logError(FRAM_read((unsigned char*)&numberOfCMDResets, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "GetCurrentWODTelemetry - FRAM_read cmd resets")) wod->num_of_cmd_resets = -1;
 	else wod->num_of_cmd_resets = numberOfCMDResets;
 
-	if(IsThePayloadOn)
+	if(IsThePayloadOn())
 	{
 		PayloadEventData eventsData;
 		if(!logError(payloadReadEvents(&eventsData), "GetCurrentWODTelemetry - payloadReadEvents"))

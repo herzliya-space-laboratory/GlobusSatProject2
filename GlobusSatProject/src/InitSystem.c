@@ -172,7 +172,6 @@ int FirstActivation()
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
 		TelemetryCollectorLogic();
-		Maintenance();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();

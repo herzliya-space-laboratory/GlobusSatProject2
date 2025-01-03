@@ -20,6 +20,9 @@ Boolean continueDeploy;
 time_unix lastTimeSendingBeacon;
 time_unix period;
 
+#define NEED_TO_DEPLOY(uptime, add) ((uptime + add) % (30*60)) != 0
+
+
 /*
  * Initialize the TRXVU and ants.
  *
@@ -456,7 +459,8 @@ void DeployAnts()
 {
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
 	if(logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "DeployAnts - Supervisor_getHousekeeping")) return; //gets the variables to the struct and also check error.
-	if(((mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS) % (30*60)) != 0) return;
+	int uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
+	if(NEED_TO_DEPLOY(uptime, 1) || NEED_TO_DEPLOY(uptime, 2) || NEED_TO_DEPLOY(uptime, 0) || NEED_TO_DEPLOY(uptime, -2) || NEED_TO_DEPLOY(uptime, -1)) return;
 	AntArm(0);
 	AntArm(1);
 	AntDeployment(0);
