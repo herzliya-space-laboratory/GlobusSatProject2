@@ -135,5 +135,5 @@ void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData);
 
 void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time);
 
-
+Boolean IsThePayloadOn();
 #endif /* TELEMETRYCOLLECTOR_H_ */

@@ -123,11 +123,19 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	if(logError(FRAM_read((unsigned char*)&numberOfCMDResets, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "GetCurrentWODTelemetry - FRAM_read cmd resets")) wod->num_of_cmd_resets = -1;
 	else wod->num_of_cmd_resets = numberOfCMDResets;
 
-	PayloadEventData eventsData;
-	if(!logError(payloadReadEvents(&eventsData), "GetCurrentWODTelemetry - payloadReadEvents"))
+	if(IsThePayloadOn)
 	{
-		wod->sel_counter = eventsData.sel_count;
-		wod->seu_counter = eventsData.seu_count;
+		PayloadEventData eventsData;
+		if(!logError(payloadReadEvents(&eventsData), "GetCurrentWODTelemetry - payloadReadEvents"))
+		{
+			wod->sel_counter = eventsData.sel_count;
+			wod->seu_counter = eventsData.seu_count;
+		}
+		else
+		{
+			wod->sel_counter = -1;
+			wod->seu_counter = -1;
+		}
 	}
 	else
 	{
