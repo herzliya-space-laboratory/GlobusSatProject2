@@ -19,7 +19,7 @@ int CMD_TurnOnKillPayloadFlag(sat_packet_t *cmd)
 
 int CMD_TurnOffKillPayloadFlag(sat_packet_t *cmd)
 {
-	Boolean false = false;
+	Boolean false = FALSE;
 	if(logError(FRAM_writeAndVerify((unsigned char*)&false, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "CMD_TurnOffKillPayloadFlag - FRAM_writeAndVerify"))
 	payloadTurnOn();
 	return SendAckPacket(ACK_TURN_ON_PAYLOAD, cmd, NULL, 0);
