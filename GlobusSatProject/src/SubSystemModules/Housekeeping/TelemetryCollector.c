@@ -189,11 +189,9 @@ void TelemetrySaveEPS()
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
 	time_unix time = GetTime();
 	if(time == 0) return;
+	lastTimeSave[tlm_eps] = time;
 	if(!logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - isismepsv2_ivid7_piu__gethousekeepingeng"))
-	{
 		Write2File(&responseEPS, tlm_eps); //Get struct and get kind of error
-		lastTimeSave[tlm_eps] = time;
-	}
 
 }
 
@@ -202,11 +200,9 @@ void TelemetrySaveTx()
 	isis_vu_e__get_tx_telemetry__from_t txTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
+	lastTimeSave[tlm_tx] = time;
 	if(!logError(isis_vu_e__get_tx_telemetry(0, &txTelem), "TelemetrySaveTx - isis_vu_e__get_tx_telemetry"))
-	{
 		Write2File(&txTelem, tlm_tx);
-		lastTimeSave[tlm_tx] = time;
-	}
 }
 
 void TelemetrySaveRx()
@@ -214,11 +210,10 @@ void TelemetrySaveRx()
 	isis_vu_e__get_rx_telemetry__from_t rxTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
+	lastTimeSave[tlm_rx] = time;
 	if(!logError(isis_vu_e__get_rx_telemetry(0, &rxTelem), "TelemetrySaveRx - isis_vu_e__get_rx_telemetry"))
-	{
 		Write2File(&rxTelem, tlm_rx);
-		lastTimeSave[tlm_rx] = time;
-	}
+
 }
 
 void TelemetrySaveAnt0()
@@ -226,11 +221,9 @@ void TelemetrySaveAnt0()
 	isis_ants__get_all_telemetry__from_t antsTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
+	lastTimeSave[tlm_ants0] = time;
 	if(!logError(isis_ants__get_all_telemetry(0, &antsTelem), "TelemetrySaveAnt0 - isis_ants__get_all_telemetry"))
-	{
 		Write2File(&antsTelem, tlm_ants0);
-		lastTimeSave[tlm_ants0] = time;
-	}
 }
 
 void TelemetrySaveAnt1()
@@ -238,11 +231,9 @@ void TelemetrySaveAnt1()
 	isis_ants__get_all_telemetry__from_t antsTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
+	lastTimeSave[tlm_ants1] = time;
 	if(!logError(isis_ants__get_all_telemetry(1, &antsTelem), "TelemetrySaveAnt1 - isis_ants__get_all_telemetry"))
-	{
 		Write2File(&antsTelem, tlm_ants1);
-		lastTimeSave[tlm_ants1] = time;
-	}
 }
 
 void TelemetrySaveSolarPanels()
@@ -277,9 +268,9 @@ void TelemetrySavePayloadRADFET()
 	time_unix time = GetTime();
 	if(time == 0) return;
 	PayloadEnvironmentData radfetData;
+	lastTimeSave[tlm_radfet] = time;
 	if(logError(payloadReadEnvironment(&radfetData), "TelemetrySavePayloadRADFET - payloadReadEnvironment")) return;
 	Write2File(&radfetData, tlm_radfet);
-	lastTimeSave[tlm_radfet] = time;
 	logError(FRAM_writeAndVerify(radfetData.raw, LAST_RADFET_READ_START, sizeof(radfetData.raw)), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
 	logError(FRAM_writeAndVerify((unsigned char*)&time, TIME_LAST_RADFET_READ_ADDR, TIME_LAST_RADFET_READ_SIZE), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
 }
@@ -296,7 +287,6 @@ void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time)
 	payloadSEL_data selData;
 	GetSEL_telemetry(eventsData, &selData);
 	Write2File(&selData, tlm_sel);
-	lastTimeSave[tlm_sel] = time;
 }
 
 void TelemetrySavePayloadEvents()
@@ -304,12 +294,11 @@ void TelemetrySavePayloadEvents()
 	time_unix time = GetTime();
 	if(time == 0) return;
 	PayloadEventData eventsData;
+	lastTimeSave[tlm_sel] = time;
+	lastTimeSave[tlm_seu] = time;
 	if(logError(payloadReadEvents(&eventsData), "TelemetrySavePayloadEvents - payloadReadEvents")) return;
 	if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel))
-	{
 		Write2File(&eventsData.seu_count, tlm_seu);
-		lastTimeSave[tlm_seu] = time;
-	}
 	if(CheckExecutionTime(lastTimeSave[tlm_sel], periods.fields.seu_sel))
 		TelemetrySavePayloadSEL(eventsData, time);
 }
