@@ -199,7 +199,6 @@ int managment_command_router(sat_packet_t *cmd)
 int payload_command_router(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
-	CMD_TurnOnKillPayloadFlag(cmd);
 	switch(cmd->cmd_subtype)
 	{
 		case TURN_ON_KILL_PAYLOAD:
