@@ -22,7 +22,7 @@
 int CMD_DeleteTLM(sat_packet_t *cmd); //we have
 
 
-int CMD_DeleteFilesOfType(sat_packet_t *cmd); //TODO will be really easy to do just need to ask Adi
+int CMD_DeleteFilesOfType(sat_packet_t *cmd); //we have
 
 /*
  * formating the SD card.

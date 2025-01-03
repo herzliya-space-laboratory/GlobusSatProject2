@@ -39,7 +39,6 @@ void InitSavePeriodTimes()
  */
 int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 {
-	//TODO: finish the function
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
 	int error_supervisor = logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "GetCurrentWODTelemetry - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
@@ -57,7 +56,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->current_5V = responseEPS.fields.vip_obc01.fields.current;
 		wod->volt_3V3 = responseEPS.fields.vip_obc05.fields.volt;
 		wod->volt_5V = responseEPS.fields.vip_obc01.fields.volt;
-		wod->charging_power = responseEPS.fields.batt_input.fields.power * 10; //TODO to check
+		wod->charging_power = responseEPS.fields.batt_input.fields.power * 10;
 		wod->power_payload = responseEPS.fields.vip_obc04.fields.power * 10;
 	}
 	else // if have error in the eps put everything in that section to -1
@@ -282,7 +281,7 @@ void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
 	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read change in mode")) selData->changes_in_mode = -1;
 }
 
-void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time)
+void TelemetrySavePayloadSEL(PayloadEventData eventsData)
 {
 	payloadSEL_data selData;
 	GetSEL_telemetry(eventsData, &selData);
@@ -300,7 +299,7 @@ void TelemetrySavePayloadEvents()
 	if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel))
 		Write2File(&eventsData.seu_count, tlm_seu);
 	if(CheckExecutionTime(lastTimeSave[tlm_sel], periods.fields.seu_sel))
-		TelemetrySavePayloadSEL(eventsData, time);
+		TelemetrySavePayloadSEL(eventsData);
 }
 
 Boolean IsThePayloadOn()
@@ -308,7 +307,7 @@ Boolean IsThePayloadOn()
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t response; //Create a variable that is the struct we need from EPS_isis
 	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&response), "GetCurrentWODTelemetry - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(error_eps) return FALSE;
-	if(response.fields.vip_obc04.fields.volt == 0)
+	if(response.fields.vip_obc04.fields.power == 0)
 		return FALSE;
 	return TRUE;
 }

@@ -26,7 +26,7 @@ typedef enum __attribute__ ((__packed__)) reset_type_t
 
 }reset_type_t;
 
-int CMD_GenericI2C(sat_packet_t *cmd); //todo
+/*int CMD_GenericI2C(sat_packet_t *cmd);*/
 
 /*
  * Set the time on the OBC

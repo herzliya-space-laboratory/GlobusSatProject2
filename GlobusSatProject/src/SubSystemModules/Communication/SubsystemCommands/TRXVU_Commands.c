@@ -503,9 +503,9 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 	error = GetAntSide(cmd, &side);
 	if(error) return error;
 	uint32_t uptime;
-	if(side == '0')
+	if(side == 0)
 		error = logError(isis_ants__get_uptime(0, &uptime), "CMD_AntGetUptime - isis_ants__get_uptime - 0");
-	else if(side == '1')
+	else if(side == 1)
 		error = logError(isis_ants__get_uptime(1, &uptime), "CMD_AntGetUptime - isis_ants__get_uptime - 1");
 	else
 	{
@@ -539,9 +539,9 @@ int CMD_AntCancelDeployment(sat_packet_t *cmd)
 	char side;
 	error = GetAntSide(cmd, &side);
 	if(error) return error;
-	if(side == '0')
+	if(side == 0)
 		error = logError(isis_ants__cancel_deploy(0), "CMD_AntCancelDeployment - isis_ants__cancel_deploy - 0");
-	else if(side == '1')
+	else if(side == 1)
 		error = logError(isis_ants__cancel_deploy(1), "CMD_AntCancelDeployment - isis_ants__cancel_deploy - 1");
 	else
 	{

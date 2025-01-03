@@ -17,7 +17,7 @@
 
 typedef union __attribute__ ((__packed__)) _PeriodTimes
 {
-    unsigned char raw[sizeof(int)*7];
+    unsigned char raw[sizeof(int)*NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS];
     struct __attribute__ ((__packed__))
     {
         unsigned int eps;
@@ -44,9 +44,9 @@ typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 	temp_t mcu_temp; 				/*!< Measured temperature provided by a sensor internal to the MCU [degC]*/
 	temp_t bat_temp; 				/*!< 2 cell battery pack: not used 4 cell battery pack: Battery pack temperature on the front of the battery pack. [degC] */
 	float solar_panels[NUMBER_OF_SOLAR_PANELS]; // temp of each solar panel
-	time_unix sat_time;				///< current Unix time of the satellites clock [sec]
-	unsigned int free_memory;		///< number of bytes free in the satellites SD [byte]
-	unsigned int corrupt_bytes;		///< number of currpted bytes in the memory	[bytes]
+	time_unix sat_time;				///< current Unix time of the satellites clock 	[sec]
+	unsigned int free_memory;		///< number of bytes free in the satellites SD 	[byte]
+	unsigned int corrupt_bytes;		///< number of corrupted bytes in the memory	[bytes]
 	unsigned int total_memory;		///< number of bytes in the memory	[bytes]
 	unsigned int used_bytes;		///< number of used bytes in the memory	[bytes]
 	int lastFS_error;				///< last error of the file system
@@ -133,7 +133,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod);
 
 void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData);
 
-void TelemetrySavePayloadSEL(PayloadEventData eventsData, time_unix time);
+void TelemetrySavePayloadSEL(PayloadEventData eventsData);
 
 Boolean IsThePayloadOn();
 #endif /* TELEMETRYCOLLECTOR_H_ */

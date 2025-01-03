@@ -67,7 +67,7 @@
 #define ANT_SAVE_TLM_PERIOD_ADDR		0x138		//<! address where the save tlm period will be
 
 #define DEFAULT_SOLAR_SAVE_TLM_TIME		10			//<! save solar panel TLM every 5 seconds
-#define SOLAR_SAVE_TLM_PERIOD_ADDR		0x13C		//<! address where the save tlm period will be //TODO it's need to be in hex right because it dosen't look like that
+#define SOLAR_SAVE_TLM_PERIOD_ADDR		0x13C		//<! address where the save tlm period will be
 
 #define DEFAULT_WOD_SAVE_TLM_TIME		10			//<! save WOD TLM every 5 seconds
 #define WOD_SAVE_TLM_PERIOD_ADDR		0x140		//<! address where the save tlm period will be

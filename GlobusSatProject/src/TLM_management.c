@@ -206,7 +206,7 @@ int DeleteTLMFiles(tlm_type_t tlmType, Time date, int numOfDays){
 	for(int i = 0; i <= numOfDays; i++){
 		if (DeleteTLMFile(tlmType, date, i) == F_NO_ERROR){
 			deletedFiles++;
-		} //TODO: what to do if we fount an error
+		}
 	}
 	return deletedFiles;
 }

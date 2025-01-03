@@ -97,7 +97,6 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 	SET_RSSI_TRANSPONDER_DEFAULT =  0x0E,   //0b10100101
 	SET_ON_TRANSPONDER =            0x0B,   //0b10100110
 	SET_OFF_TRANSPONDER =           0x0C,   //0b10100110
-//	ANT_GET_ARM_STATUS =        	0x0F,	//0b10110010 =
 	ANT_GET_UPTIME =	        	0x10,	//0b10110011 = //long int
 	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//delete before fllght
 	PING = 				        	0x13,
