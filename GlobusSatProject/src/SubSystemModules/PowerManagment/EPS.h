@@ -38,7 +38,7 @@
 #define DEFAULT_ALPHA_VALUE 0.3
 
 #define NUMBER_OF_SOLAR_PANELS			6
-#define NUMBER_OF_THRESHOLD_VOLTAGES 	4 		///< first 2 are charging voltages, last 2 are discharging voltages
+#define NUMBER_OF_THRESHOLD_VOLTAGES 	4 		///< first 2 are discharging voltages, last 2 are charging voltages
 #define DEFAULT_EPS_THRESHOLD_VOLTAGES 	{(voltage_t)6900, (voltage_t)7300,	 \
 										  (voltage_t)7000, (voltage_t)7400}
 

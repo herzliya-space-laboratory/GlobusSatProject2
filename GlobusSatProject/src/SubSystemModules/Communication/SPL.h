@@ -53,12 +53,6 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_DUMP_START = 0x90,
 	ACK_DUMP_FINISHED = 0x92,
 
-	ACK_GENERIC_I2C_CMD = 0x93,
-	ACK_ARM_DISARM = 0x94,					//after changing arm state of the ants
-	ACK_REDEPLOY = 0x95,
-	ACK_RESET_DELAYED_CMD = 0x9E,			//maybe we dont need
-	ACK_ANT_CANCEL_DEPLOY = 0xA3,
-
 	ACK_FINISH_FIRST_ACTIVE = 0x35,
 
 	ACK_SWITCHING_SD_CARD = 0x30,
@@ -139,14 +133,6 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) management_subtypes_t
 {
-/*
-	SOFT_RESET_SUBTYPE = 		0xAA,		//0b10101010
-	HARD_RESET_SUBTYPE = 		0x99,		//0b10101010
-	TRXVU_SOFT_RESET_SUBTYPE =	0xC3,		//0b11000011
-	TRXVU_HARD_RESET_SUBTYPE = 	0x3C,		//0b00111100
-	EPS_RESET_SUBTYPE =			0xBB,		//0b10111011
-	FS_RESET_SUBTYPE =			0xCC,		//0b11001100
-*/
 	GET_PERIOD_GROUND_WDT = 	0x01,
 	SET_PERIOD_GROUND_WDT = 	0x02,
 	UPDATE_SAT_TIME =           0xDD,       //0b‭11011101‬
