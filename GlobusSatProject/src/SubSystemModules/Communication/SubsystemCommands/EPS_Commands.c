@@ -255,17 +255,20 @@ int CMD_SetHeaterVal(sat_packet_t* cmd)
 {
 	if(cmd == NULL) return -1;
 	unsigned char error_ack = 0;
-	if(cmd->length != 4)
+	if(cmd->length != 8)
 	{
 		error_ack = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
+	float forUsToSwitchToShort;
+	memcpy((unsigned char*)&forUsToSwitchToShort, cmd->data, sizeof(float));
+	int16_t temp = (short)(forUsToSwitchToShort / 0.01);
 	isismepsv2_ivid7_piu__setconfigurationparameter__from_t response;
 	isismepsv2_ivid7_piu__setconfigurationparameter__to_t send;
 	//threshold low
 	send.fields.par_id = 0x3000;
-	memcpy(send.fields.par_val, cmd->data, sizeof(int16_t));
+	memcpy(send.fields.par_val, (unsigned char*)&temp, sizeof(temp));
 	int err = logError(isismepsv2_ivid7_piu__setconfigurationparameter(0, &send, &response), "CMD_SetHeaterVal - isismepsv2_ivid7_piu__setconfigurationparameter"); ///gets the data structure of the parameter to response according to the id of the parameter
 	if(err)
 	{
@@ -275,7 +278,9 @@ int CMD_SetHeaterVal(sat_packet_t* cmd)
 	}
 	//threshold high
 	send.fields.par_id = 0x3003;
-	memcpy(send.fields.par_val, cmd->data + sizeof(int16_t), sizeof(int16_t));
+	memcpy((unsigned char*)&forUsToSwitchToShort, cmd->data + sizeof(float), sizeof(float));
+	temp = (short)(forUsToSwitchToShort / 0.01);
+	memcpy(send.fields.par_val, (unsigned char*)&temp, sizeof(temp));
 	err = logError(isismepsv2_ivid7_piu__setconfigurationparameter(0, &send, &response), "CMD_SetHeaterVal - isismepsv2_ivid7_piu__setconfigurationparameter"); ///gets the data structure of the parameter to response according to the id of the parameter
 	if(err)
 	{
