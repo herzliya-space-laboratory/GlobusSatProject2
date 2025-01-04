@@ -150,12 +150,16 @@ int EPS_Conditioning()
 	{
 		if(smoothing >= threshold_volts.fields.Vup_operational)
 			EnterOperationalMode();
+		else if(GetSystemState() == OperationalMode)
+			if(threshold_volts.fields.Vdown_operational >= smoothing && smoothing >= threshold_volts.fields.Vup_cruise) //TODO: ask Adi if it's to much and I can just not check if we are between the two thresholds
+				EnterCruiseMode();
 		else if(smoothing >= threshold_volts.fields.Vup_cruise)
 			EnterCruiseMode();
+
 	}
 	else
 	{
-		if(smoothing <= threshold_volts.fields.Vdown_operational)
+		if(smoothing >= threshold_volts.fields.Vdown_cruise && smoothing <= threshold_volts.fields.Vdown_operational)
 			EnterCruiseMode();
 		else if(smoothing <= threshold_volts.fields.Vdown_cruise) //TODO: check why not working or not printing
 			EnterPowerSafeMode();

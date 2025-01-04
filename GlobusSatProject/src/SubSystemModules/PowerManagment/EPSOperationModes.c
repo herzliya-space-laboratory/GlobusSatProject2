@@ -41,7 +41,10 @@ int EnterOperationalMode()
 int EnterCruiseMode()
 {
 	if(satState == OperationalMode)
+	{
 		logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
+		vTaskDelay(5);
+	}
 	txOff = FALSE;
 	payloadOff = TRUE;
 	satState = CruiseMode;
