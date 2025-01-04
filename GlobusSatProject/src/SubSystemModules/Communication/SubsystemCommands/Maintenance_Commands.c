@@ -236,6 +236,7 @@ int CMD_UpdateSatTime(sat_packet_t *cmd)
 		return 1;
 	}
 	MostCurrentTimeToFRAM();
+	KickGroundCommWDT();
 	if(newSatTime < passSatTime)
 		Delete_allTMFilesFromSD();
 	return SendAckPacket(ACK_UPDATE_TIME , cmd, (unsigned char*)&newSatTime, sizeof(newSatTime));
