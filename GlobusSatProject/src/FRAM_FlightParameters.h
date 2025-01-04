@@ -50,7 +50,7 @@
 #define IDLE_END_TIME_SIZE				4			//<! length in bytes of
 
 #define RESET_CMD_FLAG_ADDR				0x105		//<! the flag is raised whenever a restart is commissioned
-#define RESET_CMD_FLAG_SIZE				1			//<! size of the parameter in bytes
+#define RESET_CMD_FLAG_SIZE				4			//<! size of the parameter in bytes
 
 #define NUM_OF_CHANGES_IN_MODE_ADDR		0x110
 #define NUM_OF_CHANGES_IN_MODE_SIZE		4

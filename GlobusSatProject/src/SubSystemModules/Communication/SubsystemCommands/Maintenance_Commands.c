@@ -57,10 +57,10 @@ int HardRX_ComponenetReset()
 
 int Soft_ComponenetReset()
 {
-	int one = 1; int zero = 0;
+	Boolean true = TRUE; Boolean false = FALSE;
 	SendAckPacket(ACK_SOFT_RESET, NULL, NULL, 0);
-	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Soft_ComponenetReset - cmd reset flag");
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Soft_ComponenetReset - FRAM_writeAndVerify");
+	logError(FRAM_writeAndVerify((unsigned char*)&true, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Soft_ComponenetReset - cmd reset flag");
+	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Soft_ComponenetReset - FRAM_writeAndVerify");
 	restart();
 	return 0;
 }
@@ -76,9 +76,9 @@ int Ants_ComponenetReset()
 int Hard_ComponenetReset()
 {
 	isismepsv2_ivid7_piu__replyheader_t replyheader;
-	int one = 1; int zero = 0;
-	logError(FRAM_writeAndVerify((unsigned char*)&one, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Hard_ComponenetReset - FRAM_writeAndVerify");
+	Boolean true = TRUE; Boolean false = FALSE;
+	logError(FRAM_writeAndVerify((unsigned char*)&true, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
+	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Hard_ComponenetReset - FRAM_writeAndVerify");
 	SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0);
 	return logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Hard_ComponenetReset - isismepsv2_ivid7_piu__reset");
 }

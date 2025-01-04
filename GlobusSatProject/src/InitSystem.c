@@ -80,9 +80,10 @@ int WriteDefaultValuesToFRAM()
 	int minusOne = -1;
 	if(FRAM_writeAndVerify((unsigned char*)&minusOne, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR)) error += -1;
+	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR)) error += -1
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE)) error += -1;
+	Boolean false = FALSE;
+	if(FRAM_writeAndVerify((unsigned char*)&false, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE)) error += -1;
 
 	int arrPeriod[7] = {DEFAULT_EPS_SAVE_TLM_TIME, DEFAULT_TRXVU_SAVE_TLM_TIME, DEFAULT_ANT_SAVE_TLM_TIME, DEFAULT_SOLAR_SAVE_TLM_TIME, DEFAULT_WOD_SAVE_TLM_TIME, DEFAULT_RADFET_SAVE_TLM_TIME, DEFAULT_SEU_SEL_SAVE_TLM_TIME};
 	if(FRAM_writeAndVerify((unsigned char*)arrPeriod, TLM_SAVE_PERIOD_START_ADDR, sizeof(arrPeriod))) error += -1;
@@ -107,9 +108,9 @@ int WriteDefaultValuesToFRAM()
 	unsigned int defaultTime = DEFAULT_NO_COMM_WDT_KICK_TIME;
 	if(FRAM_writeAndVerify((unsigned char*)&defaultTime, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE)) error += -1;
+	if(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1; //need to be in ground
+	if(FRAM_writeAndVerify((unsigned char*)&false, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1; //need to be in ground
 
 	Boolean true = TRUE;
 	if(FRAM_writeAndVerify((unsigned char*)&true, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) error += -1; //need to be in ground

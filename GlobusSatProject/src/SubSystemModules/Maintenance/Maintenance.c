@@ -87,11 +87,11 @@ int WakeupFromResetCMD()
 	reset += 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&reset, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
-	int flagCMDReset;
+	Boolean flagCMDReset;
 	logError(FRAM_read((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_read");
 	if(!flagCMDReset) return SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time));
 
-	flagCMDReset = 0;
+	flagCMDReset = FALSE;
 	logError(FRAM_writeAndVerify((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
 	int cmdReset = 0;
@@ -136,13 +136,13 @@ void DeleteOldFiles()
 void NeedToKillPayload()
 {
 	if(flag == TRUE) return;
-	uint8_t zero = 0;
+	Boolean false = FALSE;
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
 	int err = logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "NeedToKillPayload - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
 	if(err) return;
 	if(mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS > 60)
 	{
-		logError(FRAM_writeAndVerify((unsigned char*)&zero, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "NeedToKillPayload - FRAM_writeAndVerify");
+		logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "NeedToKillPayload - FRAM_writeAndVerify");
 		flag = TRUE;
 	}
 }
