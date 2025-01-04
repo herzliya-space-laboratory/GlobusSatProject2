@@ -98,7 +98,7 @@ typedef enum __attribute__ ((__packed__)) trxvu_subtypes_t
 	SET_ON_TRANSPONDER =            0x0B,   //0b10100110
 	SET_OFF_TRANSPONDER =           0x0C,   //0b10100110
 	ANT_GET_UPTIME =	        	0x10,	//0b10110011 = //long int
-	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//delete before fllght
+	ANT_CANCEL_DEPLOY =         	0x11,	//0b10110111 *//TODO: delete before flight
 	PING = 				        	0x13,
 	OFF_ANTS_DEPLOY = 				0x15
 

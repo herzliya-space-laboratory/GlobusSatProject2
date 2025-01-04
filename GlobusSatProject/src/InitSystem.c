@@ -77,7 +77,8 @@ int WriteDefaultValuesToFRAM()
 	time_unix mostUpdated = UNIX_SECS_FROM_Y1970_TO_Y2000;
 	if(FRAM_writeAndVerify((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE)) error += -1;
+	int minusOne = -1;
+	if(FRAM_writeAndVerify((unsigned char*)&minusOne, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE)) error += -1;
 
 	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR)) error += -1;
 
