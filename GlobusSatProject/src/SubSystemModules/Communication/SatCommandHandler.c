@@ -113,15 +113,15 @@ int ActUponCommand(sat_packet_t *cmd)
 	switch(cmd->cmd_type)
 	{
 		case trxvu_cmd_type:
-			return logError(trxvu_command_router(cmd), "ActUponCommand - trxvu_command_router");
+			return trxvu_command_router(cmd);
 		case eps_cmd_type:
-			return logError(eps_command_router(cmd), "ActUponCommand - eps_command_router");
+			return eps_command_router(cmd);
 		case filesystem_cmd_type:
-			return logError(filesystem_command_router(cmd), "ActUponCommand - filesystem_command_router");
+			return filesystem_command_router(cmd);
 		case managment_cmd_type:
-			return logError(managment_command_router(cmd), "ActUponCommand - managment_command_router");
+			return managment_command_router(cmd);
 		case payload_cmd_type:
-			return logError(payload_command_router(cmd), "ActUponCommand - payload_command_router");
+			return payload_command_router(cmd);
 		default:
 		{
 			return SendAckPacket(ACK_UNKNOWN_TYPE, cmd, NULL, 0); // Send ack that says what written in unknownType_msg

@@ -7,6 +7,7 @@
 
 #include "EPSOperationModes.h"
 #include "utils.h"
+#include "hal/Drivers/I2C.h"
 
 Boolean txOff = FALSE;
 Boolean payloadOff = FALSE;
