@@ -380,7 +380,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	time_unix check;
+	unsigned int check;
 	error = logError(FRAM_read((unsigned char*)&check, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "CMD_SetBeacon_Interval - FRAM_read"); // Read from FRAM in the place we wrote to for check
 	if(error)
 	{
@@ -419,7 +419,7 @@ int CMD_SetBeacon_Interval_DEFAULT(sat_packet_t *cmd)
 * */
 int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 {
-	time_unix period;
+	unsigned int period;
 	int error = logError(FRAM_read((unsigned char*)&period, BEACON_INTERVAL_TIME_ADDR, BEACON_INTERVAL_TIME_SIZE), "CMD_GetBeacon_Interval - FRAM_read"); // Read the beacon interval from FRAM
 	if(error)
 	{
