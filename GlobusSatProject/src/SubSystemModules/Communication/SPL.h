@@ -33,10 +33,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 	ACK_UPDATE_TIME = 0x12,					// after updating time
 
-	ACK_MEMORY_DELETE = 0x84,				// when memory delete is completed success
 	ACK_SET_NEW_TLM_PERIOD = 0x85,
 
-	ACK_UPDATE_BEACON_BIT_RATE = 0x13,
 	ACK_UPDATE_BEACON_INTERVAL = 0x14,
 
 	ACK_UPDATE_RSSI_VALUE = 0x18,
@@ -63,6 +61,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 	ACK_PING = 0xAA,
 
 	ACK_SET_GWDT = 0xA5,
+
+	ACK_ANT_CANCEL_DEPLOY = 0x69,
 
 	ACK_KILL_PAYLOAD = 0x50,
 	ACK_TURN_ON_PAYLOAD = 0x51,

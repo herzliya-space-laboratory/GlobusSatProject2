@@ -30,13 +30,13 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 /*help functions of CMD_ResetComponent*/
 int Payload_ComponenetReset()
 {
-	SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_PAYLOAD_SOFT_RESET, NULL, NULL, 0);
 	return logError(payloadSoftReset(), "Payload_ComponenetReset - payloadSoftReset");
 }
 
 int HardPayload_ComponenetReset()
 {
-	SendAckPacket(ACK_PAYLOAD_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_PAYLOAD_HARD_RESET, NULL, NULL, 0);
 	payloadTurnOff();
 	return payloadTurnOn();
 }
