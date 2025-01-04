@@ -366,7 +366,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -2;
 	}
-	time_unix new_interval;
+	unsigned int new_interval; //You are right it's not needed
 	int error;
 	memcpy(&new_interval, &cmd->data, cmd->length);
 	if(new_interval >= MAX_BEACON_INTERVAL) // Check if new_interval is bigger then max and if it is compares him to max interval
