@@ -21,7 +21,7 @@ Boolean flag = FALSE;
  * @return	TRUE if difference between now and last execution time is longer than 'period'
  * 			FALSE otherwise
  */
-Boolean CheckExecutionTime(time_unix prev_time, time_unix period)
+Boolean CheckExecutionTime(time_unix prev_time, unsigned int period)
 {
 	unsigned int timeNow;
 	int error = logError(Time_getUnixEpoch(&timeNow), "CheckExecutionTime - Time_getUnixEpoch");

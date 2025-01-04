@@ -18,7 +18,7 @@
 
 Boolean continueDeploy;
 time_unix lastTimeSendingBeacon;
-time_unix period;
+unsigned int period;
 
 #define NEED_TO_DEPLOY(uptime, add) ((uptime + add) % (30*60)) != 0
 

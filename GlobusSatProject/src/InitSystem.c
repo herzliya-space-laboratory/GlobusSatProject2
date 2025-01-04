@@ -80,7 +80,7 @@ int WriteDefaultValuesToFRAM()
 	int minusOne = -1;
 	if(FRAM_writeAndVerify((unsigned char*)&minusOne, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR)) error += -1
+	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR)) error += -1;
 
 	Boolean false = FALSE;
 	if(FRAM_writeAndVerify((unsigned char*)&false, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE)) error += -1;
