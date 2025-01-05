@@ -41,6 +41,7 @@ int EnterOperationalMode()
  */
 int EnterCruiseMode()
 {
+	printf("entered Cruise\r\n");
 	if(satState == OperationalMode)
 	{
 		logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
@@ -49,7 +50,6 @@ int EnterCruiseMode()
 	txOff = FALSE;
 	payloadOff = TRUE;
 	satState = CruiseMode;
-	printf("entered Cruise\r\n");
 	return 0;
 }
 
