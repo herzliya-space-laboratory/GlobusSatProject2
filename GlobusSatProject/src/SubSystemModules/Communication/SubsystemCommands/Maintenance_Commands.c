@@ -62,6 +62,7 @@ int Soft_ComponenetReset()
 	logError(FRAM_writeAndVerify((unsigned char*)&true, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Soft_ComponenetReset - cmd reset flag");
 	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Soft_ComponenetReset - FRAM_writeAndVerify");
 	restart();
+	vTaskDelay(20);
 	return 0;
 }
 
@@ -131,6 +132,7 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 		{
 			if(Hard_ComponenetReset())
 				return SendErrorCantReset(cmd);
+			vTaskDelay(20);
 			return 0;
 		}
 		case reset_tx_hard:
