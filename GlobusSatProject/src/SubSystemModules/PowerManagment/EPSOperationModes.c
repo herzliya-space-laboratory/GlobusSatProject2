@@ -42,11 +42,9 @@ int EnterOperationalMode()
 int EnterCruiseMode()
 {
 	printf("entered Cruise\r\n");
-	if(satState == OperationalMode)
-	{
-		logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
-		vTaskDelay(5);
-	}
+	if(satState == CruiseMode) return 0;
+	logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
+	vTaskDelay(20);
 	txOff = FALSE;
 	payloadOff = TRUE;
 	satState = CruiseMode;
@@ -60,9 +58,13 @@ int EnterCruiseMode()
  */
 int EnterPowerSafeMode()
 {
-	txOff = TRUE;
-	satState = PowerSafeMode;
 	printf("entered power safe mode\r\n");
+	if(satState == PowerSafeMode) return 0;
+	logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
+	vTaskDelay(20);
+	txOff = TRUE;
+	payloadOff = TRUE;
+	satState = PowerSafeMode;
 	return 0;
 }
 

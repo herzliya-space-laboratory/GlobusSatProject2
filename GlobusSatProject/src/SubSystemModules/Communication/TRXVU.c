@@ -111,6 +111,7 @@ void InitTxModule()
  * */
 int setTransponderOn()
 {
+	if(!CheckTransmitionAllowed()) return -1;
 	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
 	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on
 }
@@ -448,8 +449,9 @@ Boolean CheckTransmitionAllowed()
  */
 int BeaconLogic()
 {
-	if(!(CheckExecutionTime(lastTimeSendingBeacon, period) || !CheckTransmitionAllowed())) // Check if we can transmit beacon and also if the period of time we need to wait pass
+	if(!CheckExecutionTime(lastTimeSendingBeacon, period)) // Check if we can transmit beacon and also if the period of time we need to wait pass
 		return -1;
+	if(!CheckTransmitionAllowed()) return -1;
 	sat_packet_t beacon;
 	short length = sizeof(WOD_Telemetry_t);
 	WOD_Telemetry_t data;
