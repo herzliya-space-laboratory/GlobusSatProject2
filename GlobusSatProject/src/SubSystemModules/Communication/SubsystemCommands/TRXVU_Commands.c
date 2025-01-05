@@ -310,6 +310,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
 	SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)); // Send ack of success at mute
+	 SetIdleState(isis_vu_e__onoff__off, 0);
 	int error = setMuteEndTime(muteEndTime);
 	setTransponderOff();
 	if(error == -2)

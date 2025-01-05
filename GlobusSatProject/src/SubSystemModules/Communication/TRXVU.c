@@ -154,6 +154,7 @@ int turnOffTransponder()
  * */
 int turnOffIdle()
 {
+	if(!CheckTransmitionAllowed()) return SetIdleState(isis_vu_e__onoff__off, 0);
 	time_unix timeNow;
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
 	if(error) return error;
@@ -302,6 +303,7 @@ int setNewBeaconIntervalToPeriod()
  */
 int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 {
+	if(!CheckTransmitionAllowed()) state = isis_vu_e__onoff__off;
 	if(state == isis_vu_e__onoff__on)
 	{
 		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__on), "SetIdleState - isis_vu_e__set_idle_state"))

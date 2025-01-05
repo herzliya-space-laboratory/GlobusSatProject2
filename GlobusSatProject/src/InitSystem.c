@@ -16,27 +16,27 @@
 #define TIME_SYNCINTERVAL  60
 
 int StartFRAM(){
-	return logError(FRAM_start(), "StartFRAM - FRAM_start");
+	return FRAM_start();
 }
 
 int StartI2C(){
-	return logError(I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout), "StartI2C - I2C_start");
+	return I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout);
 }
 
 int StartSPI(){
-	return logError(SPI_start(bus1_spi, slave1_spi), "StartSPI - SPI_start");
+	return SPI_start(bus1_spi, slave1_spi);
 }
 
 int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
-	return logError(Time_start(&time, TIME_SYNCINTERVAL), "StartTIME - Time_start");
+	return Time_start(&time, TIME_SYNCINTERVAL);
 }
 
 int UpdateTime()
 {
 	time_unix mostUpdated;
-	if(logError(FRAM_read((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "UpdateTime - FRAM_read")) return -1;
-	return logError(Time_setUnixEpoch((unsigned int)mostUpdated), "updateTime - Time_setUnixEpoch");
+	if(FRAM_read((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE)) return -1;
+	return Time_setUnixEpoch((unsigned int)mostUpdated);
 }
 
 int InitSupervisor()
