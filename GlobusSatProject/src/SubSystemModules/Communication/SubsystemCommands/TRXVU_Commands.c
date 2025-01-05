@@ -170,6 +170,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)); // Send ack of success in turn on transponder and to how much time
 	SetIdleState(isis_vu_e__onoff__off, 0);
 	int error = setTransponderOn(); // Set transponder on
+	if(error == -1) return 0;
 	if(error)
 	{
 		error_ack = ERROR_WRITE_TO_I2C;
@@ -310,7 +311,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
 	SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)); // Send ack of success at mute
-	 SetIdleState(isis_vu_e__onoff__off, 0);
+	SetIdleState(isis_vu_e__onoff__off, 0);
 	int error = setMuteEndTime(muteEndTime);
 	setTransponderOff();
 	if(error == -2)
