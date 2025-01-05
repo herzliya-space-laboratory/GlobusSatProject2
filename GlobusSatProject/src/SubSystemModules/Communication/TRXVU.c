@@ -255,7 +255,8 @@ int setTransponderRSSIinFRAM(short val)
 		val = 0;
 	else if(val > 4095) //max according to TRXVU Transponder Mode Addendum (in drive)
 		val = 4095;
-	if(logError(isis_vu_e__set_tx_thr_rssi(0, val), "setTransponderRSSIinFRAM - isis_vu_e__set_tx_thr_rssi"))
+	unsigned char data[] = {0x52, val,0};
+	if(logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 3), "setTransponderRSSIinFRAM - I2C_write"))
 		return -3;
 	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))
 		return -1;
