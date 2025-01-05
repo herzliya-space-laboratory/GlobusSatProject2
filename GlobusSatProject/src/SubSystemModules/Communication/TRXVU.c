@@ -320,8 +320,7 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 		if(check != duration)
 			return logError(-4, "SetIdleState - Not written right");
 	}
-
-	if(state == isis_vu_e__onoff__off)
+	else if(state == isis_vu_e__onoff__off)
 	{
 		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__off), "SetIdleState - isis_vu_e__set_idle_state"))
 				return -1;
@@ -334,8 +333,8 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 		if(check != duration)
 			return logError(-4, "SetIdleState - Not written right");
 	}
-
-	return -6;
+	else return -6;
+	return 0;
 }
 
 /*

@@ -159,7 +159,7 @@ int CMD_FreeSpace(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return ackError;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&space.free, sizeof(space.free)), "CMD_FreeSpace - TransmitDataAsSPL_Packet");
+	return SendAckPacket(ACK_GET_FREE_SPACE, cmd, (unsigned char*)&space.free, sizeof(space.free));
 }
 
 /*
@@ -306,7 +306,7 @@ int CMD_GetTLMPeriodTimes(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)arrPeriod, sizeof(arrPeriod)), "CMD_GetTLMPeriodTimes - TransmitDataAsSPL_Packet");
+	return SendAckPacket(ACK_GET_TLM_SAVE_PERIODS, cmd, (unsigned char*)arrPeriod, sizeof(arrPeriod));
 }
 
 /*

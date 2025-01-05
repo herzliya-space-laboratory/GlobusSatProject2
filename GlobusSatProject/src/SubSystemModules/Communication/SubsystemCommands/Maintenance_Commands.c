@@ -24,7 +24,7 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&timeNow, sizeof(time_unix)), "CMD_GetSatTime - TransmitDataAsSPL_Packet"); //send back the sat time
+	return SendAckPacket(ACK_GET_SAT_TIME, cmd, (unsigned char*)&timeNow, sizeof(time_unix)); //send back the sat time
 }
 
 /*help functions of CMD_ResetComponent*/
@@ -200,7 +200,7 @@ int CMD_GetSatUptime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, (unsigned char*)&ack_error, sizeof(ack_error)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&supervisorHK.fields.iobcUptime, sizeof(supervisorHK.fields.iobcUptime)), "CMD_GetSatUptime - TransmitDataAsSPL_Packet"); //send back the sat time
+	return SendAckPacket(ACK_GET_SAT_UPTIME, cmd, (unsigned char*)&supervisorHK.fields.iobcUptime, sizeof(supervisorHK.fields.iobcUptime)); //send back the sat time
 }
 
 
@@ -279,6 +279,6 @@ int CMD_GetGsWdtKickTime(sat_packet_t* cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &ackError, sizeof(ackError)); // Send ack error according to "AckErrors.h"
 		return -1;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&groundWDT, sizeof(groundWDT)), "CMD_GetGsWdtKickTime - TransmitDataAsSPL_Packet");
+	return SendAckPacket(ACK_GET_GROUND_WDT, cmd, (unsigned char*)&groundWDT, sizeof(groundWDT));
 
 }

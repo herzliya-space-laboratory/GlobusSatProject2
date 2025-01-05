@@ -92,7 +92,7 @@ int CMD_GetAlpha(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_SIZE), "CMD_GetSmoothingFactor - TransmitDataAsSPL_Packet"); // Send back the alpha value
+	return SendAckPacket(ACK_GET_ALPHA, cmd, (unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_SIZE); // Send back the alpha value
 }
 
 /*
@@ -111,7 +111,7 @@ int CMD_GetThresholdVoltages(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error_ack;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)threshold.raw, EPS_THRESH_VOLTAGES_SIZE), "CMD_GetThresholdVoltages - TransmitDataAsSPL_Packet"); // Send back the threshold voltages
+	return SendAckPacket(ACK_GET_EPS_THRESHOLDS, cmd, (unsigned char*)threshold.raw, EPS_THRESH_VOLTAGES_SIZE); // Send back the threshold voltages
 
 }
 
@@ -195,7 +195,7 @@ int CMD_RestoreDefaultThresholdVoltages(sat_packet_t *cmd)
 int CMD_GetState(sat_packet_t *cmd)
 {
 	EpsState_t state = GetSystemState();
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&state, sizeof(state)), "CMD_GetState - TransmitDataAsSPL_Packet"); // Send back the state of the eps
+	return SendAckPacket(ACK_GET_STATE, cmd, (unsigned char*)&state, sizeof(state)); // Send back the state of the eps
 }
 
 int CMD_EPS_ResetWDT(sat_packet_t *cmd)
@@ -243,7 +243,7 @@ int CMD_GetHeaterVal(sat_packet_t* cmd)
 	memcpy((unsigned char*)&respones[0], response.fields.par_val, 2);
 	memcpy((unsigned char*)&respones[1], response2.fields.par_val, 2);
 	float respones_float[2] = {(respones[0] * 0.01), (respones[1] * 0.01)};
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)respones_float, sizeof(respones_float)), "CMD_GetHeaterVal - TransmitDataAsSPL_Packet"); // Send back the alpha value
+	return SendAckPacket(ACK_GET_HEATER_THRESHOLD, cmd, (unsigned char*)respones_float, sizeof(respones_float)); // Send back the alpha value
 }
 
 /**

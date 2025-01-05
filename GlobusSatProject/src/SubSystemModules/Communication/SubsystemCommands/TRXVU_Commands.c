@@ -168,6 +168,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 		return -2;
 	}
 	SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)); // Send ack of success in turn on transponder and to how much time
+	SetIdleState(isis_vu_e__onoff__off, 0);
 	int error = setTransponderOn(); // Set transponder on
 	if(error)
 	{
@@ -283,7 +284,7 @@ int CMD_GetRSSI_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return -1;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&rssi_val, TRANSPONDER_RSSI_SIZE), "CMD_GetRSSI_Transponder - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+	return SendAckPacket(ACK_GET_RSSI_VALUE, cmd, (unsigned char*)&rssi_val, TRANSPONDER_RSSI_SIZE); // Send back the beacon interval
 }
 
 /*
@@ -429,7 +430,7 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 	}
 	if(cmd == NULL)
 		return -1;
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&period, BEACON_INTERVAL_TIME_SIZE), "CMD_GetBeacon_Interval - TransmitDataAsSPL_Packet"); // Send back the beacon interval
+	return SendAckPacket(ACK_GET_BEACON_INTERVAL, cmd, (unsigned char*)&period, BEACON_INTERVAL_TIME_SIZE); // Send back the beacon interval
 }
 
 /*
@@ -447,7 +448,7 @@ int CMD_GetTxUptime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetTxUptime - TransmitDataAsSPL_Packet");
+	return SendAckPacket(ACK_GET_TX_UPTIME, cmd, (unsigned char*)&uptime, sizeof(uptime));
 }
 
 /*
@@ -465,7 +466,7 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_GetRxUptime - TransmitDataAsSPL_Packet");
+	return SendAckPacket(ACK_GET_RX_UPTIME, cmd, (unsigned char*)&uptime, sizeof(uptime));
 }
 
 /*
@@ -521,7 +522,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
-	return logError(TransmitDataAsSPL_Packet(cmd, (unsigned char*)&uptime, sizeof(uptime)), "CMD_AntGetUptime - TransmitDataAsSPL_Packet");
+	return SendAckPacket(ACK_GET_ANTS_UPTIME, cmd, (unsigned char*)&uptime, sizeof(uptime));
 }
 
 /*
