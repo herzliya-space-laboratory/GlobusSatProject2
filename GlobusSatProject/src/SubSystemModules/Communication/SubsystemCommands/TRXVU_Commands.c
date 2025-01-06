@@ -169,6 +169,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	}
 	SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)); // Send ack of success in turn on transponder and to how much time
 	SetIdleState(isis_vu_e__onoff__off, 0);
+	vTaskDelay(10);
 	short rssi = getTransponderRSSIFromFRAM();
 	if(rssi !=  -1)
 		setTransponderRSSIinFRAM(rssi);

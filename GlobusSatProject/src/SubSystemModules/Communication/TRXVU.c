@@ -142,7 +142,9 @@ int turnOffTransponder()
 	if(error) return error;
 	time_unix timeEnd = getTransponderEndTime();
 	if(timeEnd == 0) return -1;
-	if(timeEnd > timeNow)
+	if(!CheckTransmitionAllowed())
+		error = 0;
+	else if(timeEnd > timeNow)
 		return 0;
 	error = setTransponderOff();
 	if(error) return error;
