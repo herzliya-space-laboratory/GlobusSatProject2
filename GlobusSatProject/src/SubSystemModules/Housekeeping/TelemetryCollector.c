@@ -43,6 +43,10 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	int error_supervisor = logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "GetCurrentWODTelemetry - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
 	int ret = logError(f_getfreespace(f_getdrive(), &space), "GetCurrentWODTelemetry - f_getfreespace"); //gets the variables to the struct
+	isis_vu_e__get_tx_telemetry__from_t telemetryTx;
+	int rvTx = isis_vu_e__get_tx_telemetry(0, &telemetryTx);
+	isis_vu_e__get_rx_telemetry__from_t telemetryRx;
+	int rvRx = isis_vu_e__get_rx_telemetry(0, &telemetryRx);
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
 	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetCurrentWODTelemetry - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(!error_eps)
@@ -50,7 +54,6 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->voltBattery = responseEPS.fields.batt_input.fields.volt;
 		wod->consumed_power = responseEPS.fields.dist_input.fields.power * 10;
 		wod->electric_current = responseEPS.fields.batt_input.fields.current;
-		wod->mcu_temp = ((double)responseEPS.fields.temp) * 0.01;
 		wod->bat_temp = ((double)responseEPS.fields.temp2) * 0.01;
 		wod->current_3V3 = responseEPS.fields.vip_obc05.fields.current;
 		wod->current_5V = responseEPS.fields.vip_obc01.fields.current;
@@ -64,7 +67,6 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->voltBattery = -1;
 		wod->consumed_power = -1;
 		wod->electric_current = -1;
-		wod->mcu_temp = -1;
 		wod->bat_temp = -1;
 		wod->volt_5V = -1;
 		wod->volt_3V3 = -1;
@@ -112,6 +114,35 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->used_bytes = -1;
 	}
 	wod->lastFS_error = f_getlasterror();
+
+	if(!rvTx)
+	{
+		wod->temp_pa = ((float) telemetryTx.fields.temp_pa) * -0.07669 + 195.6037;
+		wod->temp_board =  ((float)telemetryRx.fields.temp_board) * -0.07669 + 195.6037;
+		short telemetryValue = telemetryTx.fields.reflected_power;
+		wod->reflected_power = ((float)(telemetryValue * telemetryValue)) * 5.887E-5;
+		telemetryValue = telemetryTx.fields.forward_power;
+		wod->forward_power = ((float)(telemetryValue * telemetryValue)) * 5.887E-5;
+	}
+	else
+	{
+		wod->temp_pa = -1;
+		wod->temp_board = -1;
+		wod->reflected_power = -1;
+		wod->forward_power = -1;
+	}
+
+	if(!rvRx)
+	{
+		wod->doppler = ((float)telemetryRx.fields.doppler) * (-38.1469726563);
+		wod->rssi = ((float)telemetryRx.fields.rssi) * (-0.5) - 22;
+	}
+	else
+	{
+		wod->doppler = -1;
+		wod->rssi = -1;
+	}
+
 	if(logError(Time_getUnixEpoch((unsigned int*)&wod->sat_time), "GetCurrentWODTelemetry - Time_getUnixEpoch")) // if have error in geting the sat time put the time to -1
 		wod->sat_time = -1;
 
@@ -169,6 +200,12 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->payload_flag = -1;
 
 	wod->eps_state = GetSystemState();
+
+	int countChange = 0;
+	if(!logError(FRAM_read((unsigned char*)&countChange, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetCurrentWODTelemetry - FRAM_read"))
+		wod->change_in_mode = countChange;
+	else
+		wod->change_in_mode = -1;
 
 	return 0;
 }

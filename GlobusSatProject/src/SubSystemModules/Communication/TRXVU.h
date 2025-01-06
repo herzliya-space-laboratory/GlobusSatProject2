@@ -18,9 +18,9 @@
 
 /*#define WE_HAVE_ANTS 0*/
 
-#define MAX_MUTE_TIME 		(60*60*24*3) 	///< max mute duration will be 3 days = 60*60*24*3 [sec]
+#define MAX_MUTE_TIME 		(60*60*24*7) 	///< max mute duration will be 7 days = 60*60*24*3 [sec]
 #define MAX_IDLE_TIME 		(2400) 	///< max IDLE duration will be 40 minutes = 120 *20 [sec]
-#define MAX_TRANS_TIME  	259200    // max time of transponder - 72 hours
+#define MAX_TRANS_TIME  	(60*60*24*14)    // max time of transponder - 14 days
 
 #define SIZE_RXFRAME	200
 #define SIZE_TXFRAME	235

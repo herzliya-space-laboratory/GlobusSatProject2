@@ -162,6 +162,9 @@ void Maintenance()
 	if(IsGroundCommunicationWDTReset())
 	{
 		KickGroundCommWDT();
+		Boolean true = TRUE;
+		logError(FRAM_writeAndVerify((unsigned char*)&true, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "Maintenance - FRAM_writeAndVerify");
+		logError(payloadTurnOff(), "Maintenance - payloadTurnOff");
 		logError(isis_vu_e__reset_hw_rx(0), "Maintenance - isis_vu_e__reset_hw_rx");
 		logError(isis_vu_e__reset_hw_tx(0), "Maintenance - isis_vu_e__reset_hw_tx");
 		isismepsv2_ivid7_piu__replyheader_t replyheader;

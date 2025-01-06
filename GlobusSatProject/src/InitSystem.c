@@ -119,6 +119,7 @@ int WriteDefaultValuesToFRAM()
 
 	return error;
 }
+
 int AntArm(uint8_t side)
 {
 #ifdef FIRST_ACTIVE_DEPLOY
@@ -175,19 +176,18 @@ int FirstActivation()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
-		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
 #endif
 	}
 	while(max > time);
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 2; i++)
 	{
 		AntArm(0);
 		AntArm(1);
 	}
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 2; i++)
 	{
 		AntDeployment(0);
 		AntDeployment(1);
