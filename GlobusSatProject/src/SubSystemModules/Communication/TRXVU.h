@@ -27,7 +27,7 @@
 #define BEACON_SPL_ID	0x02FFFFFF
 
 #define MIN_TRXVU_BUFF 5
-#define DEFAULT_RSSI_VALUE 200
+#define DEFAULT_RSSI_VALUE 10
 
 xSemaphoreHandle semaphorDump;
 xQueueHandle queueAbortDump;
