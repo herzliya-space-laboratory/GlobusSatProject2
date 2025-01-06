@@ -31,12 +31,16 @@ typedef enum{
  */
 int EnterOperationalMode();
 
+int BetweenOperationalToCruise();
+
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Cruise mode
  * @return	0 on success
  * 			errors according to <hal/errors.h>
  */
 int EnterCruiseMode();
+
+int BetweenCruiseToPowerSafeMode();
 
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Power Safe mode
@@ -72,5 +76,7 @@ channel_t GetSystemChannelState();
 Boolean GetTxFlag();
 
 Boolean GetPayloadFlag();
+
+void SetSystemState();
 
 #endif /* EPSOPERATIONMODES_H_ */

@@ -30,8 +30,14 @@ int EnterOperationalMode()
 	txOff = FALSE;
 	payloadOff = FALSE;
 	satState = OperationalMode;
-
+	logError(FRAM_writeAndVerify((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "EnterOperationalMode - FRAM_writeAndVerify");
 	return 0;
+}
+
+int BetweenOperationalToCruise()
+{
+	if(satState == OperationalMode) return EnterOperationalMode();
+	return EnterCruiseMode();
 }
 
 /*!
@@ -48,7 +54,14 @@ int EnterCruiseMode()
 	txOff = FALSE;
 	payloadOff = TRUE;
 	satState = CruiseMode;
+	logError(FRAM_writeAndVerify((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "EnterCruiseMode - FRAM_writeAndVerify");
 	return 0;
+}
+
+int BetweenCruiseToPowerSafeMode()
+{
+	if(satState == CruiseMode) return EnterCruiseMode();
+	return EnterPowerSafeMode();
 }
 
 /*!
@@ -65,6 +78,7 @@ int EnterPowerSafeMode()
 	txOff = TRUE;
 	payloadOff = TRUE;
 	satState = PowerSafeMode;
+	logError(FRAM_writeAndVerify((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "EnterPowerSafeMode - FRAM_writeAndVerify");
 	return 0;
 }
 
@@ -91,4 +105,9 @@ Boolean GetPayloadFlag()
 EpsState_t GetSystemState()
 {
 	return satState;
+}
+
+void SetSystemState()
+{
+	logError(FRAM_read((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE));
 }

@@ -113,7 +113,9 @@ int WriteDefaultValuesToFRAM()
 	if(FRAM_writeAndVerify((unsigned char*)&false, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1; //need to be in ground
 
 	Boolean true = TRUE;
-	if(FRAM_writeAndVerify((unsigned char*)&true, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) error += -1; //need to be in ground
+	if(FRAM_writeAndVerify((unsigned char*)&true, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) error += -1;
+
+	if(FRAM_writeAndVerify((unsigned char*)&zero, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE)) error += -1;
 
 	return error;
 }
@@ -244,6 +246,9 @@ int InitSubsystems(){
 	EPS_And_SP_Init();
 
 	InitTrxvuAndAnts();
+
+	//FRAM_writeAndVerify((unsigned char*)&zero, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE)
+	SetSystemState();
 
 	WakeupFromResetCMD();
 

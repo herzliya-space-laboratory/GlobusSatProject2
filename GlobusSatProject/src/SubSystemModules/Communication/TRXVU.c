@@ -20,14 +20,16 @@ Boolean continueDeploy;
 time_unix lastTimeSendingBeacon;
 unsigned int period;
 
+#define TX_FREQUENCY 436400
+#define RX_FREQUENCY 145970
 #define NEED_TO_DEPLOY(uptime, add) ((uptime + add) % (30*60)) != 0
 
 void SetTRXVU_config_param()
 {
 	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
 
-	isis_vu_e__set_tx_freq(0, 436400);
-	isis_vu_e__set_rx_freq(0, 145970);
+	isis_vu_e__set_tx_freq(0, TX_FREQUENCY);
+	isis_vu_e__set_rx_freq(0, RX_FREQUENCY);
 	isis_vu_e__set_tx_pll_powerout(0, 0xCFEF);
 }
 
@@ -257,7 +259,8 @@ int setTransponderRSSIinFRAM(short val)
 		val = 0;
 	else if(val > 4095) //max according to TRXVU Transponder Mode Addendum (in drive)
 		val = 4095;
-	unsigned char data[] = {0x52, val,0};
+	unsigned char data[] = {0x52, 0, 0};
+	memcpy(data + 1, (unsigned char*)&val, sizeof(short));
 	if(logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 3), "setTransponderRSSIinFRAM - I2C_write"))
 		return -3;
 	if(logError(FRAM_write((unsigned char*)&val, TRANSPONDER_RSSI_ADDR, TRANSPONDER_RSSI_SIZE), "setTransponderRSSIinFRAM - FRAM_write"))

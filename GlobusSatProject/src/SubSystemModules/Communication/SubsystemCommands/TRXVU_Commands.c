@@ -169,6 +169,9 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 	}
 	SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)); // Send ack of success in turn on transponder and to how much time
 	SetIdleState(isis_vu_e__onoff__off, 0);
+	short rssi = getTransponderRSSIFromFRAM();
+	if(rssi !=  -1)
+		setTransponderRSSIinFRAM(rssi);
 	int error = setTransponderOn(); // Set transponder on
 	if(error == -1) return 0;
 	if(error)
@@ -399,7 +402,7 @@ int CMD_SetBeacon_Interval(sat_packet_t *cmd)
 	}
 	setNewBeaconIntervalToPeriod();
 
-	return SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)new_interval, sizeof(new_interval)); // // Send ack with the new_interval with subtype of ACK_UPDATE_BEACON_INTERVAL
+	return SendAckPacket(ACK_UPDATE_BEACON_INTERVAL , cmd, (unsigned char*)&new_interval, sizeof(new_interval)); // // Send ack with the new_interval with subtype of ACK_UPDATE_BEACON_INTERVAL
 }
 
 /*
