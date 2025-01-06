@@ -109,5 +109,5 @@ EpsState_t GetSystemState()
 
 void SetSystemState()
 {
-	logError(FRAM_read((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE));
+	logError(FRAM_read((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "SetSystemState - FRAM_read");
 }
