@@ -30,6 +30,7 @@ void SetTRXVU_config_param()
 
 	isis_vu_e__set_tx_freq(0, TX_FREQUENCY);
 	isis_vu_e__set_rx_freq(0, RX_FREQUENCY);
+	isis_vu_e__set_transponder_in_freq(0, RX_FREQUENCY);
 	isis_vu_e__set_tx_pll_powerout(0, 0xCFEF);
 }
 
