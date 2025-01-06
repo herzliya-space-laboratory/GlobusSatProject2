@@ -146,28 +146,30 @@ int EPS_Conditioning()
 	voltage_t currentVoltage;
 	GetBatteryVoltage(&currentVoltage);
 	double smoothing = SMOOTHING(currentVoltage, Alpha);
-	if(lastVoltage <= smoothing)
-	{
+//	if(lastVoltage <= smoothing)
+	//{
 		if(smoothing >= threshold_volts.fields.Vup_operational)
 			EnterOperationalMode();
 		else if(threshold_volts.fields.Vdown_operational >= smoothing && smoothing >= threshold_volts.fields.Vup_cruise)
 			EnterCruiseMode();
-		else if(smoothing >= threshold_volts.fields.Vup_cruise)
+		else if(smoothing >= threshold_volts.fields.Vdown_operational)
 			BetweenOperationalToCruise();
-		else
-			printf("We are in power safe mode\r\n");
-	}
-	else
-	{
-		if(smoothing <= threshold_volts.fields.Vdown_cruise)
+		else if(smoothing <= threshold_volts.fields.Vdown_cruise)
 			EnterPowerSafeMode();
-		else if(smoothing >= threshold_volts.fields.Vup_cruise && smoothing <= threshold_volts.fields.Vdown_operational)
-			EnterCruiseMode();
-		else if(smoothing <= threshold_volts.fields.Vdown_operational)
-			BetweenCruiseToPowerSafeMode();
 		else
-			printf("We are in operational\r\n");
-	}
+			BetweenCruiseToPowerSafeMode();
+//	}
+//	else
+//	{
+//		if(smoothing <= threshold_volts.fields.Vdown_cruise)
+//			EnterPowerSafeMode();
+//		else if(smoothing >= threshold_volts.fields.Vup_cruise && smoothing <= threshold_volts.fields.Vdown_operational)
+//			EnterCruiseMode();
+//		else if(smoothing <= threshold_volts.fields.Vdown_operational)
+//			BetweenCruiseToPowerSafeMode();
+//		else
+//			printf("We are in operational\r\n");
+//	}
 	lastVoltage = smoothing;
 	return 0;
 }
