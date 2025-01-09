@@ -20,6 +20,9 @@
 
 static char buffer[MAX_COMMAND_DATA_LENGTH * NUM_ELEMENTS_READ_AT_ONCE]; // buffer for data coming from SD (time+size of data struct)
 
+Boolean stopDump = FALSE;
+
+
 FileSystemResult InitializeFS(){
 	uint8_t sd;
 	if(FRAM_read((unsigned char*)&sd, SD_CARD_USED_ADDR, SD_CARD_USED_SIZE)) return FS_FAIL;
@@ -294,7 +297,7 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id , int re
 	char element[(sizeof(int)+size)];// buffer for a single element that we will send
 	int numOfElementsSent=0;
 	time_unix currTime = 0;
-	int count = 0;
+	int count = resolution;
 	while(TRUE)
 	{
 		int readElements = f_read(buffer , sizeof(int)+size , NUM_ELEMENTS_READ_AT_ONCE, fp );

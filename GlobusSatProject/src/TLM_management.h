@@ -55,8 +55,6 @@ typedef enum {
 
  */
 
-static Boolean stopDump = FALSE;
-
 /*int CMD_getInfoImage(sat_packet_t *cmd);
 
  int CMD_getDataImage(sat_packet_t *cmd);*/
