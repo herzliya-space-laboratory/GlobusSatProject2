@@ -186,6 +186,9 @@ int managment_command_router(sat_packet_t *cmd)
 			return CMD_GetSatUptime(cmd);
 		case UPDATE_SAT_TIME:
 			return CMD_UpdateSatTime(cmd);
+		case SET_FLAGS_TO_FIRST:
+			CMD_SetFirstActiveFlags();
+			return 0;
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

@@ -26,7 +26,7 @@
 #include "GlobalStandards.h"
 
 
-#define MIN_2_WAIT_BEFORE_DEPLOY 45 // how many minutes to wait before we open the Ants
+#define MIN_2_WAIT_BEFORE_DEPLOY 30 // how many minutes to wait before we open the Ants
 #define RESTART_TIME 3 // how much time does it take to restart the SAT
 /*!
  * @brief	Starts the FRAM using drivers, and checks for errors.

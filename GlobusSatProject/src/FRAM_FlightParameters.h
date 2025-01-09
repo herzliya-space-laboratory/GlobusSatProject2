@@ -18,9 +18,6 @@
 #define SECONDS_SINCE_DEPLOY_ADDR		0x09		//<! counts how many seconds has past since wakup for use in deployment.
 #define SECONDS_SINCE_DEPLOY_SIZE		4			//<! size of the parameter in bytes
 
-#define SAT_EPS_MODE_ADDR				0x0E
-#define SAT_EPS_MODE_SIZE				1
-
 #define SD_CARD_USED_ADDR				0x15
 #define SD_CARD_USED_SIZE				1
 

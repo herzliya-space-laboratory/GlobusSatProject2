@@ -62,7 +62,7 @@ int Soft_ComponenetReset()
 	logError(FRAM_writeAndVerify((unsigned char*)&true, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Soft_ComponenetReset - cmd reset flag");
 	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Soft_ComponenetReset - FRAM_writeAndVerify");
 	restart();
-	vTaskDelay(20);
+	vTaskDelay(50);
 	return 0;
 }
 
@@ -132,7 +132,7 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 		{
 			if(Hard_ComponenetReset())
 				return SendErrorCantReset(cmd);
-			vTaskDelay(20);
+			vTaskDelay(50);
 			return 0;
 		}
 		case reset_tx_hard:
@@ -283,4 +283,24 @@ int CMD_GetGsWdtKickTime(sat_packet_t* cmd)
 	}
 	return SendAckPacket(ACK_GET_GROUND_WDT, cmd, (unsigned char*)&groundWDT, sizeof(groundWDT));
 
+}
+
+int CMD_SetFirstActiveFlags()
+{
+	int error = 0;
+	Boolean false = FALSE;
+	logError(FRAM_writeAndVerify((unsigned char*)&false, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "CMD_SetFirstActiveFlags - FRAM_writeAndVerify");
+	Boolean true = TRUE;
+	logError(FRAM_writeAndVerify((unsigned char*)&true, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "CMD_SetFirstActiveFlags - first activation flag = 1");
+	int zero = 0;
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "CMD_SetFirstActiveFlags - FRAM_writeAndVerify"); //TODO: need to be written before not here (like firstActiveFlag)
+	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "CMD_SetFirstActiveFlags - FRAM_writeAndVerify");
+
+	int minusOne = -1;
+	logError(FRAM_writeAndVerify((unsigned char*)&minusOne, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "CMD_SetFirstActiveFlags - FRAM_writeAndVerify");
+
+	logError(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR), "CMD_SetFirstActiveFlags - FRAM_writeAndVerify");
+
+	SendAckPacket(ACK_READY_FOR_TAKEOF, NULL, NULL, 0);
+	return error;
 }

@@ -30,6 +30,7 @@ typedef union __attribute__ ((__packed__)) _PeriodTimes
     } fields;
 } PeriodTimes;
 
+PeriodTimes periods;
 
 typedef struct __attribute__ ((__packed__)) WOD_Telemetry_t
 {

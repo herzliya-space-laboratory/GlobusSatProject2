@@ -80,12 +80,13 @@ void CalculateFileName(Time date, char* file_name, char* endFileName,
 /*
  * Read telematry file and send it to ground station over RF
  */
-int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id/*,
-		int resolution*/);
+int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id, int resolution);
 /*
  *
  */
-int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*, int resolution*/);
+int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id, int resolution);
+
+int GetPeriodTimeAccordingToTlmType(tlm_type_t type);
 
 int ReadTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
 		int cmd_id/*, int resolution*/);

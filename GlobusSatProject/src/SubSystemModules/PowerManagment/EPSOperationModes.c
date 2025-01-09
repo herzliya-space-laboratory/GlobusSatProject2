@@ -30,7 +30,6 @@ int EnterOperationalMode()
 	txOff = FALSE;
 	payloadOff = FALSE;
 	satState = OperationalMode;
-	logError(FRAM_writeAndVerify((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "EnterOperationalMode - FRAM_writeAndVerify");
 	return 0;
 }
 
@@ -50,11 +49,10 @@ int EnterCruiseMode()
 	printf("entered Cruise\r\n");
 	if(satState == CruiseMode) return 0;
 	logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
-	vTaskDelay(20);
+	vTaskDelay(100);
 	txOff = FALSE;
 	payloadOff = TRUE;
 	satState = CruiseMode;
-	logError(FRAM_writeAndVerify((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "EnterCruiseMode - FRAM_writeAndVerify");
 	return 0;
 }
 
@@ -74,11 +72,10 @@ int EnterPowerSafeMode()
 	printf("entered power safe mode\r\n");
 	if(satState == PowerSafeMode) return 0;
 	logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
-	vTaskDelay(20);
+	vTaskDelay(100);
 	txOff = TRUE;
 	payloadOff = TRUE;
 	satState = PowerSafeMode;
-	logError(FRAM_writeAndVerify((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "EnterPowerSafeMode - FRAM_writeAndVerify");
 	return 0;
 }
 
@@ -107,7 +104,3 @@ EpsState_t GetSystemState()
 	return satState;
 }
 
-void SetSystemState()
-{
-	logError(FRAM_read((unsigned char*)&satState, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE), "SetSystemState - FRAM_read");
-}

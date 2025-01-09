@@ -38,7 +38,7 @@ int CMD_StartDump(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
 	unsigned char ackError = 0;
-	if(cmd->length != 9)
+	if(cmd->length != 13)
 	{
 		ackError = ERROR_WRONG_LENGTH_DATA;
 		SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
@@ -49,7 +49,7 @@ int CMD_StartDump(sat_packet_t *cmd)
 	memcpy((unsigned char*)&arg.dump_type, cmd->data, 1);
 	memcpy((unsigned char*)&arg.t_start, cmd->data + 1, sizeof(time_unix));
 	memcpy((unsigned char*)&arg.t_end, cmd->data + 5, sizeof(time_unix));
-
+	memcpy((unsigned char*)arg.resulotion, cmd->data + 9, sizeof(int)); //in seconds
 	//check we not already in dump
 	if(xSemaphoreTake(semaphorDump, SECONDS_TO_TICKS(WAIT_TIME_SEM_DUMP)) == pdFALSE)
 	{
@@ -86,7 +86,7 @@ void TackDump(void *dump)
 	Time start;
 	timeU2time(dump_arg->t_start, &start); //change from time_unix to Time
 	SendAckPacket(ACK_DUMP_START, &dump_arg->cmd, NULL, 0);
-	ReadTLMFiles(dump_arg->dump_type, start, numOfDays, dump_arg->cmd.ID); //sends the dump packets
+	ReadTLMFiles(dump_arg->dump_type, start, numOfDays, dump_arg->cmd.ID, dump_arg->resulotion); //sends the dump packets
 	SendAckPacket(ACK_DUMP_FINISHED, &dump_arg->cmd, NULL, 0);
 	f_releaseFS();
 	xSemaphoreGive(semaphorDump); //release the dump semaphor

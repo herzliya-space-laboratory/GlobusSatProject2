@@ -88,4 +88,6 @@ int CMD_SetGsWdtKickTime(sat_packet_t* cmd);
 
 int CMD_GetGsWdtKickTime(sat_packet_t* cmd);
 
+int CMD_SetFirstActiveFlags();
+
 #endif /* MAINTENANCE_COMMANDS_H_ */

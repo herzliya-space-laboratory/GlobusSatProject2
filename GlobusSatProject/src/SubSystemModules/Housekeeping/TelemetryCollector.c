@@ -14,9 +14,6 @@
 
 time_unix lastTimeSave[sizeof(tlm_type_t)] = {0};
 
-
-PeriodTimes periods;
-
 time_unix GetTime()
 {
 	time_unix time = 0;
@@ -314,7 +311,7 @@ void TelemetrySavePayloadRADFET()
 void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
 {
 	selData->count = eventsData.sel_count;
-	if(logError(FRAM_read((unsigned char*)&selData->sat_resets_count, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->sat_resets_count = -1;
+	if(logError(FRAM_read((unsigned char*)&selData->sat_resets_count, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->sat_resets_count = -1;
 	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read change in mode")) selData->changes_in_mode = -1;
 }
 

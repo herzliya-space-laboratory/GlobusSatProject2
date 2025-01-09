@@ -210,6 +210,7 @@ int CMD_SetOff_Transponder(sat_packet_t *cmd)
 		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
 		return error;
 	}
+	InitTrxvuAndAnts();
 	time_unix check = getTransponderEndTime();
 	if(!check)
 	{

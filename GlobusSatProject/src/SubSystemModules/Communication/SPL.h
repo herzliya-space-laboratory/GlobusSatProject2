@@ -86,6 +86,8 @@ typedef enum __attribute__ ((__packed__)) ack_subtype_t
 
 	ACK_CHANGE_HEATER_THRESHOLDS = 0x55,
 
+	ACK_READY_FOR_TAKEOF = 0xFB,
+
 	ACK_UNKNOWN_SUBTYPE = 0xBB,				//when the given subtype is unknown
 	ACK_UNKNOWN_TYPE = 0xCC,				//when the given type is unknown
 	ACK_ERROR_MSG = 0XFF 					// send this ACK when error has occurred
@@ -157,7 +159,8 @@ typedef enum __attribute__ ((__packed__)) management_subtypes_t
 	GENERIC_I2C_CMD =           0xDF,       //0b‭11011111‬
 	RESET_COMPONENT =           0xDE,       //0b‭11011110
 	GET_SAT_UPTIME =    		0xE3,
-	GET_SAT_TIME =				0xE4
+	GET_SAT_TIME =				0xE4,
+	SET_FLAGS_TO_FIRST = 		0xFF
 }management_subtypes_t;
 //-----------------
 

@@ -247,7 +247,36 @@ int Delete_allTMFilesFromSD()
 	return error;
 }
 
-int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int resolution*/)
+int GetPeriodTimeAccordingToTlmType(tlm_type_t type)
+{
+	switch(type)
+	{
+		case tlm_eps:
+			return periods.fields.eps;
+		case tlm_tx:
+			return periods.fields.trxvu;
+		case tlm_rx:
+			return periods.fields.trxvu;
+		case tlm_ants1:
+			return periods.fields.ants;
+		case tlm_ants0:
+			return periods.fields.ants;
+		case tlm_radfet:
+			return periods.fields.radfet;
+		case tlm_wod:
+			return periods.fields.wod;
+		case tlm_sel:
+			return periods.fields.seu_sel;
+		case tlm_seu:
+			return periods.fields.seu_sel;
+		case tlm_solar:
+			return periods.fields.solar_panels;
+		default:
+			return 0;
+	}
+}
+
+int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id , int resolution)
 {
 	unsigned int offset = 0;
 
@@ -265,7 +294,7 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 	char element[(sizeof(int)+size)];// buffer for a single element that we will send
 	int numOfElementsSent=0;
 	time_unix currTime = 0;
-
+	int count = 0;
 	while(TRUE)
 	{
 		int readElements = f_read(buffer , sizeof(int)+size , NUM_ELEMENTS_READ_AT_ONCE, fp );
@@ -278,7 +307,11 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 
 			memcpy(&currTime, &element, sizeof(int));
 /*			PrintTLM(&element,tlmType); //check only for some of the TRXVU*/
-
+			if(count != resolution)
+			{
+				count++;
+				continue;
+			}
 			sat_packet_t dump_tlm = { 0 };
 
 			AssembleCommand((unsigned char*)element, sizeof(int)+size, dump_type, tlmType, cmd_id, &dump_tlm);
@@ -289,6 +322,7 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 				stopDump = TRUE;
 				break;
 			}
+			count = 0;
 		}
 		if(stopDump){
 			break;
@@ -300,13 +334,17 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id /*,		int
 	return numOfElementsSent;
 }
 
-int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id/*, int resolution*/)
+int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id, int resolution)
 {
+	int periodSaveTime = GetPeriodTimeAccordingToTlmType(tlmType);
+	int newResolution = 0;
+	if(periodSaveTime != 0)
+		newResolution = resolution / periodSaveTime;
 	stopDump = FALSE;
 	int totalReads=0;
 	int elementsRead=0;
 	for(int i = 0; i <= numOfDays; i++){
-		elementsRead = ReadTLMFile(tlmType, startDate, i,cmd_id);
+		elementsRead = ReadTLMFile(tlmType, startDate, i,cmd_id, newResolution);
 		totalReads+= (elementsRead>0) ? elementsRead : 0;
 		if(stopDump) break;
 		vTaskDelay(100);

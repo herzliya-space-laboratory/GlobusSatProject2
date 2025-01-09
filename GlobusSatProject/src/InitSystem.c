@@ -71,16 +71,8 @@ int WriteDefaultValuesToFRAM()
 #endif
 	if(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE)) error += -1;
 
-	//if(logError(FRAM_writeAndVerify((unsigned char*)&0, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "default to FRAM - seconds since deploy")) error = -1;
-//Need to be written with the firstActivetion that will become 1.
-
 	time_unix mostUpdated = UNIX_SECS_FROM_Y1970_TO_Y2000;
 	if(FRAM_writeAndVerify((unsigned char*)&mostUpdated, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE)) error += -1;
-
-	int minusOne = -1;
-	if(FRAM_writeAndVerify((unsigned char*)&minusOne, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE)) error += -1;
-
-	if(FRAM_writeAndVerify((unsigned char*)&zero, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_ADDR)) error += -1;
 
 	Boolean false = FALSE;
 	if(FRAM_writeAndVerify((unsigned char*)&false, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE)) error += -1;
@@ -108,14 +100,8 @@ int WriteDefaultValuesToFRAM()
 	unsigned int defaultTime = DEFAULT_NO_COMM_WDT_KICK_TIME;
 	if(FRAM_writeAndVerify((unsigned char*)&defaultTime, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE)) error += -1;
 
-	if(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE)) error += -1;
-
-	if(FRAM_writeAndVerify((unsigned char*)&false, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE)) error += -1; //need to be in ground
-
 	Boolean true = TRUE;
 	if(FRAM_writeAndVerify((unsigned char*)&true, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) error += -1;
-
-	if(FRAM_writeAndVerify((unsigned char*)&zero, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE)) error += -1;
 
 	return error;
 }
@@ -160,10 +146,9 @@ int AntDeployment(uint8_t side)
 
 int FirstActivation()
 {
-	int zero = 0;
+	Boolean false = FALSE;
 	int firstActiveFlag;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-	logError(FRAM_writeAndVerify((unsigned char*)&zero, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify"); //TODO: need to be written before not here (like firstActiveFlag)
 	if(!firstActiveFlag)
 		return 0;
 	int error = 0;
@@ -176,6 +161,7 @@ int FirstActivation()
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
 		vTaskDelay(5000 / portTICK_RATE_MS);
 		time += 5;
+		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
 #ifdef TESTING
 		if(time == 60) gracefulReset();
@@ -193,7 +179,7 @@ int FirstActivation()
 		AntDeployment(1);
 	}
 #endif
-	if(logError(FRAM_writeAndVerify((unsigned char*)&zero, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - FRAM_writeAndVerify - flag = 0")) error = -1;
+	if(logError(FRAM_writeAndVerify((unsigned char*)&false, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - FRAM_writeAndVerify - flag = 0")) error = -1;
 	SendAckPacket(ACK_FINISH_FIRST_ACTIVE, NULL, NULL, 0);
 	return error;
 }
@@ -225,12 +211,9 @@ int InitSubsystems(){
 
 	StartTIME();
 
-	//TODO: DELETE THE LINES OF THE FRAM WRITE BELOW. ONLY TO CHECK FIRST ACTIVETION!!!!!
-	int one = 1;
-	logError(FRAM_writeAndVerify((unsigned char*)&one, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "first activation flag = 1");
-
 	int firstActiveFlag = 0;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
+
 	if(firstActiveFlag)
 		WriteDefaultValuesToFRAM();
 	else
@@ -239,6 +222,7 @@ int InitSubsystems(){
 	InitializeFS();
 
 	if(firstActiveFlag) Delete_allTMFilesFromSD();
+
 	InitSavePeriodTimes();
 
 	InitSupervisor();
@@ -246,9 +230,6 @@ int InitSubsystems(){
 	EPS_And_SP_Init();
 
 	InitTrxvuAndAnts();
-
-	//FRAM_writeAndVerify((unsigned char*)&zero, SAT_EPS_MODE_ADDR, SAT_EPS_MODE_SIZE)
-	SetSystemState();
 
 	WakeupFromResetCMD();
 

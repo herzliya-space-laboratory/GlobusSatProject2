@@ -147,6 +147,8 @@ int turnOffTransponder()
 	else if(timeEnd > timeNow)
 		return 0;
 	error = setTransponderOff();
+	InitTrxvuAndAnts();
+	vTaskDelay(100);
 	if(error) return error;
 	time_unix new = 0;
 	return setTransponderEndTime(new);
