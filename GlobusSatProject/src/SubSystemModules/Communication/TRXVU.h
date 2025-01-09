@@ -115,20 +115,11 @@ int InitTrxvuAndAnts();
 
 void SetTRXVU_config_param();
 
-void checkTransponderFinish();
-
-int CMD_SetBeaconInterval(sat_packet_t *cmd);
-
 /*
  * Have the TRXVU logic. (Beacon send, check if have packets, read packet etc.)
  *@return type=int; return error if have and command_succsess if not
  **/
 int TRX_Logic();
-
-/**
- * sets the transponder's RSSI value
- */
-int SetRSSITransponder(short rssiValue);
 
 /*
  * Check if we pass the time of the transponder and if so get out of this state.
@@ -177,20 +168,6 @@ Boolean CheckTransmitionAllowed();
  * 							Error code according to <hal/errors.h>
  * */
 int TransmitSplPacket(sat_packet_t *packet, int *avalFrames);
-
-/*!
- * @brief sends an abort message via a freeRTOS queue.
- */
-void SendDumpAbortRequest();
-
-/*!
- * @brief Closes a dump task if one is executing, using vTaskDelete.
- * @note Can be used to forcibly abort the task
- */
-void AbortDump(sat_packet_t *cmd);
-
-void FinishDump(sat_packet_t *cmd,unsigned char *buffer, ack_subtype_t acktype,
-		unsigned char *err, unsigned int size) ;
 
 /*
  * @brief transmits beacon according to beacon logic

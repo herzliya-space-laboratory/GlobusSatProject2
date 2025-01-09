@@ -111,7 +111,7 @@ int UpdateThresholdVoltages(EpsThreshVolt_t thresh_volts)
 	voltage_t maxes[NUMBER_OF_THRESHOLD_VOLTAGES] = MAX_VOLTAGE_TO_STATES;
 	voltage_t mins[NUMBER_OF_THRESHOLD_VOLTAGES] = MIN_VOLTAGE_TO_STATES;
 	for(int i = 0; i < NUMBER_OF_THRESHOLD_VOLTAGES; i++)
-		if(thresh_volts.raw[i] < mins[i] || thresh_volts.raw[i] > maxes[i]) return -4;
+		if(thresh_volts.raw[i] < mins[i] || thresh_volts.raw[i] > maxes[i]) return -2;
 	if(logError(FRAM_write((unsigned char*)&thresh_volts, EPS_THRESH_VOLTAGES_ADDR, EPS_THRESH_VOLTAGES_SIZE), "UpdateThresholdVoltages - FRAM_read")) return -1;
 
 	if(GetThresholdVoltages(&threshold_volts)) return -3;
