@@ -760,19 +760,11 @@
                                 "type": "byte"
                             },
                             {
-                                "name": "cmderr",
+                                "name": "cmderr_reserved_new_flag",
                                 "type": "byte"
                             },
                             {
                                 "name": "reserved",
-                                "type": "byte"
-                            },
-                            {
-                                "name": "new_flag",
-                                "type": "byte"
-                            },
-                            {
-                                "name": "reserved2",
                                 "type": "byte"
                             },
                             {
