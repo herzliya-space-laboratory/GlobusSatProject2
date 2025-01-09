@@ -55,6 +55,9 @@
 #define NUM_OF_CHANGES_IN_MODE_ADDR		0x110
 #define NUM_OF_CHANGES_IN_MODE_SIZE		4
 
+#define LAST_TRY_TO_DEPLOY_TIME_ADDR	0x115
+#define LAST_TRY_TO_DEPLOY_TIME_SIZE	4
+
 #define TLM_SAVE_PERIOD_START_ADDR		0x130		//<! start of the save periods in the FRAM
 
 #define DEFAULT_EPS_SAVE_TLM_TIME		10			//<! save EPS TLM every 5 seconds

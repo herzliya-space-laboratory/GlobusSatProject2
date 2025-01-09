@@ -103,6 +103,8 @@ int WriteDefaultValuesToFRAM()
 	Boolean true = TRUE;
 	if(FRAM_writeAndVerify((unsigned char*)&true, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) error += -1;
 
+	if(FRAM_writeAndVerify((unsigned char*)&mostUpdated, LAST_TRY_TO_DEPLOY_TIME_ADDR, LAST_TRY_TO_DEPLOY_TIME_SIZE)) error += -1;
+
 	return error;
 }
 
@@ -163,9 +165,6 @@ int FirstActivation()
 		time += 5;
 		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
-#ifdef TESTING
-		if(time == 60) gracefulReset();
-#endif
 	}
 	while(max > time);
 	for(int i = 0; i < 2; i++)
@@ -178,6 +177,9 @@ int FirstActivation()
 		AntDeployment(0);
 		AntDeployment(1);
 	}
+	time_unix timeUnix;
+	logError(Time_getUnixEpoch((unsigned int*)&timeUnix), "FirstActivition - Time_getUnixEpoch");
+	if(logError(FRAM_writeAndVerify((unsigned char*)&timeUnix, LAST_TRY_TO_DEPLOY_TIME_ADDR, LAST_TRY_TO_DEPLOY_TIME_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
 #endif
 	if(logError(FRAM_writeAndVerify((unsigned char*)&false, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE), "FirstActivition - FRAM_writeAndVerify - flag = 0")) error = -1;
 	SendAckPacket(ACK_FINISH_FIRST_ACTIVE, NULL, NULL, 0);

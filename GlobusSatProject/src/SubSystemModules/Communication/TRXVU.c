@@ -476,14 +476,17 @@ int BeaconLogic()
 
 void DeployAnts()
 {
-	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
-	if(logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "DeployAnts - Supervisor_getHousekeeping")) return; //gets the variables to the struct and also check error.
-	int uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
-	if(NEED_TO_DEPLOY(uptime, 1) || NEED_TO_DEPLOY(uptime, 2) || NEED_TO_DEPLOY(uptime, 0) || NEED_TO_DEPLOY(uptime, -2) || NEED_TO_DEPLOY(uptime, -1)) return;
+	time_unix lastDeploy;
+	if(logError(FRAM_read((unsigned char*)&lastDeploy, LAST_TRY_TO_DEPLOY_TIME_ADDR, LAST_TRY_TO_DEPLOY_TIME_SIZE), "DeployAnts - FRAM_read")) return;
+	if(!CheckExecutionTime(lastDeploy, 30*60)) return;
 	AntArm(0);
 	AntArm(1);
 	AntDeployment(0);
 	AntDeployment(1);
+	time_unix timeUnix;
+	logError(Time_getUnixEpoch((unsigned int*)&timeUnix), "DeployAnts - Time_getUnixEpoch");
+	if(logError(FRAM_writeAndVerify((unsigned char*)&timeUnix, LAST_TRY_TO_DEPLOY_TIME_ADDR, LAST_TRY_TO_DEPLOY_TIME_SIZE), "DeployAnts - FRAM_writeAndVerify")) return;
+
 }
 
 /*
