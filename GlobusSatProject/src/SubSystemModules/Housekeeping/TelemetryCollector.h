@@ -17,7 +17,7 @@
 
 typedef union __attribute__ ((__packed__)) _PeriodTimes
 {
-    unsigned char raw[sizeof(int)*NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS];
+    unsigned char raw[28];
     struct __attribute__ ((__packed__))
     {
         unsigned int eps;
