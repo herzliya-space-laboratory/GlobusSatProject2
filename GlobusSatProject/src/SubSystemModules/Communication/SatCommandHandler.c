@@ -35,7 +35,7 @@ CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd)
 	plusPlace += sizeof(cmd->ID); // add the size of the ID to the variable
 
 	if(cmd->ID>>24 != CUBE_SAT_ID && cmd->ID>>24 != ALL_SAT_ID) // check we really are the sat it was send to.
-		return logError(invalid_sat_id, "ParseDataToCommand - invalid_sat_id");
+		return invalid_sat_id;
 
 	if(memcpy(&cmd->cmd_type, data + plusPlace, sizeof(cmd->cmd_type)) == NULL) // same just the cmd_type.
 		return null_pointer_error;
