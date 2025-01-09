@@ -49,7 +49,7 @@ int CMD_StartDump(sat_packet_t *cmd)
 	memcpy((unsigned char*)&arg.dump_type, cmd->data, 1);
 	memcpy((unsigned char*)&arg.t_start, cmd->data + 1, sizeof(time_unix));
 	memcpy((unsigned char*)&arg.t_end, cmd->data + 5, sizeof(time_unix));
-	memcpy((unsigned char*)arg.resulotion, cmd->data + 9, sizeof(int)); //in seconds
+	memcpy((unsigned char*)&arg.resulotion, cmd->data + 9, sizeof(int)); //in seconds
 	//check we not already in dump
 	if(xSemaphoreTake(semaphorDump, SECONDS_TO_TICKS(WAIT_TIME_SEM_DUMP)) == pdFALSE)
 	{
