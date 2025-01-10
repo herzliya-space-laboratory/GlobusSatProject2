@@ -121,6 +121,7 @@ void InitTxModule()
 int setTransponderOn()
 {
 	if(!CheckTransmitionAllowed()) return -1;
+	if(GetTxFlag()) return -1;
 	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
 	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on
 }
@@ -150,6 +151,7 @@ int turnOffTransponder()
 	if(timeEnd == 0) return -1;
 	if(!CheckTransmitionAllowed())
 		error = 0;
+	else if(GetTxFlag()) error = 0;
 	else if(timeEnd > timeNow)
 		return 0;
 	error = setTransponderOff();
@@ -169,6 +171,7 @@ int turnOffTransponder()
 int turnOffIdle()
 {
 	if(!CheckTransmitionAllowed()) return SetIdleState(isis_vu_e__onoff__off, 0);
+	if(GetTxFlag()) return SetIdleState(isis_vu_e__onoff__off, 0);
 	time_unix timeNow;
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
 	if(error) return error;
@@ -319,6 +322,7 @@ int setNewBeaconIntervalToPeriod()
 int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 {
 	if(!CheckTransmitionAllowed()) state = isis_vu_e__onoff__off;
+	else if(GetTxFlag()) state = isis_vu_e__onoff__off;
 	if(state == isis_vu_e__onoff__on)
 	{
 		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__on), "SetIdleState - isis_vu_e__set_idle_state"))
@@ -398,6 +402,7 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 {
 	if(!CheckTransmitionAllowed())
 		return -2;
+	else if(GetTxFlag()) return -2;
 	unsigned char avail;
 	if(packet == NULL)
 		return -1;
@@ -420,7 +425,8 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length)
 {
 	if(!CheckTransmitionAllowed())
-			return -3;
+		return -3;
+	else if(GetTxFlag()) return -3;
 	unsigned char avail;
 	if(cmd == NULL)
 		return -1;
@@ -451,7 +457,6 @@ Boolean CheckDumpAbort()
  */
 Boolean CheckTransmitionAllowed()
 {
-	if(GetTxFlag()) return FALSE;
 	time_unix timeNow;
 	logError(Time_getUnixEpoch((unsigned int*)&timeNow), "CheckTransmitionAllowed - Time_getUnixEpoch");
 	if(timeNow < getMuteEndTime()) // check we are after the mute end time.
@@ -521,4 +526,9 @@ int TRX_Logic()
 		ActUponCommand(&cmd); // Go to do the command
 	}
 	return command_success;
+}
+
+void setBeaconIntervalNOT_FROM_FRAM(unsigned int interval)
+{
+	period = interval;
 }

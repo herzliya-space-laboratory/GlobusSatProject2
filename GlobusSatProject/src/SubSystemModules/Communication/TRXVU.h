@@ -243,4 +243,6 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd);
  * */
 int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned short length);
 
+void setBeaconIntervalNOT_FROM_FRAM(unsigned int interval);
+
 #endif

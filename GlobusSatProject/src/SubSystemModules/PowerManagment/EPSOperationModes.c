@@ -53,6 +53,7 @@ int EnterCruiseMode()
 	if(satState == CruiseMode) return 0;
 	logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
 	vTaskDelay(100);
+	setNewBeaconIntervalToPeriod();
 	txOff = FALSE;
 	payloadOff = TRUE;
 	satState = CruiseMode;
@@ -79,6 +80,7 @@ int EnterPowerSafeMode()
 	if(satState == PowerSafeMode) return 0;
 	logError(payloadTurnOff(), "EnterCruiseMode - payloadTurnOff");
 	vTaskDelay(100);
+	setBeaconIntervalNOT_FROM_FRAM(MAX_BEACON_INTERVAL);
 	txOff = TRUE;
 	payloadOff = TRUE;
 	satState = PowerSafeMode;
