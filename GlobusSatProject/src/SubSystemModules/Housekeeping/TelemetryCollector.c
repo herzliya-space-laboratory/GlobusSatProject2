@@ -14,6 +14,9 @@
 
 time_unix lastTimeSave[sizeof(tlm_type_t)] = {0};
 
+/*
+ * get unix_time
+ * */
 time_unix GetTime()
 {
 	time_unix time = 0;
@@ -207,6 +210,9 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	return 0;
 }
 
+/*!
+ *  @brief saves current WOD telemetry into file
+ */
 void TelemetrySaveWOD()
 {
 	time_unix time = GetTime();
@@ -217,6 +223,10 @@ void TelemetrySaveWOD()
 	lastTimeSave[tlm_wod] = time;
 }
 
+
+/*!
+ *  @brief saves current EPS telemetry into file
+ */
 void TelemetrySaveEPS()
 {
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
@@ -228,6 +238,9 @@ void TelemetrySaveEPS()
 
 }
 
+/*!
+ *  @brief saves current TRXVU telemetry into file
+ */
 void TelemetrySaveTx()
 {
 	isis_vu_e__get_tx_telemetry__from_t txTelem;
@@ -238,6 +251,9 @@ void TelemetrySaveTx()
 		Write2File(&txTelem, tlm_tx);
 }
 
+/*!
+ *  @brief saves current TRXVU telemetry into file
+ */
 void TelemetrySaveRx()
 {
 	isis_vu_e__get_rx_telemetry__from_t rxTelem;
@@ -249,6 +265,9 @@ void TelemetrySaveRx()
 
 }
 
+/*!
+ *  @brief saves current Antenna 0 telemetry into file
+ */
 void TelemetrySaveAnt0()
 {
 	isis_ants__get_all_telemetry__from_t antsTelem;
@@ -259,6 +278,9 @@ void TelemetrySaveAnt0()
 		Write2File(&antsTelem, tlm_ants0);
 }
 
+/*!
+ *  @brief saves current Antenna 1 telemetry into file
+ */
 void TelemetrySaveAnt1()
 {
 	isis_ants__get_all_telemetry__from_t antsTelem;
@@ -269,6 +291,9 @@ void TelemetrySaveAnt1()
 		Write2File(&antsTelem, tlm_ants1);
 }
 
+/*!
+ *  @brief saves current solar panel telemetry (temparture of each panel) into file
+ */
 void TelemetrySaveSolarPanels()
 {
 	time_unix time = GetTime();
@@ -296,6 +321,9 @@ void TelemetrySaveSolarPanels()
 	lastTimeSave[tlm_solar] = time;
 }
 
+/*!
+ *  @brief saves current RADFET telemetry into file (one of the payloads)
+ */
 void TelemetrySavePayloadRADFET()
 {
 	time_unix time = GetTime();
@@ -308,6 +336,11 @@ void TelemetrySavePayloadRADFET()
 	logError(FRAM_writeAndVerify((unsigned char*)&time, TIME_LAST_RADFET_READ_ADDR, TIME_LAST_RADFET_READ_SIZE), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
 }
 
+/*!
+ *  @brief get current SEL telemetry (one of the payloads)
+ *  @param[in] name=eventsData; type=PayloadEventData; the reading from the payload of the sel and seu.
+ *  @param[out] name=selData; type=payloadSEL_data*; the struct we will save in file and we fill here.
+ */
 void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
 {
 	selData->count = eventsData.sel_count;
@@ -315,6 +348,10 @@ void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
 	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read change in mode")) selData->changes_in_mode = -1;
 }
 
+/*!
+ *  @brief saves current SEL telemetry into file (one of the payloads),  and call the get function
+ *  @param[in] name=eventsData; type=PayloadEventData; the reading from the payload of the sel and seu.
+ */
 void TelemetrySavePayloadSEL(PayloadEventData eventsData)
 {
 	payloadSEL_data selData;
@@ -322,6 +359,9 @@ void TelemetrySavePayloadSEL(PayloadEventData eventsData)
 	Write2File(&selData, tlm_sel);
 }
 
+/*!
+ *  @brief saves current events telemetry into file (two of the payloads)
+ */
 void TelemetrySavePayloadEvents()
 {
 	time_unix time = GetTime();
@@ -336,6 +376,10 @@ void TelemetrySavePayloadEvents()
 		TelemetrySavePayloadSEL(eventsData);
 }
 
+/*
+ * Check according to the eps chanel if the payload is off
+ * @return type=Boolean; TRUE is on, FALSE off or error
+ * */
 Boolean IsThePayloadOn()
 {
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t response; //Create a variable that is the struct we need from EPS_isis
@@ -346,6 +390,9 @@ Boolean IsThePayloadOn()
 	return TRUE;
 }
 
+/*!
+ * @brief saves all telemetries into the appropriate TLM files
+ */
 void TelemetryCollectorLogic()
 {
 	if(CheckExecutionTime(lastTimeSave[tlm_eps], periods.fields.eps))

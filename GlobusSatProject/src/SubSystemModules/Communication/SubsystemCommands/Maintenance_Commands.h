@@ -83,11 +83,28 @@ int FS_ComponenetReset();
 int CMD_ResetComponent(sat_packet_t *cmd);
 
 
-
+/*
+ * Set new ground WDT time
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add, and the new WDT)
+ * @return type=int;	-1 on cmd NULL;
+ * 					 	-2 on wrong length data
+ * 					 	-3 cant do
+ * 					 	-4 write to fram
+ * 					 	error according to SendAckPacket
+ * */
 int CMD_SetGsWdtKickTime(sat_packet_t* cmd);
 
+/*
+ * Get the ground WDT duration;
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (like the headers we add)
+ * @return type=int; return -1 on read from fram, error according to SendAckPacket
+ * */
 int CMD_GetGsWdtKickTime(sat_packet_t* cmd);
 
+/*
+ * Set first active flags
+ * @return type=int; sum of errors in minus
+ * */
 int CMD_SetFirstActiveFlags();
 
 #endif /* MAINTENANCE_COMMANDS_H_ */

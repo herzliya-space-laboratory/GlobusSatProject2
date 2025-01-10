@@ -84,6 +84,14 @@ int DeleteDelayedCommandByIndex(unsigned int index);
 
 int DeleteDelayedBuffer();
 
+/*
+ * According to the type in the cmd struct goes to the right type and there do the commend.
+ *
+ * @param[out] name= cmd; type= sat_packet_t *; The packet as sat_packet_t struct.
+ * @note if type not exist an unknown tpye ack is send.
+ * @return error according to <hal/errors.h>
+ *
+ * */
 int ActUponCommand(sat_packet_t *cmd);
 
 #endif /* SATCOMMANDS_H_ */

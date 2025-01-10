@@ -108,12 +108,12 @@ void TelemetrySaveRx();
 
 
 /*!
- *  @brief saves current Antenna telemetry into file
+ *  @brief saves current Antenna 0 telemetry into file
  */
 void TelemetrySaveAnt0();
 
 /*!
- *  @brief saves current Antenna telemetry into file
+ *  @brief saves current Antenna 1 telemetry into file
  */
 void TelemetrySaveAnt1();
 
@@ -122,8 +122,14 @@ void TelemetrySaveAnt1();
  */
 void TelemetrySaveSolarPanels();
 
+/*!
+ *  @brief saves current RADFET telemetry into file (one of the payloads)
+ */
 void TelemetrySavePayloadRADFET();
 
+/*!
+ *  @brief saves current events telemetry into file (two of the payloads)
+ */
 void TelemetrySavePayloadEvents();
 
 /*!
@@ -133,14 +139,27 @@ void TelemetrySaveWOD();
 
 /*!
  * @brief Gets all necessary telemetry and arranges it into a WOD structure
- * @param[out] output WOD telemetry. If an error occurred while getting TLM the fields will be -1
- * @return 0 	//error according to <hal/errors.h>
+ * @param[out] name=wod; type=WOD_Telemetry_t*; output WOD telemetry. If an error occurred while getting TLM the fields will be -1
+ * @return 0
  */
 int GetCurrentWODTelemetry(WOD_Telemetry_t *wod);
 
+/*!
+ *  @brief get current SEL telemetry (one of the payloads)
+ *  @param[in] name=eventsData; type=PayloadEventData; the reading from the payload of the sel and seu.
+ *  @param[out] name=selData; type=payloadSEL_data*; the struct we will save in file and we fill here.
+ */
 void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData);
 
+/*!
+ *  @brief saves current SEL telemetry into file (one of the payloads),  and call the get function
+ *  @param[in] name=eventsData; type=PayloadEventData; the reading from the payload of the sel and seu.
+ */
 void TelemetrySavePayloadSEL(PayloadEventData eventsData);
 
+/*
+ * Check according to the eps chanel if the payload is off
+ * @return type=Boolean; TRUE is on, FALSE off or error
+ * */
 Boolean IsThePayloadOn();
 #endif /* TELEMETRYCOLLECTOR_H_ */

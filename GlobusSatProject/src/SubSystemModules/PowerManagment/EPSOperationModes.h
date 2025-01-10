@@ -26,26 +26,31 @@ typedef enum{
 
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Operational mode
- * @return	0 on success
- * 			errors according to <hal/errors.h>
+ * @return	0
  */
 int EnterOperationalMode();
 
+/*!
+ * @brief Check if we need to be in Operational or Cruise
+ * @return	0
+ */
 int BetweenOperationalToCruise();
 
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Cruise mode
- * @return	0 on success
- * 			errors according to <hal/errors.h>
+ * @return	0
  */
 int EnterCruiseMode();
 
+/*!
+ * @brief Check if we need to be in Cruise or Power safe mode
+ * @return	0
+ */
 int BetweenCruiseToPowerSafeMode();
 
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Power Safe mode
- * @return	0 on success
- * 			errors according to <hal/errors.h>
+ * @return	0
  */
 int EnterPowerSafeMode();
 
@@ -56,7 +61,7 @@ int EnterPowerSafeMode();
  * @return	0 on success
  * 			errors according to <hal/errors.h>
  */
-int SetEPS_Channels(channel_t channel);
+//int SetEPS_Channels(channel_t channel);
 
 /*!
  * returns the current system state according to the EpsState_t enumeration
@@ -64,19 +69,20 @@ int SetEPS_Channels(channel_t channel);
  */
 EpsState_t GetSystemState();
 
-/*
- * Gets the current system channel state
- * @return current system channel state
- */
-channel_t GetSystemChannelState();
+///*
+// * Gets the current system channel state
+// * @return current system channel state
+// */
+//channel_t GetSystemChannelState();
 
 /*
  * Get if the Tx flag is on or off for us to put in the CheckAllowed in the TRXVU.c code.
  * */
 Boolean GetTxFlag();
 
+/*
+ * Get if the Payload flag is on or off.
+ * */
 Boolean GetPayloadFlag();
-
-void SetSystemState();
 
 #endif /* EPSOPERATIONMODES_H_ */

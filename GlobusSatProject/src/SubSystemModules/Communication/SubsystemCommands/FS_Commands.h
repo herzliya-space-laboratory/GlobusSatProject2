@@ -19,24 +19,33 @@
  * 					 0 on success
  *
  * */
-int CMD_DeleteTLM(sat_packet_t *cmd); //we have
+int CMD_DeleteTLM(sat_packet_t *cmd);
 
-
-int CMD_DeleteFilesOfType(sat_packet_t *cmd); //we have
+/*
+ * Delete tlm files from sd according to tlmType
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and tlmType)
+ * @return type=int; -1 cmd null
+ * 					 17 wrong data length
+ * 					 30 can't do
+ * 					 according to SendAckPacket errors.
+ * 					 0 on success
+ *
+ * */
+int CMD_DeleteFilesOfType(sat_packet_t *cmd);
 
 /*
  * formating the SD card.
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
  * @return type=int; return type of error according to SendAckPacket and Hard_ComponenetReset errors
  * */
-int CMD_DeleteAllFiles(sat_packet_t *cmd); //we have
+int CMD_DeleteAllFiles(sat_packet_t *cmd);
 
 /*
  * Get last FS error
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
  * @return type=int; according to SendAckPacket
  * */
-int CMD_GetLastFS_Error(sat_packet_t *cmd); //we have
+int CMD_GetLastFS_Error(sat_packet_t *cmd);
 
 /*
  * Get free space on the sd in bytes <- it's not precise but it's the best we got
@@ -44,7 +53,7 @@ int CMD_GetLastFS_Error(sat_packet_t *cmd); //we have
  * @return type=int;	27 on error get from struct
  * 						according to TransmitDataAsSPL_Packet
  * */
-int CMD_FreeSpace(sat_packet_t *cmd); //we have
+int CMD_FreeSpace(sat_packet_t *cmd);
 
 /*
  * start dump according to days and create the task of dump
@@ -55,7 +64,7 @@ int CMD_FreeSpace(sat_packet_t *cmd); //we have
  * 					 0 on success
  *
  * */
-int CMD_StartDump(sat_packet_t *cmd); //we have
+int CMD_StartDump(sat_packet_t *cmd);
 
 /*
  * abort dump. (stops the dump)
@@ -67,7 +76,7 @@ int CMD_SendDumpAbortRequest();
  * the function start dump call for the task. have the dump final logic.
  * @param[in] name=dump; type=void*; have the parameters we need for the dump.
  * */
-void TackDump(void *dump); //we have
+void TackDump(void *dump);
 
 /*
  * Switch between the sd cards.
@@ -89,21 +98,22 @@ int CMD_SwitchSD_card(sat_packet_t *cmd);
  * 					 error according to SaveAndCheck
  * 					 30 invalid tlmPeriod
  * */
-int CMD_SetTLMPeriodTimes(sat_packet_t *cmd); //we have
+int CMD_SetTLMPeriodTimes(sat_packet_t *cmd);
 
 /*
  * Set default period of saving telemetry
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
  * @return type=int;	according to FRAM_writeAndVerify
  * */
-int CMD_SetTLMPeriodTimes_default(sat_packet_t *cmd); //we have - need check
+int CMD_SetTLMPeriodTimes_default(sat_packet_t *cmd);
 
 /*
  * Get telemetry period times from FRAM
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
  * @return type=int;	according to FRAM_read and TransmitDataAsSPL_Packet
  * */
-int CMD_GetTLMPeriodTimes(sat_packet_t *cmd); //we have
+int CMD_GetTLMPeriodTimes(sat_packet_t *cmd);
+
 
 
 /*int CMD_GetFileLengthByTime(sat_packet_t *cmd);*/

@@ -50,7 +50,7 @@ typedef enum __attribute__ ((__packed__)) _ISIStrxvuTransponderMode
 /*
  * Gets Idle end time value from FRAM
  * @return type=time_unix; 0 on fail
- * 						   mute end time on success
+ * 						   idle end time on success
  */
 time_unix getIdleEndTime();
 
@@ -104,15 +104,21 @@ short getTransponderRSSIFromFRAM();
  */
 void InitTxModule();
 
+/*
+ * set in FRAM that we need to stop try to deploy
+ * */
 void SetNeedToStopAntDeploy();
 
-/*!
- * @brief initializes the TRXVU subsystem
- * @return	0 on successful init
- * 			errors according to <hal/errors.h>
- */
+/*
+ * Initialize the TRXVU and ants.
+ *
+ * @return error according to <hal/errors.h>
+ * */
 int InitTrxvuAndAnts();
 
+/*
+ * set in the TRXVU his config param. (freq, bitrate and more)
+ * */
 void SetTRXVU_config_param();
 
 /*
@@ -129,6 +135,12 @@ int TRX_Logic();
  * */
 int turnOffTransponder();
 
+/*
+ * Check if we pass the time of the idle and if so get out of this state.
+ * return type=int; -1 on error in getIdleEndTime
+ * 					0 on success
+ * 					error according to SetIdleState errors
+ * */
 int turnOffIdle();
 
 /*
@@ -150,6 +162,10 @@ int setTransponderOff();
  */
 int setTransponderEndTime(time_unix transponderEndTime);
 
+/*
+ * check if we are needed to abort the dump
+ * @return type=Boolean; FALSE - not needed. TRUE - abort
+ * */
 Boolean CheckDumpAbort();
 
 /*

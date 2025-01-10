@@ -580,7 +580,10 @@ int CMD_Ping(sat_packet_t *cmd)
 	return SendAckPacket(ACK_PING , cmd, pong_msg, sizeof(pong_msg)); // send ack ping (says pong)
 }
 
-
+/*
+ * turn up the flag of stop deploy ants.
+ * @return type=int; return error according to SendAckpacket;
+ * */
 int CMD_OffAntsDeploy(sat_packet_t *cmd)
 {
 	SetNeedToStopAntDeploy();

@@ -18,12 +18,12 @@
 #define SECONDS_SINCE_DEPLOY_ADDR		0x09		//<! counts how many seconds has past since wakup for use in deployment.
 #define SECONDS_SINCE_DEPLOY_SIZE		4			//<! size of the parameter in bytes
 
-#define SD_CARD_USED_ADDR				0x15
-#define SD_CARD_USED_SIZE				1
+#define SD_CARD_USED_ADDR				0x15		//<! save which SD we are using (0/1)
+#define SD_CARD_USED_SIZE				1			//<! size of the parameter in bytes
 
 #define DEFAULT_NO_COMM_WDT_KICK_TIME  (7*24*60*60)	//<! number of seconds in 7 days
 #define NO_COMM_WDT_KICK_TIME_ADDR  	0x24		///< number of seconds of no communications before GS WDT kick
-#define NO_COMM_WDT_KICK_TIME_SIZE		4
+#define NO_COMM_WDT_KICK_TIME_SIZE		4			//<! size of the parameter in bytes
 
 #define STOP_REDEPOLOY_FLAG_ADDR		0x30		//<! stop calling ant deploy every 30 min flag
 #define STOP_REDEPOLOY_FLAG_SIZE		4			//<! length in bytes of
@@ -52,11 +52,11 @@
 #define RESET_CMD_FLAG_ADDR				0x105		//<! the flag is raised whenever a restart is commissioned
 #define RESET_CMD_FLAG_SIZE				4			//<! size of the parameter in bytes
 
-#define NUM_OF_CHANGES_IN_MODE_ADDR		0x110
-#define NUM_OF_CHANGES_IN_MODE_SIZE		4
+#define NUM_OF_CHANGES_IN_MODE_ADDR		0x110		//<! changes between cruise to operational
+#define NUM_OF_CHANGES_IN_MODE_SIZE		4			//<! size of the parameter in bytes
 
-#define LAST_TRY_TO_DEPLOY_TIME_ADDR	0x115
-#define LAST_TRY_TO_DEPLOY_TIME_SIZE	4
+#define LAST_TRY_TO_DEPLOY_TIME_ADDR	0x115		//<! save time_unix of the last time we tried to deploy ants
+#define LAST_TRY_TO_DEPLOY_TIME_SIZE	4			//<! size of the parameter in bytes
 
 #define TLM_SAVE_PERIOD_START_ADDR		0x130		//<! start of the save periods in the FRAM
 
@@ -75,11 +75,11 @@
 #define DEFAULT_WOD_SAVE_TLM_TIME		10			//<! save WOD TLM every 5 seconds
 #define WOD_SAVE_TLM_PERIOD_ADDR		0x140		//<! address where the save tlm period will be
 
-#define DEFAULT_RADFET_SAVE_TLM_TIME	15*60
-#define RADFET_SAVE_TLM_PERIOD_ADDR		0x144
+#define DEFAULT_RADFET_SAVE_TLM_TIME	15*60		//<! save RADFET TLM every 15 minutes
+#define RADFET_SAVE_TLM_PERIOD_ADDR		0x144		//<! address where the save tlm period will be
 
-#define DEFAULT_SEU_SEL_SAVE_TLM_TIME	20
-#define SEU_SEL_SAVE_TLM_PERIOD_ADDR	0x148
+#define DEFAULT_SEU_SEL_SAVE_TLM_TIME	20			//<! save sel and seu TLM every 20 seconds
+#define SEU_SEL_SAVE_TLM_PERIOD_ADDR	0x148		//<! address where the save tlm period will be
 
 
 #define NUMBER_OF_CMD_RESETS_ADDR		0x160		//<! counts how many restarts did the satellite endure from ground command
@@ -91,25 +91,25 @@
 #define LAST_RADFET_READ_START			0x210
 
 #define LAST_RADFET_ONE_VALUE_ADDR		0x210		//<! the first value of the fram need to keep after get telemetry.
-#define LAST_RADFET_ONE_VALUE_SIZE		4			//<! number of bytes describing the frame count of delayed buffer
+#define LAST_RADFET_ONE_VALUE_SIZE		4			//<! size of the parameter in bytes
 
-#define LAST_RADFET_TWO_VALUE_ADDR		0x214
-#define LAST_RADFET_TWO_VALUE_SIZE		4
+#define LAST_RADFET_TWO_VALUE_ADDR		0x214		//<! the second value of the fram need to keep after get telemetry.
+#define LAST_RADFET_TWO_VALUE_SIZE		4			//<! size of the parameter in bytes
 
-#define LAST_RADFET_TEMP_ADDR			0x218
-#define LAST_RADFET_TEMP_SIZE			8
+#define LAST_RADFET_TEMP_ADDR			0x218		//<! last temp of RADFET need to keep after get telemetry.
+#define LAST_RADFET_TEMP_SIZE			8			//<! size of the parameter in bytes
 
-#define	TIME_LAST_RADFET_READ_ADDR		0x220
-#define	TIME_LAST_RADFET_READ_SIZE		4
+#define	TIME_LAST_RADFET_READ_ADDR		0x220		//<! last time save tlm of RADFET
+#define	TIME_LAST_RADFET_READ_SIZE		4			//<! size of the parameter in bytes
 
-#define HAD_RESET_IN_A_MINUTE_ADDR		0x230
-#define HAD_RESET_IN_A_MINUTE_SIZE		4
+#define HAD_RESET_IN_A_MINUTE_ADDR		0x230		//<! the flag that check if we had a reset in less then a minute
+#define HAD_RESET_IN_A_MINUTE_SIZE		4			//<! size of the parameter in bytes (Boolean)
 
-#define PAYLOAD_IS_DEAD_ADDR			0x240
-#define PAYLOAD_IS_DEAD_SIZE			4
+#define PAYLOAD_IS_DEAD_ADDR			0x240		//<! the flag that tales us if we need to kill the payload or if he is already dead
+#define PAYLOAD_IS_DEAD_SIZE			4			//<! size of the parameter in bytes (Boolean)
 
-#define TRY_TO_DEPLOY_ADDR				0x250 		//zero will be stop trys to deploy
-#define TRY_TO_DEPLOY_SIZE				4
+#define TRY_TO_DEPLOY_ADDR				0x250 		//zero will be stop trys to deploy ants
+#define TRY_TO_DEPLOY_SIZE				4			//<! size of the parameter in bytes
 
 #define TRANS_ABORT_FLAG_ADDR			0x500		//<! transmission abort request flag
 #define TRANS_ABORT_FLAG_SIZE			1			//<! size of mute flag in bytes

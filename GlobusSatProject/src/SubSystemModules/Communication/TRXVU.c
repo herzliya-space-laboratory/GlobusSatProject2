@@ -24,6 +24,9 @@ unsigned int period;
 #define RX_FREQUENCY 145970
 #define NEED_TO_DEPLOY(uptime, add) ((uptime + add) % (30*60)) != 0
 
+/*
+ * set in the TRXVU his config param. (freq, bitrate and more)
+ * */
 void SetTRXVU_config_param()
 {
 	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
@@ -84,9 +87,12 @@ void IsNeededToContinueAntDeploy()
 	return;
 }
 
+/*
+ * set in FRAM that we need to stop try to deploy
+ * */
 void SetNeedToStopAntDeploy()
 {
-	continueDeploy = 0;
+	continueDeploy = FALSE;
 	if(FRAM_writeAndVerify((unsigned char*)&continueDeploy, TRY_TO_DEPLOY_ADDR, TRY_TO_DEPLOY_SIZE)) return;
 }
 
@@ -240,7 +246,7 @@ time_unix getTransponderEndTime()
 /*
  * Gets Idle end time value from FRAM
  * @return type=time_unix; 0 on fail
- * 						   mute end time on success
+ * 						   idle end time on success
  */
 time_unix getIdleEndTime()
 {
@@ -423,6 +429,10 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TransmitDataAsSPL_Packet - isis_vu_e__send_frame"); // Transmit packet
 }
 
+/*
+ * check if we are needed to abort the dump
+ * @return type=Boolean; FALSE - not needed. TRUE - abort
+ * */
 Boolean CheckDumpAbort()
 {
 	Boolean recive = FALSE;

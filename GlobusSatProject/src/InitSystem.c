@@ -15,23 +15,43 @@
 #define I2CTransferTimeout 10
 #define TIME_SYNCINTERVAL  60
 
+/*!
+ * @brief	Starts the FRAM using drivers, and checks for errors.
+ * @see FRAM.h
+ */
 int StartFRAM(){
 	return FRAM_start();
 }
 
+/*!
+ * @brief	Starts the I2C using drivers, and checks for errors.
+ * @see	I2C.h
+ */
 int StartI2C(){
 	return I2C_start(I2CBusSpeed_Hz, I2CTransferTimeout);
 }
 
+/*!
+ * @brief	Starts the SPI using drivers, and checks for errors
+ * @see	SPI.h
+ */
 int StartSPI(){
 	return SPI_start(bus1_spi, slave1_spi);
 }
 
+/*!
+ * @brief	Starts the Time module using drivers, and checks for errors.
+ * @see Time.h
+ */
 int StartTIME(){
 	const Time time = UNIX_DATE_JAN_D1_Y2000;
 	return Time_start(&time, TIME_SYNCINTERVAL);
 }
 
+/*
+ * update sat time according to most update sat time
+ * @return type=int; according to Time_setUnixEpoch errors
+ * */
 int UpdateTime()
 {
 	time_unix mostUpdated;
@@ -39,6 +59,10 @@ int UpdateTime()
 	return Time_setUnixEpoch((unsigned int)mostUpdated);
 }
 
+/*
+ * @brief	Starts the supervisor module using drivers, and checks for errors.
+ * @see supervisor.h
+ */
 int InitSupervisor()
 {
 	uint8_t po = SUPERVISOR_SPI_INDEX;
@@ -46,6 +70,10 @@ int InitSupervisor()
 	return logError(error, "InitSupervisor - Supervisor_start");
 }
 
+/*!
+ * @brief	writes the default flight parameters to the corresponding FRAM addresses
+ * @see FRAM_FlightParameters.h
+ */
 int WriteDefaultValuesToFRAM()
 {
 	int zero = 0;
@@ -108,6 +136,11 @@ int WriteDefaultValuesToFRAM()
 	return error;
 }
 
+/*
+ * arm ants according to which side (0/1)
+ * @param[in] name=side; type=uint8_t; side of the ants (0/1)
+ * @return type=int; 0 on success -1 on error
+ * */
 int AntArm(uint8_t side)
 {
 #ifdef FIRST_ACTIVE_DEPLOY
@@ -126,6 +159,11 @@ int AntArm(uint8_t side)
 	return 0;
 }
 
+/*
+ * deploy ants according to which side (0/1)
+ * @param[in] name=side; type=uint8_t; side of the ants (0/1)
+ * @return type=int; 0 on success -1 on error
+ * */
 int AntDeployment(uint8_t side)
 {
 
@@ -146,6 +184,11 @@ int AntDeployment(uint8_t side)
 	return 0;
 }
 
+/*!
+ * @brief	deployment procedure
+ * @return	0 successful deployment
+ * 			-1 failed to deploy
+ */
 int FirstActivation()
 {
 	Boolean false = FALSE;
@@ -204,6 +247,10 @@ void payloadKillOrInit()
 
 }
 
+/*!
+ * @brief	executes all required initializations of systems, including sub-systems, and checks for errors
+ * @return	0
+ */
 int InitSubsystems(){
 	StartI2C();
 

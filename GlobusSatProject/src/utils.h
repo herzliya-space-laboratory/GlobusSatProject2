@@ -43,11 +43,17 @@ typedef struct data
 
 /*
  * convert unix time to Time struct
+ * @param[in] name=utime; type=time_unix; unix time we want to convert.
+ * @param[out] name=time; type=Time*; where we save the convert time.
  */
 void timeU2time(time_unix utime, Time *time);
+
 /*
- * log error message
- */
+ * save log (error + error msg) -> in FS
+ * @param[in] name=error; type=int; enter the error code for the problem
+ * @param[in] name=msg; type=char*; have the msg of which function had error and where. (max length 66)
+ * @return type=int; return the error we got.
+ * */
 int logError(int error ,char* msg);
 
 

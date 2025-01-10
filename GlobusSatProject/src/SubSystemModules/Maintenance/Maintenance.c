@@ -47,7 +47,7 @@ Boolean IsFS_Corrupted()
 }
 
 /*!
- * @brief resets the ground station communication WDT because communication took place.
+ * @brief kick the ground station communication WDT because communication took place.
 */
 void KickGroundCommWDT()
 {
@@ -103,6 +103,9 @@ int WakeupFromResetCMD()
 
 }
 
+/*
+ * Update most current sat time to FRAM for every time we have reset to have it.
+ * */
 void MostCurrentTimeToFRAM()
 {
 	time_unix timeNow = 0;
@@ -110,6 +113,11 @@ void MostCurrentTimeToFRAM()
 	logError(FRAM_writeAndVerify((unsigned char*)&timeNow, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "MostCurrentTimeToFRAM - FRAM_writeAndVerify");
 }
 
+/*
+ * Delete old files according to how much space we have left. (20% for start delete until we have 25% free)
+ * MIN_FREE_SPACE_PERCENTAGE - the minimum free space in bytes we want to keep in the SD in all times.
+ * If free space<minFreeSpace we start deleting old TLM files
+ */
 void DeleteOldFiles()
 {
 	F_SPACE space;
@@ -120,8 +128,8 @@ void DeleteOldFiles()
 		return;
 	}
 	if(logError(f_getfreespace(sd, &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
-	if(space.free >= ((space.total * MIN_FREE_SPACE_PERCENTAGE) / 100)) return;
-	F_FIND find;
+	if(space.free >= ((space.total * MIN_FREE_SPACE_PERCENTAGE) / 100)) return; //if we only left 20% free
+	F_FIND find; // we delete until we have 25% free
 	f_findfirst("*.*", &find);
 	do
 	{
@@ -129,10 +137,13 @@ void DeleteOldFiles()
 		if(logError(f_getfreespace(sd, &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
 
 	}
-	while((space.free < (space.total * MIN_FREE_SPACE_PERCENTAGE) / 100) && !f_findnext(&find));
+	while((space.free < (space.total * MIN_FREE_SPACE_PERCENTAGE_TO_DELETE) / 100) && !f_findnext(&find));
 
 }
 
+/*
+ * Check if we need to kill the payload (turn him off for good)
+ * */
 void NeedToKillPayload()
 {
 	if(flag == TRUE) return;

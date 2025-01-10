@@ -12,10 +12,10 @@
 Boolean txOff = FALSE;
 Boolean payloadOff = FALSE;
 EpsState_t satState = OperationalMode;
+
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Operational mode
- * @return	0 on success
- * 			errors according to <hal/errors.h>
+ * @return	0
  */
 int EnterOperationalMode()
 {
@@ -33,6 +33,10 @@ int EnterOperationalMode()
 	return 0;
 }
 
+/*!
+ * @brief Check if we need to be in Operational or Cruise
+ * @return	0
+ */
 int BetweenOperationalToCruise()
 {
 	if(satState == OperationalMode) return EnterOperationalMode();
@@ -41,8 +45,7 @@ int BetweenOperationalToCruise()
 
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Cruise mode
- * @return	0 on success
- * 			errors according to <hal/errors.h>
+ * @return	0
  */
 int EnterCruiseMode()
 {
@@ -56,6 +59,10 @@ int EnterCruiseMode()
 	return 0;
 }
 
+/*!
+ * @brief Check if we need to be in Cruise or Power safe mode
+ * @return	0
+ */
 int BetweenCruiseToPowerSafeMode()
 {
 	if(satState == CruiseMode) return EnterCruiseMode();
@@ -64,8 +71,7 @@ int BetweenCruiseToPowerSafeMode()
 
 /*!
  * @brief Executes the necessary procedure in order to initiate the system into Power Safe mode
- * @return	0 on success
- * 			errors according to <hal/errors.h>
+ * @return	0
  */
 int EnterPowerSafeMode()
 {
@@ -88,7 +94,7 @@ Boolean GetTxFlag()
 }
 
 /*
- * Get if the Payload flag is on or off for us to put in the CheckAllowed in the telemetry collector
+ * Get if the Payload flag is on or off.
  * */
 Boolean GetPayloadFlag()
 {

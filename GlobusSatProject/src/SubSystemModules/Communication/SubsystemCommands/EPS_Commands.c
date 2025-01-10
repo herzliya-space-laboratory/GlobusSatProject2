@@ -198,6 +198,11 @@ int CMD_GetState(sat_packet_t *cmd)
 	return SendAckPacket(ACK_GET_STATE, cmd, (unsigned char*)&state, sizeof(state)); // Send back the state of the eps
 }
 
+/*
+ * Reset EPS WDT
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int; 26 can't reset, error according to SendAckPacket
+ * */
 int CMD_EPS_ResetWDT(sat_packet_t *cmd)
 {
 	isismepsv2_ivid7_piu__replyheader_t response;

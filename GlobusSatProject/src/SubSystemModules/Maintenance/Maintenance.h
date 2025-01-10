@@ -7,20 +7,15 @@
 
 #include "TLM_management.h"
 
-#define MIN_FREE_SPACE_PERCENTAGE 25
+#define MIN_FREE_SPACE_PERCENTAGE 20
+#define MIN_FREE_SPACE_PERCENTAGE_TO_DELETE 25
 #define DEPLOY_INTRAVAL 1800 //TBD: RBF every 1800 sec (30 minutes)
 
 #define RESET_KEY 0xA6 // need to send this key to the reset command otherwise reset will not happen
 
-
-/**
- * use the EPS to hard reset the MCU
- */
-int HardResetMCU();
-
 /*
- * delete onld files from SD card
- * minFreeSpace - the minimum free space in bytes we want to keep in the SD in all times.
+ * Delete old files according to how much space we have left. (20% for start delete until we have 25% free)
+ * MIN_FREE_SPACE_PERCENTAGE - the minimum free space in bytes we want to keep in the SD in all times.
  * If free space<minFreeSpace we start deleting old TLM files
  */
 void DeleteOldFiles();
@@ -34,13 +29,6 @@ void DeleteOldFiles();
  */
 Boolean CheckExecutionTime(time_unix prev_time, unsigned int period);
 
-/*
-!
- * @brief reads the current UNIX time and writes it into the FRAM for future reference.
-
-void SaveSatTimeInFRAM(unsigned int time_addr, unsigned int time_size);
-*/
-
 /*!
  * @brief checks if there is a memory corruption in the file system.
  * @return	TRUE if is corrupted.
@@ -48,11 +36,9 @@ void SaveSatTimeInFRAM(unsigned int time_addr, unsigned int time_size);
  */
 Boolean IsFS_Corrupted();
 
-
 /*!
- * @brief resets the ground station communication WDT because communication took place.
+ * @brief kick the ground station communication WDT because communication took place.
 */
-
 void KickGroundCommWDT();
 
 /*!
@@ -78,8 +64,14 @@ int WakeupFromResetCMD();
  */
 void Maintenance();
 
+/*
+ * Update most current sat time to FRAM for every time we have reset to have it.
+ * */
 void MostCurrentTimeToFRAM();
 
+/*
+ * Check if we need to kill the payload (turn him off for good)
+ * */
 void NeedToKillPayload();
 
 #endif /* MAINTENANCE_H_ */

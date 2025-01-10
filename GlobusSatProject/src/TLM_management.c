@@ -190,7 +190,6 @@ int Write2File(void* data, tlm_type_t tlmType)
 	}
 	f_write(&timeNow , sizeof(timeNow) ,1, fp );
 	f_write(data , structSize , 1, fp );
-/*	PrintTLM(data,tlmType);*/
 	/* close the file*/
 	f_flush(fp);
 	f_close (fp);
@@ -250,6 +249,11 @@ int Delete_allTMFilesFromSD()
 	return error;
 }
 
+/*
+ * Get save tlm period time according to type to save.
+ * @param[in] name=type; type=tlm_type_t; have which tlm we try to save/send
+ * @return type=int; period time for type and 0 for log and unknown type
+ * */
 int GetPeriodTimeAccordingToTlmType(tlm_type_t type)
 {
 	switch(type)
@@ -279,6 +283,14 @@ int GetPeriodTimeAccordingToTlmType(tlm_type_t type)
 	}
 }
 
+/*
+ * Read telematry file and send it to ground station over RF
+ *	@param[in] name=tlmType; type=tlm_type_t; type of data we save.
+ *	@param[in] name=startDate; type=Time; time to start from the reading/the dump.
+ *	@param[in] name=days2Add; type=int; day to add for startDate to read the next days from there.
+ *	@param[in] name=resolution; type=int; resolution is how many times we need to not send until we send
+ *	@return type=int; num of elements sent
+ */
 int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id , int resolution)
 {
 	unsigned int offset = 0;
@@ -289,7 +301,6 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id , int re
 
 	GetTlmTypeInfo(tlmType, endFileName, &size);
 	CalculateFileName(date, file_name, endFileName , days2Add);
-	//printf("reading from file %s...\n",file_name);
 	F_FILE *fp = f_open(file_name, "r");
 
 	if (!fp) return -1; //unable to open file
@@ -337,6 +348,14 @@ int ReadTLMFile(tlm_type_t tlmType, Time date, int days2Add, int cmd_id , int re
 	return numOfElementsSent;
 }
 
+/*
+ *	call function read according to name of dates and start and resolution
+ *	@param[in] name=tlmType; type=tlm_type_t; type of data we save.
+ *	@param[in] name=startDate; type=Time; time to start from the reading.
+ *	@param[in] name=numOfDays; type=int; how many days we wand to read => how many files form the same type from start time
+ *	@param[in] name=resolution; type=int; resolution in seconds of the tlm of the same day we want to read
+ *	@return type=int; num of elements read
+ */
 int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id, int resolution)
 {
 	int periodSaveTime = GetPeriodTimeAccordingToTlmType(tlmType);
@@ -354,33 +373,6 @@ int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id, 
 	}
 
 	return totalReads;
-}
-
-void PrintTLM(void* element, tlm_type_t tlmType)
-{
-	int offset = sizeof(int);
-	if (tlmType==tlm_tx){
-		isis_vu_e__get_tx_telemetry__from_t data;
-		offset += (sizeof(unsigned short) * 7);// skip 7 unsigned short fields
-		memcpy(&data.fields.temp_pa,element+offset,sizeof(data.fields.temp_pa));
-		offset += sizeof(data.fields.temp_pa);
-		printf("pa_temp: %d\n ",data.fields.temp_pa);
-
-		memcpy(&data.fields.temp_board,element+offset,sizeof(data.fields.temp_board));
-		offset += sizeof(data.fields.temp_board);
-		printf("board_temp: %d\n ",data.fields.temp_board);
-	}
-	else if (tlmType==tlm_rx){
-		isis_vu_e__get_rx_telemetry__from_t data;
-		offset += (sizeof(unsigned short) * 1);// skip 1 unsigned short fields
-		memcpy(&data.fields.rssi,element+offset,sizeof(data.fields.rssi));
-		offset += sizeof(data.fields.rssi);
-		printf("rx_rssi: %d\n ",data.fields.rssi);
-
-		memcpy(&data.fields.voltage,element+offset,sizeof(data.fields.voltage));
-		offset += sizeof(data.fields.voltage);
-		printf("bus_volt: %d\n ",data.fields.voltage);
-	}
 }
 
 void DeInitializeFS()

@@ -20,6 +20,11 @@ voltage_t lastVoltage;
 EpsThreshVolt_t threshold_volts;
 float Alpha;
 
+/*!
+ * @brief initializes the EPS subsystem and the solar panels.
+ * @return	0 on success
+ * 			-1 on failure of init
+ */
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;

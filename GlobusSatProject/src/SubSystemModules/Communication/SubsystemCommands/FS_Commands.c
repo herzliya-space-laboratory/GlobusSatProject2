@@ -359,7 +359,16 @@ int CMD_SwitchSD_card(sat_packet_t *cmd)
 	return Hard_ComponenetReset();
 }
 
-
+/*
+ * Delete tlm files from sd according to tlmType
+ * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and tlmType)
+ * @return type=int; -1 cmd null
+ * 					 17 wrong data length
+ * 					 30 can't do
+ * 					 according to SendAckPacket errors.
+ * 					 0 on success
+ *
+ * */
 int CMD_DeleteFilesOfType(sat_packet_t *cmd)
 {
 	if(cmd == NULL) return -1;
@@ -390,5 +399,5 @@ int CMD_DeleteFilesOfType(sat_packet_t *cmd)
 		f_delete(find.filename);
 	}
 	while(!f_findnext(&find));
-	return 0;
+	return SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
 }

@@ -67,6 +67,11 @@ int CMD_GetAlpha(sat_packet_t *cmd);
  * */
 int CMD_GetState(sat_packet_t *cmd);
 
+/*
+ * Reset EPS WDT
+ * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
+ * @return type=int; 26 can't reset, error according to SendAckPacket
+ * */
 int CMD_EPS_ResetWDT(sat_packet_t *cmd);
 
 /**

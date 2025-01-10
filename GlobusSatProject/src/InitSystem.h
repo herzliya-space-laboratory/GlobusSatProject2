@@ -46,7 +46,6 @@ int WriteDefaultValuesToFRAM();
  */
 int StartI2C();
 
-
 /*!
  * @brief	Starts the SPI using drivers, and checks for errors
  * @see	SPI.h
@@ -60,6 +59,10 @@ int StartSPI();
  */
 int StartTIME();
 
+/*
+ * update sat time according to most update sat time
+ * @return type=int; according to Time_setUnixEpoch errors
+ * */
 int UpdateTime();
 
 /*
@@ -74,7 +77,18 @@ int InitSupervisor();
  */
 int InitSubsystems();
 
+/*
+ * arm ants according to which side (0/1)
+ * @param[in] name=side; type=uint8_t; side of the ants (0/1)
+ * @return type=int; 0 on success -1 on error
+ * */
 int AntArm(uint8_t side);
+
+/*
+ * deploy ants according to which side (0/1)
+ * @param[in] name=side; type=uint8_t; side of the ants (0/1)
+ * @return type=int; 0 on success -1 on error
+ * */
 int AntDeployment(uint8_t side);
 
 /*!
