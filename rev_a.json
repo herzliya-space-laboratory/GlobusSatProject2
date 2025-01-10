@@ -718,6 +718,11 @@
                         "params": []
                     },
                     {
+                        "name": "ACK_READY_FOR_TAKEOF",
+                        "id": 251,
+                        "params": []
+                    },
+                    {
                         "name": "ACK_ERROR_MSG",
                         "id": 255,
                         "params": [
@@ -2170,8 +2175,13 @@
                         "params": []
                     },
                     {
-                        "name": "Get Sat time ",
+                        "name": "Get Sat time",
                         "id": 228,
+                        "params": []
+                    },
+                    {
+                        "name": "Set flags to takeof",
+                        "id": 255,
                         "params": []
                     }
                 ]
