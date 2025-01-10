@@ -370,9 +370,7 @@ void TelemetrySavePayloadEvents()
 	lastTimeSave[tlm_sel] = time;
 	lastTimeSave[tlm_seu] = time;
 	if(logError(payloadReadEvents(&eventsData), "TelemetrySavePayloadEvents - payloadReadEvents")) return;
-	if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel))
 		Write2File(&eventsData.seu_count, tlm_seu);
-	if(CheckExecutionTime(lastTimeSave[tlm_sel], periods.fields.seu_sel))
 		TelemetrySavePayloadSEL(eventsData);
 }
 
@@ -414,7 +412,8 @@ void TelemetryCollectorLogic()
 		if(CheckExecutionTime(lastTimeSave[tlm_radfet], periods.fields.radfet))
 			TelemetrySavePayloadRADFET();
 
-		TelemetrySavePayloadEvents();
+		if(CheckExecutionTime(lastTimeSave[tlm_seu], periods.fields.seu_sel))
+			TelemetrySavePayloadEvents();
 	}
 
 
