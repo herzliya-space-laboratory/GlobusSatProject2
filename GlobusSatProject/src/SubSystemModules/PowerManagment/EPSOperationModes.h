@@ -4,7 +4,6 @@
 
 #include "GlobalStandards.h"
 #include "SubSystemModules/Payload/payload_drivers.h"
-#include "SubSystemModules/Communication/TRXVU.h"
 #include <stdio.h>
 
 
