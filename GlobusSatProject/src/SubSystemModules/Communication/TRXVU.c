@@ -402,7 +402,6 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 {
 	if(!CheckTransmitionAllowed())
 		return -2;
-	else if(GetTxFlag()) return -2;
 	unsigned char avail;
 	if(packet == NULL)
 		return -1;
