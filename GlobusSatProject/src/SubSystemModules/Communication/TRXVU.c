@@ -29,12 +29,12 @@ unsigned int period;
  * */
 void SetTRXVU_config_param()
 {
-	isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps);
+	logError(isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps), "SetTRXVU_config_param - isis_vu_e__set_bitrate");
 
-	isis_vu_e__set_tx_freq(0, TX_FREQUENCY);
-	isis_vu_e__set_rx_freq(0, RX_FREQUENCY);
-	isis_vu_e__set_transponder_in_freq(0, RX_FREQUENCY);
-	isis_vu_e__set_tx_pll_powerout(0, 0xCFEF);
+	logError(isis_vu_e__set_tx_freq(0, TX_FREQUENCY), "SetTRXVU_config_param - isis_vu_e__set_tx_freq");
+	logError(isis_vu_e__set_rx_freq(0, RX_FREQUENCY), "SetTRXVU_config_param - isis_vu_e__set_rx_freq");
+	logError(isis_vu_e__set_transponder_in_freq(0, RX_FREQUENCY), "SetTRXVU_config_param - isis_vu_e__set_transponder_in_freq");
+	logError(isis_vu_e__set_tx_pll_powerout(0, 0xCFEF), "SetTRXVU_config_param - isis_vu_e__set_tx_pll_powerout");
 }
 
 /*
