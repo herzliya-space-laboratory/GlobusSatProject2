@@ -370,8 +370,8 @@ void TelemetrySavePayloadEvents()
 	lastTimeSave[tlm_sel] = time;
 	lastTimeSave[tlm_seu] = time;
 	if(logError(payloadReadEvents(&eventsData), "TelemetrySavePayloadEvents - payloadReadEvents")) return;
-		Write2File(&eventsData.seu_count, tlm_seu);
-		TelemetrySavePayloadSEL(eventsData);
+	Write2File(&eventsData.seu_count, tlm_seu);
+	TelemetrySavePayloadSEL(eventsData);
 }
 
 /*

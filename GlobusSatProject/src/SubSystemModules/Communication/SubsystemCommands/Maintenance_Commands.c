@@ -132,7 +132,8 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 		{
 			if(Hard_ComponenetReset())
 				return SendErrorCantReset(cmd);
-			vTaskDelay(50);
+			else
+				vTaskDelay(50000);
 			return 0;
 		}
 		case reset_tx_hard:
