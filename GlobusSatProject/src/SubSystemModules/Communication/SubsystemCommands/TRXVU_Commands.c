@@ -533,43 +533,6 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 }
 
 /*
- * cancel deployment according to side.
- * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
- * @return type=int; return type of error according to this
- * 																-1 cmd NULL
- * 																-2 if length isn't in size.
- * 																-3 got wrong side (not exist one)
- * 																else from <hal/errors.h>
- * */
-int CMD_AntCancelDeployment(sat_packet_t *cmd)
-{
-	unsigned char error_ack;
-	if(cmd == NULL) return -1;
-	int error;
-	char side;
-	error = GetAntSide(cmd, &side);
-	if(error) return error;
-	if(side == 0)
-		error = logError(isis_ants__cancel_deploy(0), "CMD_AntCancelDeployment - isis_ants__cancel_deploy - 0");
-	else if(side == 1)
-		error = logError(isis_ants__cancel_deploy(1), "CMD_AntCancelDeployment - isis_ants__cancel_deploy - 1");
-	else
-	{
-		error_ack = ERROR_NOT_VALID_SIDE;
-		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-		return -3;
-	}
-	if(error)
-	{
-		error_ack = ERROR_CANT_DO;
-		SendAckPacket(ACK_ERROR_MSG , cmd, &error_ack, sizeof(error_ack)); // Send ack error according to "AckErrors.h"
-		return error;
-	}
-	return logError(SendAckPacket(ACK_ANT_CANCEL_DEPLOY , cmd, NULL, 0), "isis_ants__cancel_deploy - SendAckPacket");
-}
-
-
-/*
 * Send ack ping
 * @param[in] name=cmd; type=sat_packet_t*; Not needed can be NULL
 * @return type=int; according to errors <hal/errors.h>

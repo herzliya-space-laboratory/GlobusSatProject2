@@ -59,8 +59,6 @@ int trxvu_command_router(sat_packet_t *cmd)
 			return CMD_GetRxUptime(cmd);
 		case ANT_GET_UPTIME:
 			return CMD_AntGetUptime(cmd);
-		case ANT_CANCEL_DEPLOY:
-			return CMD_AntCancelDeployment(cmd);
 		case PING:
 			return CMD_Ping(cmd);
 		case OFF_ANTS_DEPLOY:

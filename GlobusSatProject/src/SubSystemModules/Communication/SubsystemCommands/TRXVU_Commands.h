@@ -146,17 +146,6 @@ int GetAntSide(sat_packet_t *cmd, char *side);
 int CMD_AntGetUptime(sat_packet_t *cmd);
 
 /*
- * cancel deployment according to side.
- * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
- * @return type=int; return type of error according to this
- * 																-1 cmd NULL
- * 																-2 if length isn't in size.
- * 																-3 got wrong side (not exist one)
- * 																else from <hal/errors.h>
- * */
-int CMD_AntCancelDeployment(sat_packet_t *cmd);
-
-/*
  * Send ack ping
 * @param[in] name=cmd; type=sat_packet_t*; Not needed can be NULL
 * @return type=int; according to errors <hal/errors.h>

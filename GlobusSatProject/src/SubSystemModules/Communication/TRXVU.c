@@ -386,7 +386,8 @@ CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 	error += logError(isis_vu_e__remove_frame(0), "GetOnlineCommand - isis_vu_e__remove_frame");
 	if(error != E_NO_SS_ERR)
 		return execution_error;
-	error = logError(ParseDataToCommand(rx_frame.data, cmd), "GetOnlineCommand - ParseDataToCommand"); // Put the info from the packet in the cmd parameter
+	error = ParseDataToCommand(rx_frame.data, cmd); // Put the info from the packet in the cmd parameter
+	if(error != invalid_sat_id) return logError(error, "GetOnlineCommand - ParseDataToCommand");
 	return error;
 }
 
