@@ -39,10 +39,6 @@
 #include "TestingDemos/MaintenanceTestingDemo.h"
 #include "TestingDemos/MainTest.h"
 
-#ifdef TESTING
-	#include "TestingDemos/MainTest.h"
-#else
-
 //#define Testing_TRXVU 1
 //#define Testing_Maintenance 1
 
@@ -50,11 +46,7 @@ void taskMain()
 {
 	WDT_startWatchdogKickTask(10 / portTICK_RATE_MS, FALSE);
 	InitSubsystems();
-#ifdef Testing_TRXVU
-	MainTrxvuTestBench();
-#elif Testing_Maintenance
-	MainMaintenanceTestBench();
-#else
+
 	while(TRUE)
 	{
 		EPS_Conditioning();
@@ -62,9 +54,7 @@ void taskMain()
 		Maintenance();
 		TelemetryCollectorLogic();
 	}
-#endif
 }
-#endif
 
 // main operation function. will be called upon software boot.
 int main()

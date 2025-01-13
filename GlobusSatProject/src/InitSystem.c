@@ -92,11 +92,8 @@ int WriteDefaultValuesToFRAM()
 	float alpha = DEFAULT_ALPHA_VALUE;
 	if(FRAM_writeAndVerify((unsigned char*)&alpha, EPS_ALPHA_FILTER_VALUE_ADDR, EPS_ALPHA_FILTER_VALUE_SIZE)) error += -1;
 
-#ifdef TESTING
-	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY;
-#else
 	int timeDeploy = MIN_2_WAIT_BEFORE_DEPLOY*60;
-#endif
+
 	if(FRAM_writeAndVerify((unsigned char*)&timeDeploy, DEPLOYMENT_TIME_ADDR, DEPLOYMENT_TIME_SIZE)) error += -1;
 
 	time_unix mostUpdated = UNIX_SECS_FROM_Y1970_TO_Y2000;
