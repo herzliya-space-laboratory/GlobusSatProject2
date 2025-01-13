@@ -495,8 +495,8 @@ void DeployAnts()
 	if(logError(FRAM_read((unsigned char*)&lastDeploy, LAST_TRY_TO_DEPLOY_TIME_ADDR, LAST_TRY_TO_DEPLOY_TIME_SIZE), "DeployAnts - FRAM_read")) return;
 	if(!CheckExecutionTime(lastDeploy, 30*60)) return;
 	AntArm(0);
-	AntArm(1);
 	AntDeployment(0);
+	AntArm(1);
 	AntDeployment(1);
 	time_unix timeUnix;
 	logError(Time_getUnixEpoch((unsigned int*)&timeUnix), "DeployAnts - Time_getUnixEpoch");

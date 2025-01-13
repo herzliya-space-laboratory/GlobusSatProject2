@@ -206,13 +206,11 @@ int FirstActivation()
 	for(int i = 0; i < 2; i++)
 	{
 		AntArm(0);
-		AntArm(1);
-	}
-	for(int i = 0; i < 2; i++)
-	{
 		AntDeployment(0);
+		AntArm(1);
 		AntDeployment(1);
 	}
+
 	time_unix timeUnix;
 	logError(Time_getUnixEpoch((unsigned int*)&timeUnix), "FirstActivition - Time_getUnixEpoch");
 	if(logError(FRAM_writeAndVerify((unsigned char*)&timeUnix, LAST_TRY_TO_DEPLOY_TIME_ADDR, LAST_TRY_TO_DEPLOY_TIME_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
