@@ -8,8 +8,8 @@
 #include "InitSystem.h"
 #include "utils.h"
 
-//#define FIRST_ACTIVE
-//#define FIRST_ACTIVE_DEPLOY
+#define FIRST_ACTIVE
+#define FIRST_ACTIVE_DEPLOY
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
@@ -141,15 +141,13 @@ int WriteDefaultValuesToFRAM()
 int AntArm(uint8_t side)
 {
 #ifdef FIRST_ACTIVE_DEPLOY
-	isis_ants__get_status__from_t status;
-	if(logError(isis_ants__get_status(side, &status), "AntArm - isis_ants__get_status")) return -1;
-	if(status.fields.arm_state) return 0;
 	int rv = logError(isis_ants__arm(side), "AntArm - isis_ants__arm");
 	if(rv)
 	{
 		printf("Ants not armed\r\n");
 		return -1;
 	}
+	printf("Ant %d arm\r\n", side);
 #else
 	printf("Armed (test)\r\n");
 #endif
@@ -165,15 +163,13 @@ int AntDeployment(uint8_t side)
 {
 
 #ifdef FIRST_ACTIVE_DEPLOY
-	isis_ants__get_status__from_t status;
-	if(logError(isis_ants__get_status(side, &status)), "AntDeployment - isis_ants__get_status") return -1;
-	if(!status.fields.arm_state) return -1;
 	int rv = logError(isis_ants__start_auto_deploy(side, 10), "AntDeployment - isis_ants__start_auto_deploy");
 	if(rv)
 	{
 		printf("Ants not deployed\r\n");
 		return -1;
 	}
+	printf("Ant %d deploy\r\n", side);
 #else
 	printf("Deploy (test)\r\n");
 #endif

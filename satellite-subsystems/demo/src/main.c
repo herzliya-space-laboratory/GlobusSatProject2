@@ -42,6 +42,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <hal/Storage/FRAM.h>
+
 #define ENABLE_MAIN_TRACES 1
 #if ENABLE_MAIN_TRACES
 	#define MAIN_TRACE_INFO			TRACE_INFO
@@ -81,6 +83,7 @@ Boolean selectAndExecuteTest()
 	printf("\t 9) ISIS PDU iMEPS test \n\r");
 	printf("\t 10) ISIS PIU iCEPS Test \n\r");
 	printf("\t 11) ISIS AOCS test \n\r");
+	printf("\t 12) Put down First active flag and try to deploy \r\n");
 
 
 	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 11) == 0);
@@ -120,7 +123,13 @@ Boolean selectAndExecuteTest()
 		case 11:
 			offerMoreTests = isis_aocs_demo();
 			break;
-
+		case 12:
+		{
+			Boolean false = FALSE;
+			FRAM_writeAndVerify((unsigned char*)&false, 0x42, 4);
+			FRAM_writeAndVerify((unsigned char*)&false, 0x250, 4);
+			break;
+		}
 		default:
 			break;
 	}
