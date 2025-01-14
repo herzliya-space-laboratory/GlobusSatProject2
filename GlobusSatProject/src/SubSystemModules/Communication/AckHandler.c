@@ -22,7 +22,11 @@ int SendAckPacket(ack_subtype_t acksubtype, sat_packet_t *cmd, unsigned char *da
 	if(cmd != NULL)
 		logError(AssembleCommand(data, length, ack_type, acksubtype, cmd->ID, &cmd1), "SendAckPacket - AssembleCommand"); // Assemble new cmd1 stract according to data, length and cmd
 	else
-		logError(AssembleCommand(data, length, ack_type, acksubtype, CUBE_SAT_ID, &cmd1), "SendAckPacket - AssembleCommand"); // Assemble new cmd1 struct according to data, length. cmd is null.
+	{
+		unsigned int id = CUBE_SAT_ID;
+		id = id<<24;
+		logError(AssembleCommand(data, length, ack_type, acksubtype, id, &cmd1), "SendAckPacket - AssembleCommand"); // Assemble new cmd1 struct according to data, length. cmd is null.
+	}
 	int avalFrames;
 
 	return logError(TransmitSplPacket(&cmd1, &avalFrames), "SendAckPacket - TransmitSplPacket"); // Send ack and return error if have else 0
