@@ -151,7 +151,7 @@ int EPS_Conditioning()
 	voltage_t currentVoltage;
 	GetBatteryVoltage(&currentVoltage);
 	double smoothing = SMOOTHING(currentVoltage, Alpha);
-
+	printf("%d - \r\n", (int)smoothing);
 	if(smoothing >= threshold_volts.fields.Vup_operational)
 		EnterOperationalMode();
 	else if(threshold_volts.fields.Vdown_operational >= smoothing && smoothing >= threshold_volts.fields.Vup_cruise)

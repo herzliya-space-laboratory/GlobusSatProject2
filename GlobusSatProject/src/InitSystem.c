@@ -201,6 +201,7 @@ int FirstActivation()
 		time += 5;
 		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
+		printf("%d\r\n", time);
 	}
 	while(max > time);
 	for(int i = 0; i < 2; i++)
