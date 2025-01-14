@@ -479,7 +479,9 @@ int BeaconLogic()
 	short length = sizeof(WOD_Telemetry_t);
 	WOD_Telemetry_t data;
 	GetCurrentWODTelemetry(&data); // Gets the telemetry of the beacon and put it in data.
-	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, CUBE_SAT_ID, &beacon), "BeaconLogic - AssembleCommand"); // Create the beacon packet
+	unsigned int id = CUBE_SAT_ID;
+	id = id<<24;
+	logError(AssembleCommand((unsigned char *)&data, length, trxvu_cmd_type, BEACON_SUBTYPE, id, &beacon), "BeaconLogic - AssembleCommand"); // Create the beacon packet
 	int avalFrames;
 	SetTRXVU_config_param();
 	int error = logError(TransmitSplPacket(&beacon, &avalFrames), "BeaconLogic - TransmitSplPacket"); // Send the beacon packet
