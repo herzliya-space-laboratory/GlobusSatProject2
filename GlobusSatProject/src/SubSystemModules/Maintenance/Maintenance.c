@@ -180,5 +180,6 @@ void Maintenance()
 		logError(isis_vu_e__reset_hw_tx(0), "Maintenance - isis_vu_e__reset_hw_tx");
 		isismepsv2_ivid7_piu__replyheader_t replyheader;
 		logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Maintenance - isismepsv2_ivid7_piu__reset");
+		vTaskDelay(5000);
 	}
 }
