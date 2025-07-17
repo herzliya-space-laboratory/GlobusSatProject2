@@ -57,12 +57,12 @@ int trxvu_command_router(sat_packet_t *cmd)
 			return CMD_GetTxUptime(cmd);
 		case GET_RX_UPTIME:
 			return CMD_GetRxUptime(cmd);
-		case ANT_GET_UPTIME:
-			return CMD_AntGetUptime(cmd);
+//		case ANT_GET_UPTIME:
+//			return CMD_AntGetUptime(cmd);
 		case PING:
 			return CMD_Ping(cmd);
-		case OFF_ANTS_DEPLOY:
-			return CMD_OffAntsDeploy(cmd);
+//		case OFF_ANTS_DEPLOY:
+//			return CMD_OffAntsDeploy(cmd);
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
@@ -86,7 +86,7 @@ int eps_command_router(sat_packet_t *cmd)
 	// Go to each subtype known and according to trxvu_subtypes_t struct and check if it's equal to the subtype in the cmd. if equal go the function of the command
 	switch(cmd->cmd_subtype)
 	{
-		case UPDATE_ALPHA:
+		/*case UPDATE_ALPHA:
 			return CMD_UpdateAlpha(cmd);
 		case UPDATE_ALPHA_DEFAULT:
 			return CMD_RestoreDefaultAlpha(cmd);
@@ -105,7 +105,7 @@ int eps_command_router(sat_packet_t *cmd)
 		case GET_HEATER_VALUES:
 			return CMD_GetHeaterVal(cmd);
 		case SET_HEATER_VALUES:
-			return CMD_SetHeaterVal(cmd);
+			return CMD_SetHeaterVal(cmd);*/
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}
@@ -204,10 +204,10 @@ int payload_command_router(sat_packet_t *cmd)
 	if(cmd == NULL) return -1;
 	switch(cmd->cmd_subtype)
 	{
-		case TURN_ON_KILL_PAYLOAD:
+		/*case TURN_ON_KILL_PAYLOAD:
 			return CMD_TurnOnKillPayloadFlag(cmd);
 		case TURN_OFF_KILL_PAYLOAD:
-			return CMD_TurnOffKillPayloadFlag(cmd);
+			return CMD_TurnOffKillPayloadFlag(cmd);*/
 		default:
 			return SendAckPacket(ACK_UNKNOWN_SUBTYPE, cmd, NULL, 0); // Send ack that says what written in unknownSubtype_msg
 	}

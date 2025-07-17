@@ -6,8 +6,8 @@
  */
 
 #include "EPS.h"
-
-
+//int USE_EPS = FALSE;
+#ifdef USE_EPS
 
 #define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage)))
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
@@ -166,3 +166,4 @@ int EPS_Conditioning()
 	lastVoltage = smoothing;
 	return 0;
 }
+#endif

@@ -175,11 +175,12 @@ void Maintenance()
 		KickGroundCommWDT();
 		Boolean true = TRUE;
 		logError(FRAM_writeAndVerify((unsigned char*)&true, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "Maintenance - FRAM_writeAndVerify");
-		logError(payloadTurnOff(), "Maintenance - payloadTurnOff");
+		printf("need to do hardware reset (ground watchdog\n\r");
+/*		logError(payloadTurnOff(), "Maintenance - payloadTurnOff");
 		logError(isis_vu_e__reset_hw_rx(0), "Maintenance - isis_vu_e__reset_hw_rx");
 		logError(isis_vu_e__reset_hw_tx(0), "Maintenance - isis_vu_e__reset_hw_tx");
 		isismepsv2_ivid7_piu__replyheader_t replyheader;
-		logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Maintenance - isismepsv2_ivid7_piu__reset");
+		logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Maintenance - isismepsv2_ivid7_piu__reset");*/
 		vTaskDelay(5000);
 	}
 }

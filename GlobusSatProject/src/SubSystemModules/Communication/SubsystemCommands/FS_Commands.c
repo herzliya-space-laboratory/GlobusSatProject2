@@ -22,7 +22,8 @@ int CMD_DeleteAllFiles(sat_packet_t *cmd)
 		return SendAckPacket(ACK_ERROR_MSG, cmd, &ackError, sizeof(ackError));
 	}
 	SendAckPacket(ACK_DELETE_TLM, cmd, NULL, 0);
-	return Hard_ComponenetReset();
+//	return Hard_ComponenetReset();
+	return 0;
 }
 
 /*
@@ -356,7 +357,9 @@ int CMD_SwitchSD_card(sat_packet_t *cmd)
 		return -3;
 	}
 	SendAckPacket(ACK_SWITCHING_SD_CARD, cmd, NULL, 0);
-	return Hard_ComponenetReset();
+	printf("needed to do Hard reset\r\n");
+	return 0;
+//	return Hard_ComponenetReset();
 }
 
 /*

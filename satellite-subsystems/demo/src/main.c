@@ -1,29 +1,31 @@
 /*
  * main.c
  *      Author: Akhil
- *     	Updated: 20/10/2023
- *     	Author: OBAR
  */
 
-#include "Demos/isis_ants_demo.h"
+#include "Demos/IsisAntSdemo.h"
 #include "Demos/isis_ants2_demo.h"
+#include "Demos/GomEPSdemo.h"
+#include "Demos/IsisSPdemo.h"
 #include "Demos/IsisSPv2demo.h"
-#include "Demos/IsisHSTXS_V2demo.h"
-#include "Demos/isisRXSrevCdemo.h"
+#include "Demos/IsisTRXUVdemo.h"
+#include "Demos/IsisTRXVUdemo.h"
+#include "Demos/IsisMTQv1demo.h"
 #include "Demos/IsisMTQv2demo.h"
-#include "Demos/IsisTRXVUrevDdemo.h"
-#include "Demos/IsisTRXVUrevEdemo.h"
-#include "Demos/IsisAOCSdemo.h"
+#include "Demos/cspaceADCSdemo.h"
+#include "Demos/ScsGeckoDemo.h"
+#include "Demos/IsisHSTxSdemo.h"
+#include "Demos/isis_eps_demo.h"
+#include "Demos/tausat2_pdhudemo.h"
+#include "Demos/isis_OBC_demo.h"
+#include "Demos/payload_demo.h"
 #include <satellite-subsystems/version/version.h>
 
 #include <at91/utility/exithandler.h>
 #include <at91/commons.h>
 #include <at91/utility/trace.h>
 #include <at91/peripherals/cp15/cp15.h>
-#include <at91/peripherals/dbgu/dbgu.h>
 #include <at91/peripherals/pio/pio_it.h>
-#include <Demos/isismeps_ivid5_pdu_demo.h>
-#include <Demos/isismeps_ivid5_piu_demo.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -42,8 +44,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <hal/Storage/FRAM.h>
-
 #define ENABLE_MAIN_TRACES 1
 #if ENABLE_MAIN_TRACES
 	#define MAIN_TRACE_INFO			TRACE_INFO
@@ -59,77 +59,60 @@
 	#define MAIN_TRACE_FATAL		TRACE_FATAL
 #endif
 
+/*
+ * Asks the user which test he wants.
+ * all the functions returns TRUE.
+ * @return type= Boolean; offerMoreTest that get to an infinite loop and the loop ends if the function return FALSE.
+ * */
 Boolean selectAndExecuteTest()
 {
 	int selection = 0;
 	Boolean offerMoreTests = TRUE;
 
 	//Initialize the I2C
-	int retValInt = I2C_start(200000, 10);
+	int retValInt = I2C_start(100000, 10);
 	if(retValInt != 0)
 	{
 		TRACE_FATAL("\n\r I2C_start_Master for demo: %d! \n\r", retValInt);
 	}
 
 	printf( "\n\r Select the device to be tested to perform: \n\r");
-	printf("\t 1) TRXVU rev. D test \n\r");
-	printf("\t 2) TRXVU rev. E test \n\r");
-	printf("\t 3) HSTxS V2 test \n\r");
-	printf("\t 4) RXS rev. C test \n\r");
-	printf("\t 5) AntS test \n\r");
-	printf("\t 6) AntS rev. 2 test \n\r");
-	printf("\t 7) Solar Panels V2 test \n\r");
-	printf("\t 8) MTQv2 test \n\r");
-	printf("\t 9) ISIS PDU iMEPS test \n\r");
-	printf("\t 10) ISIS PIU iCEPS Test \n\r");
-	printf("\t 11) ISIS AOCS test \n\r");
-	printf("\t 12) Put down First active flag and try to deploy \r\n");
-
-
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 11) == 0);
+	printf("\t 1) TRXVU test \n\r");
+	printf("\t 2) Solar Panels V2 test \n\r");
+#ifdef USE_EPS_ISIS //this define is in the file of isis_OBC_demo.h
+	printf("\t 3) isis EPS Test \n\r");
+#else
+	printf("\t 3) Gom EPS Test \n\r");
+#endif
+	printf("\t 4) OBC Test \n\r");
+	printf("\t 5) Ants Test \n\r");
+	printf("\t 6) Payload Test \n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 6) == 0); //you have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection)
 	{
 		case 1:
-			offerMoreTests = TRXVUrevDtest();
+			offerMoreTests = TRXVUtest();
 			break;
 		case 2:
-			offerMoreTests = TRXVUrevEtest();
+			offerMoreTests = SolarPanelv2test();
 			break;
 		case 3:
-			offerMoreTests = IsisHSTxSV2demoMain();
+#ifdef USE_EPS_ISIS //this define is in the file of isis_OBC_demo.h
+			offerMoreTests = isis_eps__test();
+#else
+			offerMoreTests = GomEPStest();
+#endif
 			break;
 		case 4:
-			offerMoreTests = RXSrevCtest();
+			offerMoreTests = OBCtest();
 			break;
 		case 5:
 			offerMoreTests = AntStest();
 			break;
-        case 6:
-            offerMoreTests = AntS2test();
-            break;
-		case 7:
-			offerMoreTests = SolarPanelv2test();
+		case 6:
+			offerMoreTests = PayloadTest();
 			break;
-		case 8:
-			offerMoreTests = IsisMTQv2test();
-			break;
-		case 9:
-			offerMoreTests = isismepsv2_ivid5_pdu__test();
-			break;
-		case 10:
-			offerMoreTests = isismepsv2_ivid5_piu__test();
-			break;
-		case 11:
-			offerMoreTests = isis_aocs_demo();
-			break;
-		case 12:
-		{
-			Boolean false = FALSE;
-			FRAM_writeAndVerify((unsigned char*)&false, 0x42, 4);
-			FRAM_writeAndVerify((unsigned char*)&false, 0x250, 4);
-			break;
-		}
 		default:
 			break;
 	}
@@ -167,7 +150,7 @@ int main()
 	unsigned int i;
 	xTaskHandle taskMainHandle;
 
-	TRACE_CONFIGURE(DBGU_STANDARD, 115200, BOARD_MCK);
+	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 	// Enable the Instruction cache of the ARM9 core. Keep the MMU and Data Cache disabled.
 	CP15_Enable_I_Cache();
 

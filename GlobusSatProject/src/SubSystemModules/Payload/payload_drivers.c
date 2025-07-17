@@ -1,10 +1,10 @@
-
-
+//int USE_PAYLOAD = FALSE;
+#ifdef USE_PAYLOAD
 #include "payload_drivers.h"
 #include "hal/Drivers/I2C.h"
 #include <string.h>
 #include <hal/Timing/Time.h>
-#include <satellite-subsystems/isismepsv2_ivid7_piu.h>
+#include <satellite-subsystems/imepsv2_piu.h>
 #include "FRAM_FlightParameters.h"
 
 #define PAYLOAD_I2C_ADDRESS 0x55
@@ -119,4 +119,4 @@ SoreqResult payloadTurnOn() {
     return isismepsv2_ivid7_piu__outputbuschannelon(EPS_INDEX, PAYLOAD_BUS_CHANNEL, &response) ? EPS_ERROR : PAYLOAD_SUCCESS;
 }
 
-
+#endif

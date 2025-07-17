@@ -8,7 +8,6 @@
 #include "TelemetryCollector.h"
 #include <hal/supervisor.h>
 #include <hcc/api_fat.h>
-#include <satellite-subsystems/isismepsv2_ivid7_piu.h>
 #include <satellite-subsystems/IsisSolarPanelv2.h>
 #include "utils.h"
 
@@ -43,11 +42,12 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	int error_supervisor = logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "GetCurrentWODTelemetry - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
 	F_SPACE space; //same just to SD
 	int ret = logError(f_getfreespace(f_getdrive(), &space), "GetCurrentWODTelemetry - f_getfreespace"); //gets the variables to the struct
-	isis_vu_e__get_tx_telemetry__from_t telemetryTx;
-	int rvTx = isis_vu_e__get_tx_telemetry(0, &telemetryTx);
-	isis_vu_e__get_rx_telemetry__from_t telemetryRx;
-	int rvRx = isis_vu_e__get_rx_telemetry(0, &telemetryRx);
-	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
+	ISIStrxvuTxTelemetry telemetryTx;
+	int rvTx = IsisTrxvu_tcGetTelemetryAll(0, &telemetryTx);
+	ISIStrxvuRxTelemetry telemetryRx;
+	int rvRx = IsisTrxvu_rcGetTelemetryAll(0, &telemetryRx);
+/*	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
+
 	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "GetCurrentWODTelemetry - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(!error_eps)
 	{
@@ -93,6 +93,20 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->solar_panels[panel] = conv_temp;
 	}
 	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
+*/
+
+	//FOR CHECK:
+	wod->voltBattery = -1;
+	wod->consumed_power = -1;
+	wod->electric_current = -1;
+	wod->bat_temp = -1;
+	wod->volt_5V = -1;
+	wod->volt_3V3 = -1;
+	wod->charging_power = -1;
+	wod->current_5V = -1;
+	wod->current_3V3 = -1;
+	wod->power_payload = -1;
+	for(int panel = 0; panel < NUMBER_OF_SOLAR_PANELS; panel++) wod->solar_panels[panel] = -1;
 
 	if(!error_supervisor)
 		wod->sat_uptime = mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS;
@@ -117,11 +131,11 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 
 	if(!rvTx)
 	{
-		wod->temp_pa = ((float) telemetryTx.fields.temp_pa) * -0.07669 + 195.6037;
-		wod->temp_board =  ((float)telemetryRx.fields.temp_board) * -0.07669 + 195.6037;
-		short telemetryValue = telemetryTx.fields.reflected_power;
+		wod->temp_pa = ((float) telemetryTx.fields.pa_temp) * -0.07669 + 195.6037;
+		wod->temp_board =  ((float)telemetryRx.fields.board_temp) * -0.07669 + 195.6037;
+		short telemetryValue = telemetryTx.fields.tx_reflpwr;
 		wod->reflected_power = ((float)(telemetryValue * telemetryValue)) * 5.887E-5;
-		telemetryValue = telemetryTx.fields.forward_power;
+		telemetryValue = telemetryTx.fields.tx_fwrdpwr;
 		wod->forward_power = ((float)(telemetryValue * telemetryValue)) * 5.887E-5;
 	}
 	else
@@ -134,8 +148,8 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 
 	if(!rvRx)
 	{
-		wod->doppler = ((float)telemetryRx.fields.doppler) * (-38.1469726563);
-		wod->rssi = ((float)telemetryRx.fields.rssi) * (-0.5) - 22;
+		wod->doppler = ((float)telemetryRx.fields.rx_doppler) * (-38.1469726563);
+		wod->rssi = ((float)telemetryRx.fields.rx_rssi) * (-0.5) - 22;
 	}
 	else
 	{
@@ -153,7 +167,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	if(logError(FRAM_read((unsigned char*)&numberOfCMDResets, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "GetCurrentWODTelemetry - FRAM_read cmd resets")) wod->num_of_cmd_resets = -1;
 	else wod->num_of_cmd_resets = numberOfCMDResets;
 
-	if(IsThePayloadOn())
+/*	if(IsThePayloadOn())
 	{
 		PayloadEventData eventsData;
 		if(!logError(payloadReadEvents(&eventsData), "GetCurrentWODTelemetry - payloadReadEvents"))
@@ -171,9 +185,13 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	{
 		wod->sel_counter = -1;
 		wod->seu_counter = -1;
-	}
-
-	PayloadEnvironmentData radfetData;
+	}*/
+	wod->sel_counter = -1;
+	wod->seu_counter = -1;
+	wod->sensor_one_radfet = -1;
+	wod->sensor_two_radfet = -1;
+	wod->radfet_temp = -1;
+/*	PayloadEnvironmentData radfetData;
 	if(!logError(FRAM_read(radfetData.raw, LAST_RADFET_READ_START, sizeof(radfetData.raw)), "GetCurrentWODTelemetry - FRAM_read"))
 	{
 		wod->sensor_one_radfet = radfetData.fields.adc_conversion_radfet1;
@@ -186,7 +204,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 		wod->sensor_one_radfet = -1;
 		wod->sensor_two_radfet = -1;
 		wod->radfet_temp = -1;
-	}
+	}*/
 	time_unix lastTime;
 	if(!logError(FRAM_read((unsigned char*)&lastTime, TIME_LAST_RADFET_READ_ADDR, TIME_LAST_RADFET_READ_SIZE), "GetCurrentWODTelemetry - FRAM_read"))
 		wod->last_radfet_read_time = lastTime;
@@ -199,7 +217,7 @@ int GetCurrentWODTelemetry(WOD_Telemetry_t *wod)
 	else
 		wod->payload_flag = -1;
 
-	wod->eps_state = GetSystemState();
+	wod->eps_state = -1;
 
 	int countChange = 0;
 	if(!logError(FRAM_read((unsigned char*)&countChange, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetCurrentWODTelemetry - FRAM_read"))
@@ -229,12 +247,14 @@ void TelemetrySaveWOD()
  */
 void TelemetrySaveEPS()
 {
+/*
 	isismepsv2_ivid7_piu__gethousekeepingeng__from_t responseEPS; //Create a variable that is the struct we need from EPS_isis
 	time_unix time = GetTime();
 	if(time == 0) return;
 	lastTimeSave[tlm_eps] = time;
 	if(!logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&responseEPS), "TelemetrySaveEPS - isismepsv2_ivid7_piu__gethousekeepingeng"))
 		Write2File(&responseEPS, tlm_eps); //Get struct and get kind of error
+*/
 
 }
 
@@ -243,11 +263,10 @@ void TelemetrySaveEPS()
  */
 void TelemetrySaveTx()
 {
-	isis_vu_e__get_tx_telemetry__from_t txTelem;
-	time_unix time = GetTime();
+	ISIStrxvuTxTelemetry txTelem;
 	if(time == 0) return;
 	lastTimeSave[tlm_tx] = time;
-	if(!logError(isis_vu_e__get_tx_telemetry(0, &txTelem), "TelemetrySaveTx - isis_vu_e__get_tx_telemetry"))
+	if(!logError(IsisTrxvu_tcGetTelemetryAll(0, &txTelem), "TelemetrySaveTx - isis_vu_e__get_tx_telemetry"))
 		Write2File(&txTelem, tlm_tx);
 }
 
@@ -256,11 +275,11 @@ void TelemetrySaveTx()
  */
 void TelemetrySaveRx()
 {
-	isis_vu_e__get_rx_telemetry__from_t rxTelem;
+	ISIStrxvuRxTelemetry rxTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
 	lastTimeSave[tlm_rx] = time;
-	if(!logError(isis_vu_e__get_rx_telemetry(0, &rxTelem), "TelemetrySaveRx - isis_vu_e__get_rx_telemetry"))
+	if(!logError(IsisTrxvu_rcGetTelemetryAll(0, &rxTelem), "TelemetrySaveRx - isis_vu_e__get_rx_telemetry"))
 		Write2File(&rxTelem, tlm_rx);
 
 }
@@ -270,12 +289,12 @@ void TelemetrySaveRx()
  */
 void TelemetrySaveAnt0()
 {
-	isis_ants__get_all_telemetry__from_t antsTelem;
-	time_unix time = GetTime();
-	if(time == 0) return;
-	lastTimeSave[tlm_ants0] = time;
-	if(!logError(isis_ants__get_all_telemetry(0, &antsTelem), "TelemetrySaveAnt0 - isis_ants__get_all_telemetry"))
-		Write2File(&antsTelem, tlm_ants0);
+//	isis_ants__get_all_telemetry__from_t antsTelem;
+//	time_unix time = GetTime();
+//	if(time == 0) return;
+//	lastTimeSave[tlm_ants0] = time;
+//	if(!logError(isis_ants__get_all_telemetry(0, &antsTelem), "TelemetrySaveAnt0 - isis_ants__get_all_telemetry"))
+//		Write2File(&antsTelem, tlm_ants0);
 }
 
 /*!
@@ -283,12 +302,12 @@ void TelemetrySaveAnt0()
  */
 void TelemetrySaveAnt1()
 {
-	isis_ants__get_all_telemetry__from_t antsTelem;
+/*	isis_ants__get_all_telemetry__from_t antsTelem;
 	time_unix time = GetTime();
 	if(time == 0) return;
 	lastTimeSave[tlm_ants1] = time;
 	if(!logError(isis_ants__get_all_telemetry(1, &antsTelem), "TelemetrySaveAnt1 - isis_ants__get_all_telemetry"))
-		Write2File(&antsTelem, tlm_ants1);
+		Write2File(&antsTelem, tlm_ants1);*/
 }
 
 /*!
@@ -296,7 +315,7 @@ void TelemetrySaveAnt1()
  */
 void TelemetrySaveSolarPanels()
 {
-	time_unix time = GetTime();
+/*	time_unix time = GetTime();
 	if(time == 0) return;
 	IsisSolarPanelv2_wakeup();
 	int error_sp;
@@ -318,7 +337,7 @@ void TelemetrySaveSolarPanels()
 	}
 	IsisSolarPanelv2_sleep(); //Puts the internal temperature sensor to sleep mode
 	Write2File(&tempSolar, tlm_solar);
-	lastTimeSave[tlm_solar] = time;
+	lastTimeSave[tlm_solar] = time;*/
 }
 
 /*!
@@ -326,6 +345,7 @@ void TelemetrySaveSolarPanels()
  */
 void TelemetrySavePayloadRADFET()
 {
+/*
 	time_unix time = GetTime();
 	if(time == 0) return;
 	PayloadEnvironmentData radfetData;
@@ -334,6 +354,7 @@ void TelemetrySavePayloadRADFET()
 	Write2File(&radfetData, tlm_radfet);
 	logError(FRAM_writeAndVerify(radfetData.raw, LAST_RADFET_READ_START, sizeof(radfetData.raw)), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
 	logError(FRAM_writeAndVerify((unsigned char*)&time, TIME_LAST_RADFET_READ_ADDR, TIME_LAST_RADFET_READ_SIZE), "TelemetrySavePayloadRADFET - FRAM_writeAndVerify");
+*/
 }
 
 /*!
@@ -343,9 +364,11 @@ void TelemetrySavePayloadRADFET()
  */
 void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
 {
+/*
 	selData->count = eventsData.sel_count;
 	if(logError(FRAM_read((unsigned char*)&selData->sat_resets_count, NUMBER_OF_CMD_RESETS_ADDR, NUMBER_OF_CMD_RESETS_SIZE), "GetSEL_telemetry - FRAM_read resets")) selData->sat_resets_count = -1;
 	if(logError(FRAM_read((unsigned char*)&selData->changes_in_mode, NUM_OF_CHANGES_IN_MODE_ADDR, NUM_OF_CHANGES_IN_MODE_SIZE), "GetSEL_telemetry - FRAM_read change in mode")) selData->changes_in_mode = -1;
+*/
 }
 
 /*!
@@ -354,9 +377,9 @@ void GetSEL_telemetry(PayloadEventData eventsData, payloadSEL_data *selData)
  */
 void TelemetrySavePayloadSEL(PayloadEventData eventsData)
 {
-	payloadSEL_data selData;
+/*	payloadSEL_data selData;
 	GetSEL_telemetry(eventsData, &selData);
-	Write2File(&selData, tlm_sel);
+	Write2File(&selData, tlm_sel);*/
 }
 
 /*!
@@ -364,14 +387,14 @@ void TelemetrySavePayloadSEL(PayloadEventData eventsData)
  */
 void TelemetrySavePayloadEvents()
 {
-	time_unix time = GetTime();
+/*	time_unix time = GetTime();
 	if(time == 0) return;
 	PayloadEventData eventsData;
 	lastTimeSave[tlm_sel] = time;
 	lastTimeSave[tlm_seu] = time;
 	if(logError(payloadReadEvents(&eventsData), "TelemetrySavePayloadEvents - payloadReadEvents")) return;
 	Write2File(&eventsData.seu_count, tlm_seu);
-	TelemetrySavePayloadSEL(eventsData);
+	TelemetrySavePayloadSEL(eventsData);*/
 }
 
 /*
@@ -380,12 +403,13 @@ void TelemetrySavePayloadEvents()
  * */
 Boolean IsThePayloadOn()
 {
-	isismepsv2_ivid7_piu__gethousekeepingeng__from_t response; //Create a variable that is the struct we need from EPS_isis
+/*	isismepsv2_ivid7_piu__gethousekeepingeng__from_t response; //Create a variable that is the struct we need from EPS_isis
 	int error_eps = logError(isismepsv2_ivid7_piu__gethousekeepingeng(0,&response), "GetCurrentWODTelemetry - isismepsv2_ivid7_piu__gethousekeepingeng"); //Get struct and get kind of error
 	if(error_eps) return FALSE;
 	if(response.fields.vip_obc04.fields.power == 0)
 		return FALSE;
-	return TRUE;
+	return TRUE;*/
+	return FALSE;
 }
 
 /*!

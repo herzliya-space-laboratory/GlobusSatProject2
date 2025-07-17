@@ -93,16 +93,16 @@ void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 		case tlm_tx:
 		{
 			memcpy(endFileName, END_FILE_NAME_TX, sizeof(END_FILE_NAME_TX));
-			*structSize = sizeof(isis_vu_e__get_tx_telemetry__from_t);
+			*structSize = TRXVU_ALL_TXTELEMETRY_SIZE;
 			break;
 		}
 		case tlm_rx:
 		{
 			memcpy(endFileName, END_FILE_NAME_RX, sizeof(END_FILE_NAME_RX));
-			*structSize = sizeof(isis_vu_e__get_rx_telemetry__from_t);
+			*structSize = TRXVU_ALL_RXTELEMETRY_SIZE;
 			break;
 		}
-		case tlm_ants0:
+		/*case tlm_ants0:
 		{
 			memcpy(endFileName,END_FILE_NAME_ANTENNA_SIDE_ZERO,sizeof(END_FILE_NAME_ANTENNA_SIDE_ZERO));
 			*structSize = sizeof(isis_ants__get_all_telemetry__from_t);
@@ -119,26 +119,26 @@ void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 			memcpy(endFileName,END_FILENAME_EPS_TLM,sizeof(END_FILENAME_EPS_TLM));
 			*structSize = sizeof(isismepsv2_ivid7_piu__gethousekeepingeng__from_t);
 			break;
-		}
+		}*/
 		case tlm_wod:
 		{
 			memcpy(endFileName,END_FILENAME_WOD_TLM,sizeof(END_FILENAME_WOD_TLM));
 			*structSize = sizeof(WOD_Telemetry_t);
 			break;
 		}
-		case tlm_solar:
+	/*	case tlm_solar:
 		{
 			memcpy(endFileName,END_FILENAME_SOLAR_PANELS_TLM,sizeof(END_FILENAME_SOLAR_PANELS_TLM));
 			*structSize = sizeof(solar_tlm_t);
 			break;
-		}
+		}*/
 		case tlm_log:
 		{
 			memcpy(endFileName,END_FILENAME_LOGS,sizeof(END_FILENAME_LOGS));
 			*structSize = sizeof(logData_t);
 			break;
 		}
-		case tlm_radfet:
+		/*case tlm_radfet:
 		{
 			memcpy(endFileName,END_FILENAME_RADFET_TLM,sizeof(END_FILENAME_RADFET_TLM));
 			*structSize = sizeof(PayloadEnvironmentData);
@@ -155,7 +155,7 @@ void GetTlmTypeInfo(tlm_type_t tlmType, char* endFileName, int* structSize)
 			memcpy(endFileName,END_FILENAME_SEU_TLM,sizeof(END_FILENAME_SEU_TLM));
 			*structSize = sizeof(int);
 			break;
-		}
+		}*/
 		default:
 			break;
 	}

@@ -7,7 +7,9 @@
 
 #include "EPS_Commands.h"
 #include <string.h>
+//int USE_EPS = FALSE;
 
+#ifdef USE_EPS
 /*
  * Set new alpha value.
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add and the new alpha val)
@@ -296,3 +298,4 @@ int CMD_SetHeaterVal(sat_packet_t* cmd)
 	return SendAckPacket(ACK_CHANGE_HEATER_THRESHOLDS, cmd, NULL, 0);
 }
 
+#endif

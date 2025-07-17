@@ -28,7 +28,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 	int duration;
 	memcpy(&duration, cmd->data, cmd->length);
 	if(duration > MAX_IDLE_TIME) duration = MAX_IDLE_TIME;
-	int error = SetIdleState(isis_vu_e__onoff__on, duration);
+	int error = SetIdleState(trxvu_idle_state_on, duration);
 	switch(error)
 	{
 		case 0:
@@ -81,7 +81,7 @@ int CMD_SetOn_IdleState(sat_packet_t *cmd)
 int CMD_SetOff_IdleState(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
-	int error = SetIdleState(isis_vu_e__onoff__off, 0);
+	int error = SetIdleState(trxvu_idle_state_off, 0);
 	switch(error)
 	{
 		case 0:
@@ -168,7 +168,7 @@ int CMD_SetOn_Transponder(sat_packet_t *cmd)
 		return -2;
 	}
 	SendAckPacket(ACK_ALLOW_TRANSPONDER , cmd, (unsigned char*)&duration, sizeof(duration)); // Send ack of success in turn on transponder and to how much time
-	SetIdleState(isis_vu_e__onoff__off, 0);
+	SetIdleState(trxvu_idle_state_off, 0);
 	vTaskDelay(10);
 	short rssi = getTransponderRSSIFromFRAM();
 	if(rssi !=  -1)
@@ -316,7 +316,7 @@ int CMD_MuteTRXVU(sat_packet_t *cmd)
 	if(muteEndTime > MAX_MUTE_TIME)
 		muteEndTime = MAX_MUTE_TIME;
 	SendAckPacket(ACK_MUTE , cmd, (unsigned char*)&muteEndTime, sizeof(muteEndTime)); // Send ack of success at mute
-	SetIdleState(isis_vu_e__onoff__off, 0);
+	SetIdleState(trxvu_idle_state_off, 0);
 	int error = setMuteEndTime(muteEndTime);
 	setTransponderOff();
 	if(error == -2)
@@ -448,7 +448,7 @@ int CMD_GetBeacon_Interval(sat_packet_t *cmd)
 int CMD_GetTxUptime(sat_packet_t *cmd)
 {
 	uint32_t uptime;
-	int error = logError(isis_vu_e__tx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime), "CMD_GetTxUptime - isis_vu_e__tx_uptime");
+	int error = logError(IsisTrxvu_tcGetUptime(ISIS_TRXVU_I2C_BUS_INDEX, (unsigned int*)&uptime), "CMD_GetTxUptime - isis_vu_e__tx_uptime");
 	if(error)
 	{
 		unsigned char error_ack = ERROR_GET_UPTIME;
@@ -466,7 +466,7 @@ int CMD_GetTxUptime(sat_packet_t *cmd)
 int CMD_GetRxUptime(sat_packet_t *cmd)
 {
 	uint32_t uptime;
-	int error = logError(isis_vu_e__rx_uptime(ISIS_TRXVU_I2C_BUS_INDEX, &uptime), "CMD_GetRxUptime - isis_vu_e__rx_uptime");
+	int error = logError(IsisTrxvu_rcGetUptime(ISIS_TRXVU_I2C_BUS_INDEX, (unsigned int*)&uptime), "CMD_GetRxUptime - isis_vu_e__rx_uptime");
 	if(error)
 	{
 		unsigned char error_ack = ERROR_GET_UPTIME;
@@ -477,10 +477,11 @@ int CMD_GetRxUptime(sat_packet_t *cmd)
 }
 
 /*
+
  * Helper function to get side of ants.
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
  * @param[out] name=side; type=char*; here we left the side for further use.
- * */
+ *
 int GetAntSide(sat_packet_t *cmd, char *side)
 {
 	unsigned char error_ack;
@@ -495,7 +496,7 @@ int GetAntSide(sat_packet_t *cmd, char *side)
 	return 0;
 }
 
-/*
+
  * Gets Ant uptime according to side.
  * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the ant side and the headers we add)
  * @return type=int; return type of error according to this
@@ -503,7 +504,7 @@ int GetAntSide(sat_packet_t *cmd, char *side)
  * 																-2 if length isn't in size.
  * 																-3 got wrong side (not exist one)
  * 																else from <hal/errors.h>
- * */
+ *
 int CMD_AntGetUptime(sat_packet_t *cmd)
 {
 	unsigned char error_ack;
@@ -531,6 +532,7 @@ int CMD_AntGetUptime(sat_packet_t *cmd)
 	}
 	return SendAckPacket(ACK_GET_ANTS_UPTIME, cmd, (unsigned char*)&uptime, sizeof(uptime));
 }
+*/
 
 /*
 * Send ack ping
@@ -546,9 +548,9 @@ int CMD_Ping(sat_packet_t *cmd)
 /*
  * turn up the flag of stop deploy ants.
  * @return type=int; return error according to SendAckpacket;
- * */
+ *
 int CMD_OffAntsDeploy(sat_packet_t *cmd)
 {
 	SetNeedToStopAntDeploy();
 	return SendAckPacket(ACK_COMD_EXEC, cmd, NULL, 0);
-}
+}*/

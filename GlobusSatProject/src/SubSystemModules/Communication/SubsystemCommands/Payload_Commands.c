@@ -4,10 +4,11 @@
  *  Created on: 2 Jan 2025
  *      Author: maayan
  */
+//int USE_PAYLOAD = FALSE;
 
 #include "Payload_Commands.h"
 #include <hal/supervisor.h>
-
+#ifdef USE_PAYLOAD
 /*
  * turn on the flag of kill payload and turn payload off
  * @param[in] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
@@ -46,3 +47,4 @@ int CMD_TurnOffKillPayloadFlag(sat_packet_t *cmd)
 	payloadTurnOn();
 	return SendAckPacket(ACK_TURN_ON_PAYLOAD, cmd, NULL, 0);
 }
+#endif

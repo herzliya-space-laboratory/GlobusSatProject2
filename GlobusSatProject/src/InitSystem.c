@@ -9,7 +9,7 @@
 #include "utils.h"
 
 #define FIRST_ACTIVE
-#define FIRST_ACTIVE_DEPLOY
+//#define FIRST_ACTIVE_DEPLOY
 
 #define I2CBusSpeed_Hz 100000
 #define I2CTransferTimeout 10
@@ -252,31 +252,31 @@ int InitSubsystems(){
 
 	StartTIME();
 
-	int firstActiveFlag = 0;
-	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
+	//int firstActiveFlag = 0;
+	//FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
 
-	if(firstActiveFlag)
+	if(TRUE)
 		WriteDefaultValuesToFRAM();
 	else
 		UpdateTime();
 
 	InitializeFS();
 
-	if(firstActiveFlag) Delete_allTMFilesFromSD();
+	if(TRUE) Delete_allTMFilesFromSD();
 
 	InitSavePeriodTimes();
 
 	InitSupervisor();
 
-	EPS_And_SP_Init();
+/*	EPS_And_SP_Init();*/
 
 	InitTrxvuAndAnts();
 
 	WakeupFromResetCMD();
 
-	payloadKillOrInit();
+/*	payloadKillOrInit();*/
 
-	FirstActivation();
+	//FirstActivation();
 
 	logError(SAT_RESET, "InitSubsystems - reset");
 	printf("Did init\r\n");

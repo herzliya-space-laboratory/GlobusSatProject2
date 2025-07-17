@@ -29,12 +29,12 @@ unsigned int period;
  * */
 void SetTRXVU_config_param()
 {
-	logError(isis_vu_e__set_bitrate(0, isis_vu_e__bitrate__9600bps), "SetTRXVU_config_param - isis_vu_e__set_bitrate");
+/*	logError(isis_vu_e__set_bitrate(0, trxvu_bitrate_9600), "SetTRXVU_config_param - isis_vu_e__set_bitrate");
 
 	logError(isis_vu_e__set_tx_freq(0, TX_FREQUENCY), "SetTRXVU_config_param - isis_vu_e__set_tx_freq");
 	logError(isis_vu_e__set_rx_freq(0, RX_FREQUENCY), "SetTRXVU_config_param - isis_vu_e__set_rx_freq");
 	logError(isis_vu_e__set_transponder_in_freq(0, RX_FREQUENCY), "SetTRXVU_config_param - isis_vu_e__set_transponder_in_freq");
-	logError(isis_vu_e__set_tx_pll_powerout(0, 0xCFEF), "SetTRXVU_config_param - isis_vu_e__set_tx_pll_powerout");
+	logError(isis_vu_e__set_tx_pll_powerout(0, 0xCFEF), "SetTRXVU_config_param - isis_vu_e__set_tx_pll_powerout");*/
 }
 
 /*
@@ -44,36 +44,38 @@ void SetTRXVU_config_param()
  * */
 int InitTrxvuAndAnts(){
 	// Definition of I2C and TRXVU
-    ISIS_VU_E_t myTRXVU[1];
-    driver_error_t rv;
-
+	ISIStrxvuI2CAddress myTRXVUAddress[1];
+	ISIStrxvuFrameLengths myTRXVUBuffers[1];
+	ISIStrxvuBitrate myTRXVUBitrates[1];
+    int rv;
 	//I2C addresses defined
-    myTRXVU[0].rxAddr = I2C_TRXVU_RC_ADDR;
-    myTRXVU[0].txAddr = I2C_TRXVU_TC_ADDR;
+    myTRXVUAddress[0].addressVu_rc = I2C_TRXVU_RC_ADDR;
+    myTRXVUAddress[0].addressVu_tc = I2C_TRXVU_TC_ADDR;
 
 	//Buffer definition
-    myTRXVU[0].maxSendBufferLength = SIZE_TXFRAME;
-    myTRXVU[0].maxReceiveBufferLength = SIZE_RXFRAME;
+    myTRXVUBuffers[0].maxAX25frameLengthTX = SIZE_TXFRAME;
+    myTRXVUBuffers[0].maxAX25frameLengthRX = SIZE_RXFRAME;
+
+	myTRXVUBitrates[0] = trxvu_bitrate_9600;
 
 	//Initialize the trxvu subsystem
-	rv = ISIS_VU_E_Init(myTRXVU, 1);
+	rv = logError(IsisTrxvu_initialize(myTRXVUAddress, myTRXVUBuffers, myTRXVUBitrates, 1), "IsisTrxvu_initialize");
 	SetTRXVU_config_param();
-	//TODO: transponder set freq
 
 	InitTxModule();
 
-	isismepsv2_ivid7_piu__replyheader_t response;
-    logError(isismepsv2_ivid7_piu__outputbuschannelon(0, isismepsv2_ivid7_piu__imeps_channel__channel_5v_sw2, &response), "InitTrxvuAndAnts - isismepsv2_ivid7_piu__outputbuschannelon");
-	ISIS_ANTS_t myAntennaAddress[2];
-	myAntennaAddress[0].i2cAddr = ANTS_SIDE_A_I2C_ADDR;
-	myAntennaAddress[1].i2cAddr = ANTS_SIDE_B_I2C_ADDR;
-	int errorAnts = ISIS_ANTS_Init(myAntennaAddress, 2);
+//	int retValInt = 0;
+	ISISantsI2Caddress myAntennaAddress[2];
+	myAntennaAddress[0].addressSideA = ANTS_SIDE_A_I2C_ADDR;
+	myAntennaAddress[0].addressSideB = ANTS_SIDE_B_I2C_ADDR;
+	int errorAnts = IsisAntS_initialize(myAntennaAddress, 1);
 
-	logError(errorAnts, "Ants - ISIS_ANTS_Init");
-	logError(rv, "TRXVU - ISIS_VU_E_Init");
+	logError(errorAnts, "Ants - IsisAntS_initialize");
+	logError(rv, "TRXVU - IsisTrxvu_initialize");
+
+	if(rv == 6) rv = 0;
 
 	//Initialize the AntS system
-	if(rv == 6) return errorAnts;
 	return errorAnts + rv;
 
 }
@@ -121,7 +123,7 @@ void InitTxModule()
 int setTransponderOn()
 {
 	if(!CheckTransmitionAllowed()) return -1;
-	if(GetTxFlag()) return -1;
+//	if(GetTxFlag()) return -1;
 	unsigned char data[] = {0x38, trxvu_transponder_on}; // 0x38 - number of commend to change the transmitter mode.
 	return logError(I2C_write(I2C_TRXVU_TC_ADDR, data, 2), "setTransponderOn - I2C_write"); // Set transponder on
 }
@@ -151,7 +153,7 @@ int turnOffTransponder()
 	if(timeEnd == 0) return -1;
 	if(!CheckTransmitionAllowed())
 		error = 0;
-	else if(GetTxFlag()) error = 0;
+//	else if(GetTxFlag()) error = 0;
 	else if(timeEnd > timeNow)
 		return 0;
 	error = setTransponderOff();
@@ -170,8 +172,8 @@ int turnOffTransponder()
  * */
 int turnOffIdle()
 {
-	if(!CheckTransmitionAllowed()) return SetIdleState(isis_vu_e__onoff__off, 0);
-	if(GetTxFlag()) return SetIdleState(isis_vu_e__onoff__off, 0);
+	if(!CheckTransmitionAllowed()) return SetIdleState(trxvu_idle_state_off, 0);
+//	if(GetTxFlag()) return SetIdleState(trxvu_idle_state_off, 0);
 	time_unix timeNow;
 	int error = logError(Time_getUnixEpoch((unsigned int*)&timeNow), "turnOffTransponder - Time_getUnixEpoch");
 	if(error) return error;
@@ -179,7 +181,7 @@ int turnOffIdle()
 	if(timeEnd == 0) return -1;
 	if(timeEnd > timeNow)
 		return 0;
-	return SetIdleState(isis_vu_e__onoff__off, 0);
+	return SetIdleState(trxvu_idle_state_off, 0);
 }
 
 /*
@@ -319,13 +321,13 @@ int setNewBeaconIntervalToPeriod()
  * 						-5 time problem
  * 						-6 not on or off
  */
-int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
+int SetIdleState(ISIStrxvuIdleState state, time_unix duration)
 {
-	if(!CheckTransmitionAllowed()) state = isis_vu_e__onoff__off;
-	else if(GetTxFlag()) state = isis_vu_e__onoff__off;
-	if(state == isis_vu_e__onoff__on)
+	if(!CheckTransmitionAllowed()) state = trxvu_idle_state_off;
+//	else if(GetTxFlag()) state = trxvu_idle_state_off;
+	if(state == trxvu_idle_state_on)
 	{
-		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__on), "SetIdleState - isis_vu_e__set_idle_state"))
+		if(logError(IsisTrxvu_tcSetIdlestate(ISIS_TRXVU_I2C_BUS_INDEX, trxvu_idle_state_on), "SetIdleState - isis_vu_e__set_idle_state"))
 			return -1;
 		if(duration > MAX_IDLE_TIME)
 			duration = MAX_IDLE_TIME;
@@ -341,9 +343,9 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 		if(check != duration)
 			return logError(-4, "SetIdleState - Not written right");
 	}
-	else if(state == isis_vu_e__onoff__off)
+	else if(state == trxvu_idle_state_off)
 	{
-		if(logError(isis_vu_e__set_idle_state(ISIS_TRXVU_I2C_BUS_INDEX, isis_vu_e__onoff__off), "SetIdleState - isis_vu_e__set_idle_state"))
+		if(logError(IsisTrxvu_tcSetIdlestate(ISIS_TRXVU_I2C_BUS_INDEX, trxvu_idle_state_off), "SetIdleState - isis_vu_e__set_idle_state"))
 				return -1;
 		duration = 0;
 		if(logError(FRAM_write((unsigned char*)&duration, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE), "SetIdleState - FRAM_write"))
@@ -366,7 +368,7 @@ int SetIdleState(isis_vu_e__onoff_t state, time_unix duration)
 int GetNumberOfFramesInBuffer()
 {
 	unsigned short frameCount;
-	int err = logError(isis_vu_e__get_frame_count(0, &frameCount), "GetNumberOfFramesInBuffer - isis_vu_e__get_frame_count"); // Get number of packets in buffer
+	int err = logError(IsisTrxvu_rcGetFrameCount(0, &frameCount), "GetNumberOfFramesInBuffer - isis_vu_e__get_frame_count"); // Get number of packets in buffer
 	if(err != E_NO_SS_ERR)
 		return -1;
 	return frameCount;
@@ -381,12 +383,11 @@ int GetNumberOfFramesInBuffer()
 CMD_ERR GetOnlineCommand(sat_packet_t *cmd)
 {
 	unsigned char rxframebuffer[SIZE_RXFRAME] = {0};
-	isis_vu_e__get_frame__from_t rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read
-	int error = logError(isis_vu_e__get_frame(0, &rx_frame), "GetOnlineCommand - isis_vu_e__get_frame"); // Get packet
-	error += logError(isis_vu_e__remove_frame(0), "GetOnlineCommand - isis_vu_e__remove_frame");
+	ISIStrxvuRxFrame rx_frame = {0,0,0, rxframebuffer}; // Where the packet saved after read
+	int error = logError(IsisTrxvu_rcGetCommandFrame(0, &rx_frame), "GetOnlineCommand - isis_vu_e__get_frame"); // Get packet
 	if(error != E_NO_SS_ERR)
 		return execution_error;
-	error = ParseDataToCommand(rx_frame.data, cmd); // Put the info from the packet in the cmd parameter
+	error = ParseDataToCommand(rx_frame.rx_framedata, cmd); // Put the info from the packet in the cmd parameter
 	if(error != invalid_sat_id) return logError(error, "GetOnlineCommand - ParseDataToCommand");
 	return error;
 }
@@ -407,7 +408,7 @@ int TransmitSplPacket(sat_packet_t *packet, int *avalFrames)
 	if(packet == NULL)
 		return -1;
 	size_t place = sizeof(packet->ID) + sizeof(packet->cmd_subtype) + sizeof(packet->cmd_type) + sizeof(packet->length) + packet->length; // Get the length of the data of the packet (including the headers we add)
-	int error = logError(isis_vu_e__send_frame(0, (unsigned char *)packet, place, &avail), "TransmitSplPacket - isis_vu_e__send_frame");  // Transmit packet
+	int error = logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)packet, place, &avail), "TransmitSplPacket - isis_vu_e__send_frame");  // Transmit packet
 	*avalFrames = (int)avail; // Get avail Frames
 	return error;
 }
@@ -432,7 +433,7 @@ int TransmitDataAsSPL_Packet(sat_packet_t *cmd, unsigned char *data, unsigned sh
 		return -1;
 	if(AssembleCommand(data, length, cmd->cmd_type, cmd->cmd_subtype, cmd->ID, cmd)) return -2; // Change the packet for send with the needed info
 	size_t place = sizeof(cmd->ID) + sizeof(cmd->cmd_subtype) + sizeof(cmd->cmd_type) + sizeof(cmd->length) + cmd->length; // Get the length of the data of the packet (including the headers we add)
-	return logError(isis_vu_e__send_frame(0, (unsigned char *)cmd, place, &avail), "TransmitDataAsSPL_Packet - isis_vu_e__send_frame"); // Transmit packet
+	return logError(IsisTrxvu_tcSendAX25DefClSign(0, (unsigned char *)cmd, place, &avail), "TransmitDataAsSPL_Packet - isis_vu_e__send_frame"); // Transmit packet
 }
 
 /*

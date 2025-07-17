@@ -49,7 +49,7 @@ void taskMain()
 
 	while(TRUE)
 	{
-		EPS_Conditioning();
+//		EPS_Conditioning();
 		TRX_Logic();
 		Maintenance();
 		TelemetryCollectorLogic();

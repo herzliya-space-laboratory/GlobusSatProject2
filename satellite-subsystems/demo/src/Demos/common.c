@@ -15,7 +15,6 @@
 #include <at91/commons.h>
 #include <at91/utility/trace.h>
 #include <at91/peripherals/cp15/cp15.h>
-#include <at91/peripherals/dbgu/dbgu.h>
 
 #include <hal/Utility/util.h>
 #include <hal/Timing/WatchDogTimer.h>

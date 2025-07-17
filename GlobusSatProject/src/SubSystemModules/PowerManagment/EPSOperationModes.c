@@ -9,7 +9,8 @@
 #include "utils.h"
 #include "hal/Drivers/I2C.h"
 #include "SubSystemModules/Communication/TRXVU.h"
-
+//int USE_EPS = FALSE;
+#ifdef USE_EPS
 Boolean txOff = FALSE;
 Boolean payloadOff = FALSE;
 EpsState_t satState = OperationalMode;
@@ -113,3 +114,4 @@ EpsState_t GetSystemState()
 	return satState;
 }
 
+#endif
