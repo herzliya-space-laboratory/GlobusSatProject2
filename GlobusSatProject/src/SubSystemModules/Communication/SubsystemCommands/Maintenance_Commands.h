@@ -56,23 +56,23 @@ int CMD_GetSatUptime(sat_packet_t *cmd);
 
 
 /*help functions of CMD_ResetComponent*/
-int HardPayload_ComponenetReset();
+int HardPayload_ComponenetReset(sat_packet_t *cmd);
 
-int Payload_ComponenetReset();
+int Payload_ComponenetReset(sat_packet_t *cmd);
 
-int HardTX_ComponenetReset();
+int HardTX_ComponenetReset(sat_packet_t *cmd);
 
-int HardRX_ComponenetReset();
+int HardRX_ComponenetReset(sat_packet_t *cmd);
 
-int Soft_ComponenetReset();
+int Soft_ComponenetReset(sat_packet_t *cmd);
 
-int Hard_ComponenetReset();
+int Hard_ComponenetReset(sat_packet_t *cmd);
 
-int Ants_ComponenetReset();
+int Ants_ComponenetReset(sat_packet_t *cmd);
 
-int FRAM_ComponenetReset();
+int FRAM_ComponenetReset(sat_packet_t *cmd);
 
-int FS_ComponenetReset();
+int FS_ComponenetReset(sat_packet_t *cmd);
 
 /*!
  * @brief 	starts a reset according to 'reset_type_t'

@@ -28,37 +28,37 @@ int CMD_GetSatTime(sat_packet_t *cmd)
 }
 
 /*help functions of CMD_ResetComponent*/
-int Payload_ComponenetReset()
+int Payload_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_PAYLOAD_SOFT_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_PAYLOAD_SOFT_RESET, cmd, NULL, 0);
 	return logError(payloadSoftReset(), "Payload_ComponenetReset - payloadSoftReset");
 }
 
-int HardPayload_ComponenetReset()
+int HardPayload_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_PAYLOAD_HARD_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_PAYLOAD_HARD_RESET, cmd, NULL, 0);
 	payloadTurnOff();
 	return payloadTurnOn();
 }
 
-int HardTX_ComponenetReset()
+int HardTX_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_TX_HARD_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_TX_HARD_RESET, cmd, NULL, 0);
 	logError(isis_vu_e__reset_hw_tx(0), "HardTX_ComponenetReset - isis_vu_e__reset_hw_tx");
 	return InitTrxvuAndAnts();
 }
 
-int HardRX_ComponenetReset()
+int HardRX_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_RX_HARD_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_RX_HARD_RESET, cmd, NULL, 0);
 	logError(isis_vu_e__reset_hw_rx(0), "HardRX_ComponenetReset - isis_vu_e__reset_hw_rx");
 	return InitTrxvuAndAnts();
 }
 
-int Soft_ComponenetReset()
+int Soft_ComponenetReset(sat_packet_t *cmd)
 {
 	Boolean true = TRUE; Boolean false = FALSE;
-	SendAckPacket(ACK_SOFT_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_SOFT_RESET, cmd, NULL, 0);
 	logError(FRAM_writeAndVerify((unsigned char*)&true, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Soft_ComponenetReset - cmd reset flag");
 	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Soft_ComponenetReset - FRAM_writeAndVerify");
 	restart();
@@ -66,34 +66,34 @@ int Soft_ComponenetReset()
 	return 0;
 }
 
-int Ants_ComponenetReset()
+int Ants_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_ANTS_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_ANTS_RESET, cmd, NULL, 0);
 	int err = logError(isis_ants__reset(0), "Ants_ComponenetReset - isis_ants__reset - 0");
 	err += logError(isis_ants__reset(1), "Ants_ComponenetReset - isis_ants__reset - 1");
 	return err;
 }
 
-int Hard_ComponenetReset()
+int Hard_ComponenetReset(sat_packet_t *cmd)
 {
 	isismepsv2_ivid7_piu__replyheader_t replyheader;
 	Boolean true = TRUE; Boolean false = FALSE;
 	logError(FRAM_writeAndVerify((unsigned char*)&true, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "Hard_ComponenetReset - cmd reset flag");
 	logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "Hard_ComponenetReset - FRAM_writeAndVerify");
-	SendAckPacket(ACK_HARD_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_HARD_RESET, cmd, NULL, 0);
 	return logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Hard_ComponenetReset - isismepsv2_ivid7_piu__reset");
 }
 
-int FS_ComponenetReset()
+int FS_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_FS_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_FS_RESET, cmd, NULL, 0);
 	DeInitializeFS();
 	return InitializeFS();
 }
 
-int FRAM_ComponenetReset()
+int FRAM_ComponenetReset(sat_packet_t *cmd)
 {
-	SendAckPacket(ACK_FRAM_RESET, NULL, NULL, 0);
+	SendAckPacket(ACK_FRAM_RESET, cmd, NULL, 0);
 	FRAM_stop();
 	return logError(FRAM_start(), "FRAM_ComponenetReset - FRAM_start");
 }
@@ -127,10 +127,10 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 	switch(type)
 	{
 		case reset_software:
-			return Soft_ComponenetReset();
+			return Soft_ComponenetReset(cmd);
 		case reset_hardware:
 		{
-			if(Hard_ComponenetReset())
+			if(Hard_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			else
 				vTaskDelay(50000);
@@ -138,43 +138,43 @@ int CMD_ResetComponent(sat_packet_t *cmd)
 		}
 		case reset_tx_hard:
 		{
-			if(HardTX_ComponenetReset())
+			if(HardTX_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_rx_hard:
 		{
-			if(HardRX_ComponenetReset())
+			if(HardRX_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_ants:
 		{
-			if(Ants_ComponenetReset())
+			if(Ants_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_payload:
 		{
-			if(Payload_ComponenetReset())
+			if(Payload_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_payload_hard:
 		{
-			if(HardPayload_ComponenetReset())
+			if(HardPayload_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_fram:
 		{
-			if(FRAM_ComponenetReset())
+			if(FRAM_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}
 		case reset_filesystem:
 		{
-			if(FS_ComponenetReset())
+			if(FS_ComponenetReset(cmd))
 				return SendErrorCantReset(cmd);
 			return 0;
 		}

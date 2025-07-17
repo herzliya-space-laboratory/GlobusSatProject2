@@ -150,14 +150,14 @@ typedef enum __attribute__ ((__packed__)) filesystem_subtypes_t
 
 typedef enum __attribute__ ((__packed__)) management_subtypes_t
 {
-	GET_PERIOD_GROUND_WDT = 	0x01,
-	SET_PERIOD_GROUND_WDT = 	0x02,
-	UPDATE_SAT_TIME =           0xDD,       //0b‭11011101‬
-	GENERIC_I2C_CMD =           0xDF,       //0b‭11011111‬
-	RESET_COMPONENT =           0xDE,       //0b‭11011110
-	GET_SAT_UPTIME =    		0xE3,
-	GET_SAT_TIME =				0xE4,
-	SET_FLAGS_TO_FIRST = 		0xFF
+	GET_PERIOD_GROUND_WDT 	= 	0x01,
+	SET_PERIOD_GROUND_WDT 	= 	0x02,
+	UPDATE_SAT_TIME 		=   0xDD,       //0b‭11011101‬
+	GENERIC_I2C_CMD 		= 	0xDF,       //0b‭11011111‬
+	RESET_COMPONENT 		=	0xDE,       //0b‭11011110
+	GET_SAT_UPTIME 			=   0xE3,
+	GET_SAT_TIME 			=	0xE4,
+	SET_FLAGS_TO_FIRST 		= 	0xFF
 }management_subtypes_t;
 //-----------------
 

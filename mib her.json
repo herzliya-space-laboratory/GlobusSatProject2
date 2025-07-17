@@ -67,37 +67,37 @@
                                 "subSystem": "EPS"
                             },
                             {
-                                "name": "solar_panels 0",
+                                "name": "solar_panels0",
                                 "type": "float",
                                 "isLittleEndian": true,
                                 "subSystem": "Solar Panels"
                             },
                             {
-                                "name": "solar_panels 1",
+                                "name": "solar_panels1",
                                 "type": "float",
                                 "isLittleEndian": true,
                                 "subSystem": "Solar Panels"
                             },
                             {
-                                "name": "solar_panels 2",
+                                "name": "solar_panels2",
                                 "type": "float",
                                 "isLittleEndian": true,
                                 "subSystem": "Solar Panels"
                             },
                             {
-                                "name": "solar_panels 3",
+                                "name": "solar_panels3",
                                 "type": "float",
                                 "isLittleEndian": true,
                                 "subSystem": "Solar Panels"
                             },
                             {
-                                "name": "solar_panels 4",
+                                "name": "solar_panels4",
                                 "type": "float",
                                 "isLittleEndian": true,
                                 "subSystem": "Solar Panels"
                             },
                             {
-                                "name": "solar_panels 5",
+                                "name": "solar_panels5",
                                 "type": "float",
                                 "isLittleEndian": true,
                                 "subSystem": "Solar Panels"
@@ -343,12 +343,12 @@
                         "id": 65,
                         "params": [
                             {
-                                "name": "down to power safe mode",
+                                "name": "down to cruise",
                                 "type": "int16",
                                 "isLittleEndian": true
                             },
                             {
-                                "name": "down to cruise",
+                                "name": "down to power safe mode",
                                 "type": "int16",
                                 "isLittleEndian": true
                             },
@@ -685,7 +685,7 @@
                         "params": [
                             {
                                 "name": "pong_msg",
-                                "type": "buffer",
+                                "type": "text",
                                 "isLittleEndian": true,
                                 "size": "4"
                             }
@@ -1074,7 +1074,8 @@
                                 "name": "voltage",
                                 "type": "uint16",
                                 "isLittleEndian": true,
-                                "description": "raw, for eng: 0.00488 * raw"
+                                "calibration": "voltage_trxvu",
+                                "description": "raw, for eng: 0.00488 * raw <- not suppose to be raw anymore"
                             },
                             {
                                 "name": "current_total",
@@ -1693,7 +1694,7 @@
                             },
                             {
                                 "name": "error msg",
-                                "type": "buffer",
+                                "type": "text",
                                 "size": "66"
                             }
                         ]
@@ -2079,7 +2080,7 @@
                                     "min": 0,
                                     "max": 10
                                 },
-                                "description": "0 - eps,\n 1 - tx,\n 2 - ants0,\n 3 - solar panels,\n 4 - wod,\n 5 - radfet,\n 6 - sel,\n 7- seu,\n 8 - rx,\n 9 - ants1,\n 10 - log"
+                                "description": "0 - eps, 1 - tx, 2 - ants0, 3 - solar panels, 4 - wod, 5 - radfet, 6 - sel, 7- seu, 8 - rx, 9 - ants1, 10 - log"
                             }
                         ]
                     },
@@ -2099,7 +2100,7 @@
                                     "min": 0,
                                     "max": 6
                                 },
-                                "description": "0 - eps,\n 1 - trxvu,\n 2 - ants,\n 3 - solar panels,\n 4 - wod,\n 5 - radfet,\n 6 - seu and sel"
+                                "description": "0 - eps, 1 - trxvu, 2 - ants, 3 - solar panels, 4 - wod, 5 - radfet, 6 - seu and sel"
                             },
                             {
                                 "name": "new period time",
@@ -2204,5 +2205,73 @@
             }
         ]
     },
-    "calibrations": []
+    "calibrations": [
+        {
+            "name": "temp_eps",
+            "type": "linear",
+            "b": 0,
+            "m": 0.01
+        },
+        {
+            "name": "power_mW",
+            "type": "linear",
+            "b": 0,
+            "m": 10
+        },
+        {
+            "name": "voltage_trxvu",
+            "type": "linear",
+            "b": 0,
+            "m": 0.00488
+        },
+        {
+            "name": "current_trxvu",
+            "type": "linear",
+            "b": 0,
+            "m": 0.3052
+        },
+        {
+            "name": "temp_trxvu",
+            "type": "linear",
+            "b": 195.6037,
+            "m": -0.07669
+        },
+        {
+            "name": "rssi",
+            "type": "linear",
+            "b": -22,
+            "m": -0.5
+        },
+        {
+            "name": "doppler",
+            "type": "linear",
+            "b": 0,
+            "m": -38.1469726563
+        },
+        {
+            "name": "temp_ants",
+            "type": "linear",
+            "b": 190.65, 
+            "m": -0.2922
+        },
+        {
+            "name": "eps state",
+            "type": "enum",
+            "options": [
+                {
+                    "name": "operational",
+                    "value": 0
+                },
+                {
+                    "name": "cruise",
+                    "value": 1
+                },
+                {
+                    "name": "power safe mode",
+                    "value": 2
+                }
+            ]
+        }
+
+    ]
 }
