@@ -86,10 +86,6 @@ static Boolean softResetVUTest(void)
  * */
 static Boolean vutc_sendBeacon(void)
 {
-	unsigned char data[10]  = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-	IsisTrxvu_tcSetAx25BeaconDefClSign(0, data, 10, 20);
-
-
 	return TRUE;
 }
 /**
@@ -97,7 +93,6 @@ static Boolean vutc_sendBeacon(void)
  * */
 static Boolean vutc_stopSendingBeacon(void)
 {
-	IsisTrxvu_tcClearBeacon(0);
 	return TRUE;
 }
 
@@ -135,41 +130,6 @@ static Boolean vutc_sendEmptyPacketTest(void)
  * */
 static Boolean vutc_sendPacketInsertedByTheUser(void)
 {
-	//Buffers and variables definition
-	unsigned char testBuffer2[10];
-	int amountOfRepetitions;
-	unsigned char txCounter = 0;
-	unsigned char avalFrames = 0;
-	int timeoutCounter = 0;
-	int i;
-	unsigned int temp;
-	printf("\r\nEnter buffer: \r\n");
-	for(i = 0; i < 10 ; i++)
-	{
-		if (UTIL_DbguGetHexa32(&temp) == 1) //get from user hexa32 and check if it was fine else i = i - 1
-			testBuffer2[i] = (unsigned char)temp;
-		else
-			i--;
-	}
-	printf("\r\nEnter amount of repetitions: \r\n");
-	while(UTIL_DbguGetIntegerMinMax(&amountOfRepetitions, 1, 1000) == 0); // get amount of repetition from user and check that is indeed get a number between 1 - 1000
-	while(txCounter < amountOfRepetitions && timeoutCounter < amountOfRepetitions) // send packets the amount of times the user insert.
-	{
-		printf("\r\n Transmission of single buffers with default callsign. AX25 Format. \r\n");
-		print_error(IsisTrxvu_tcSendAX25DefClSign(0, testBuffer2, 10, &avalFrames)); // send one packet that its the packet the user enter
-
-		if ((avalFrames != 0)&&(avalFrames != 255))
-		{
-			printf("\r\n Number of frames in the buffer: %d  \r\n", avalFrames);
-			txCounter++;
-		}
-		else
-		{
-			vTaskDelay(100 / portTICK_RATE_MS);
-			timeoutCounter++;
-		}
-	}
-
 	return TRUE;
 }
 
@@ -506,8 +466,6 @@ static Boolean vutc_getTxTelemTest_revD(void)
  * */
 static Boolean TransponderOn()
 {
-	unsigned char data[] = {0x38, 0x02};
-	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 2));
 	return TRUE;
 }
 /**
@@ -515,22 +473,12 @@ static Boolean TransponderOn()
  * */
 static Boolean TransponderOff()
 {
-	unsigned char data[] = {0x38, 0x01};
-	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 2));
 	return TRUE;
 }
 /*
  * Brief sets the RSSI of the transmitter.
  * */
 static Boolean SetTransponderThreshold(void){
-	int input;
-	short threshold;
-	unsigned char data[] = {0x52, 0,0};
-	printf("Set the transponder Threshold range to be between 0-4095 \r\n");
-	UTIL_DbguGetIntegerMinMax(&input, 0, 4095);
-	threshold = (short)input;
-	memcpy(data + 1,&threshold, sizeof(threshold));
-	I2CWrite_Error(I2C_write(MICROCHIP_SLAVE, data, 3));
 	return TRUE;
 }
 /*
