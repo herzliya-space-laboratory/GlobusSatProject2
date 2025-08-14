@@ -255,7 +255,16 @@ static Boolean EPS_TelemetryHKGeneral(void)
  * */
 static Boolean EPS_Status(void)
 {
+	gom_eps_hk_t EPS_CHECK;
+//myEpsTelemetry_hk.fields.vbatt
+	print_error(GomEpsGetHkData_general(0, &EPS_CHECK));
+	unsigned short temp_EPS= EPS_CHECK.fields.vbatt;
+	if (temp_EPS>7400) printf("operation\r\n");
+	else if (temp_EPS<6900) printf("power\r\n");
+	else printf("cruise\r\n");
+	printf ("the value=%d \r\n",temp_EPS);
 	return TRUE;
+
 }
 
 /*
