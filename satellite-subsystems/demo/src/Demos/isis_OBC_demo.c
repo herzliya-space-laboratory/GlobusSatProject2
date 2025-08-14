@@ -188,6 +188,13 @@ static Boolean WriteAndReadFromFRAM(void){
 	return TRUE;
 }
 
+
+static Boolean CheckTamar(void){
+	printf(" Tamar\r\n");
+	return TRUE;
+}
+
+
 /*
  * Asks the user which test he wants or if he wants to exit the test loop.
  * All the functions returns TRUE while the exit is FALSE.
@@ -203,7 +210,8 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 	printf("\t 1) Print beacon \n\r");
 	printf("\t 2) Write and read from FRAM \n\r");
 	printf("\t 3) Set beacon period place in FRAM to 20\n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 3) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
+	printf("\t 4) TAMAR SHALEV\n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 4) == 0); //You have to write a number between the two numbers include or else it ask you to enter a number between the two.
 
 	switch(selection) {
 	case 0:
@@ -217,6 +225,9 @@ static Boolean selectAndExecuteOBCDemoTest(void)
 		break;
 	case 3:
 		offerMoreTests = SetBeaconPeriodPlaceToTwenty();
+		break;
+	case 4:
+		offerMoreTests =CheckTamar();
 		break;
 	default:
 		break;
