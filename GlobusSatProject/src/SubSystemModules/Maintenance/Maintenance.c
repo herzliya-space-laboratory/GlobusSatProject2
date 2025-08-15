@@ -24,10 +24,10 @@ Boolean flag = FALSE;
 Boolean CheckExecutionTime(time_unix prev_time, unsigned int period)
 {
 	unsigned int timeNow;
-	int error = logError(Time_getUnixEpoch(&timeNow), "CheckExecutionTime - Time_getUnixEpoch");
-	if(error)
+	int error = logError(Time_getUnixEpoch(&timeNow), "CheckExecutionTime - Time_getUnixEpoch"); // Get time now
+	if(error) // if error return FALSE
 		return FALSE;
-	if(timeNow - prev_time >= period)
+	if(timeNow - prev_time >= period) // if the time needed pass then return TRUE.
 		return TRUE;
 	return FALSE;
 }
@@ -36,6 +36,7 @@ Boolean CheckExecutionTime(time_unix prev_time, unsigned int period)
  * @brief checks if there is a memory corruption in the file system.
  * @return	TRUE if is corrupted.
  * 			FALSE if no corruption (yay!)
+ * 	we do not use this function anywhere in the code.
  */
 Boolean IsFS_Corrupted()
 {
@@ -52,8 +53,8 @@ Boolean IsFS_Corrupted()
 void KickGroundCommWDT()
 {
 	time_unix timeNow;
-	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "KickGroundCommWDT - Time_getUnixEpoch")) return;
-	FRAM_writeAndVerify((unsigned char*)&timeNow, LAST_COMM_TIME_ADDR, LAST_COMM_TIME_SIZE);
+	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "KickGroundCommWDT - Time_getUnixEpoch")) return; // continue if there is no error
+	FRAM_writeAndVerify((unsigned char*)&timeNow, LAST_COMM_TIME_ADDR, LAST_COMM_TIME_SIZE); // change last communication time.
 }
 
 /*!
@@ -64,11 +65,11 @@ void KickGroundCommWDT()
 */
 Boolean IsGroundCommunicationWDTReset()
 {
-	time_unix lastComm = 0;
+	time_unix lastComm = 0; // get time of last communicate.
 	if(logError(FRAM_read((unsigned char*)&lastComm, LAST_COMM_TIME_ADDR, LAST_COMM_TIME_SIZE), "IsGroundCommunicationWDTReset - FRAM_read")) return FALSE;
-	unsigned int WDTime = 0;
+	unsigned int WDTime = 0; // get period for WDT
 	if(logError(FRAM_read((unsigned char*)&WDTime, NO_COMM_WDT_KICK_TIME_ADDR, NO_COMM_WDT_KICK_TIME_SIZE), "IsGroundCommunicationWDTReset - FRAM_read")) return FALSE;
-	return CheckExecutionTime(lastComm, WDTime);
+	return CheckExecutionTime(lastComm, WDTime); // did the time pass? do we need to reset?
 }
 
 /*!
@@ -82,15 +83,18 @@ int WakeupFromResetCMD()
 	time_unix time = 0;
 	logError(Time_getUnixEpoch((unsigned int*)&time), "WakeupFromResetCMD - Time_getUnixEpoch");
 
+	// general number of resets.
 	int reset = 0;
 	logError(FRAM_read((unsigned char*)&reset, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WakeupFromResetCMD - FRAM_read");
 	reset += 1;
 	logError(FRAM_writeAndVerify((unsigned char*)&reset, NUMBER_OF_RESETS_ADDR, NUMBER_OF_RESETS_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
+	// check if we reset because of CMD reset.
 	Boolean flagCMDReset;
 	logError(FRAM_read((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_read");
-	if(!flagCMDReset) return SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time));
+	if(!flagCMDReset) return SendAckPacket(ACK_RESET_WAKEUP , NULL, (unsigned char*)&time, sizeof(time)); // if not CMD reset
 
+	// if CMD reset. (change flag back to false and add to counter.)
 	flagCMDReset = FALSE;
 	logError(FRAM_writeAndVerify((unsigned char*)&flagCMDReset, RESET_CMD_FLAG_ADDR, RESET_CMD_FLAG_SIZE), "WakeupFromResetCMD - FRAM_writeAndVerify");
 
@@ -109,14 +113,14 @@ int WakeupFromResetCMD()
 void MostCurrentTimeToFRAM()
 {
 	time_unix timeNow = 0;
-	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "MostCurrentTimeToFRAM - Time_getUnixEpoch")) return;
-	logError(FRAM_writeAndVerify((unsigned char*)&timeNow, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "MostCurrentTimeToFRAM - FRAM_writeAndVerify");
+	if(logError(Time_getUnixEpoch((unsigned int*)&timeNow), "MostCurrentTimeToFRAM - Time_getUnixEpoch")) return; // get time and if there is no error continue.
+	logError(FRAM_writeAndVerify((unsigned char*)&timeNow, MOST_UPDATED_SAT_TIME_ADDR, MOST_UPDATED_SAT_TIME_SIZE), "MostCurrentTimeToFRAM - FRAM_writeAndVerify"); // save in FRAM
 }
 
 /*
  * Delete old files according to how much space we have left. (20% for start delete until we have 25% free)
  * MIN_FREE_SPACE_PERCENTAGE - the minimum free space in bytes we want to keep in the SD in all times.
- * If free space<minFreeSpace we start deleting old TLM files
+ * If free_space < minFreeSpace we start deleting old TLM files
  */
 void DeleteOldFiles()
 {
@@ -151,10 +155,10 @@ void NeedToKillPayload()
 	supervisor_housekeeping_t mySupervisor_housekeeping_hk; //create a variable that is the struct we need from supervisor
 	int err = logError(Supervisor_getHousekeeping(&mySupervisor_housekeeping_hk, SUPERVISOR_SPI_INDEX), "NeedToKillPayload - Supervisor_getHousekeeping"); //gets the variables to the struct and also check error.
 	if(err) return;
-	if(mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS > 60)
+	if(mySupervisor_housekeeping_hk.fields.iobcUptime / portTICK_RATE_MS > 60) //check if we are past the time of reset
 	{
-		logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "NeedToKillPayload - FRAM_writeAndVerify");
-		flag = TRUE;
+		logError(FRAM_writeAndVerify((unsigned char*)&false, HAD_RESET_IN_A_MINUTE_ADDR, HAD_RESET_IN_A_MINUTE_SIZE), "NeedToKillPayload - FRAM_writeAndVerify"); // say that we didn't reset twice in less then a minute
+		flag = TRUE; // won't get here again. (in the first line we will leave function.
 	}
 }
 
@@ -174,10 +178,13 @@ void Maintenance()
 	{
 		KickGroundCommWDT();
 		Boolean true = TRUE;
+		// In case of a Ground Communication WatchDog is active turn off payload until turning him on from the ground.
 		logError(FRAM_writeAndVerify((unsigned char*)&true, PAYLOAD_IS_DEAD_ADDR, PAYLOAD_IS_DEAD_SIZE), "Maintenance - FRAM_writeAndVerify");
 		logError(payloadTurnOff(), "Maintenance - payloadTurnOff");
+		// Because it is happening to try to fix the TRXVU we reset the two parts (rx, tx).
 		logError(isis_vu_e__reset_hw_rx(0), "Maintenance - isis_vu_e__reset_hw_rx");
 		logError(isis_vu_e__reset_hw_tx(0), "Maintenance - isis_vu_e__reset_hw_tx");
+		// Finally we are doing an hard reset to sat, in case of other problem.
 		isismepsv2_ivid7_piu__replyheader_t replyheader;
 		logError(isismepsv2_ivid7_piu__reset(0, &replyheader), "Maintenance - isismepsv2_ivid7_piu__reset");
 		vTaskDelay(5000);

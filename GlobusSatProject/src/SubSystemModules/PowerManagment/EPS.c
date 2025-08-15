@@ -9,7 +9,7 @@
 
 
 
-#define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage)))
+#define SMOOTHING(currentVolt, alpha) (lastVoltage + (alpha * (currentVolt - lastVoltage))) //What we enter and what we return. It's a macro function.
 #define MAX_VOLTAGE_TO_STATES {7100, 7500, 7200, 7600}
 #define MIN_VOLTAGE_TO_STATES {6000, 6500, 6100, 6600}
 
@@ -28,9 +28,10 @@ float Alpha;
 int EPS_And_SP_Init(){
 	int errorEPS = 0;
 	int errorSP = 0;
-	ISISMEPSV2_IVID7_PIU_t stract_1;
-	stract_1.i2cAddr = EPS_I2C_ADDR;
-	errorEPS = logError(ISISMEPSV2_IVID7_PIU_Init(&stract_1, 1), "EPS_And_SP_Init - ISISMEPSV2_IVID7_PIU_Init");
+
+	ISISMEPSV2_IVID7_PIU_t eps_init_stract;
+	eps_init_stract.i2cAddr = EPS_I2C_ADDR;
+	errorEPS = logError(ISISMEPSV2_IVID7_PIU_Init(&eps_init_stract, 1), "EPS_And_SP_Init - ISISMEPSV2_IVID7_PIU_Init");
 	if(!errorEPS)
 	{
 		GetThresholdVoltages(&threshold_volts);
@@ -48,7 +49,7 @@ int EPS_And_SP_Init(){
 
 /*!
  * @brief returns the current voltage on the battery
- * @param[out] vbat he current battery voltage
+ * @param[out] vbat the current battery voltage
  * @return	0 on success
  * 			Error code according to <hal/errors.h>
  */

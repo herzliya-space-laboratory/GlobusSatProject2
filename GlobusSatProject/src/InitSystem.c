@@ -79,6 +79,8 @@ int WriteDefaultValuesToFRAM()
 	int zero = 0;
 	time_unix param = 0;
 	int error = 0;
+
+	//we change the time on all of those to 0.
 	if(FRAM_writeAndVerify((unsigned char*)&param, TRANSPONDER_END_TIME_ADDR, TRANSPONDER_END_TIME_SIZE)) error += -1;
 	if(FRAM_writeAndVerify((unsigned char*)&param, MUTE_END_TIME_ADDR, MUTE_END_TIME_SIZE)) error += -1;
 	if(FRAM_writeAndVerify((unsigned char*)&param, IDLE_END_TIME_ADDR, IDLE_END_TIME_SIZE)) error += -1;
@@ -197,7 +199,7 @@ int FirstActivation()
 	do
 	{
 		FRAM_read((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE);
-		vTaskDelay(5000 / portTICK_RATE_MS);
+		vTaskDelay(5000 / portTICK_RATE_MS); // wait 5 seconds.
 		time += 5;
 		TelemetryCollectorLogic();
 		if(logError(FRAM_writeAndVerify((unsigned char*)&time, SECONDS_SINCE_DEPLOY_ADDR, SECONDS_SINCE_DEPLOY_SIZE), "FirstActivition - FRAM_writeAndVerify")) error = -1;
@@ -221,6 +223,10 @@ int FirstActivation()
 	return error;
 }
 
+/*
+ * This function reads from FRAM if the payload needs to init or if we have the payload kill flag on.
+ * It also checks we didn't have the reset under a minute flag on. If so, it change the payload flag kill to true and does not activate the payload.
+ * */
 void payloadKillOrInit()
 {
 	Boolean checkPayloadFlag;
@@ -243,7 +249,8 @@ void payloadKillOrInit()
  * @brief	executes all required initializations of systems, including sub-systems, and checks for errors
  * @return	0
  */
-int InitSubsystems(){
+int InitSubsystems()
+{
 	StartI2C();
 
 	StartSPI();
@@ -252,9 +259,9 @@ int InitSubsystems(){
 
 	StartTIME();
 
+	// Reads if the first active flag is on, if so write defaults to FRAM. Else update the time.
 	int firstActiveFlag = 0;
 	FRAM_read((unsigned char*)&firstActiveFlag, FIRST_ACTIVATION_FLAG_ADDR, FIRST_ACTIVATION_FLAG_SIZE);
-
 	if(firstActiveFlag)
 		WriteDefaultValuesToFRAM();
 	else
@@ -262,6 +269,7 @@ int InitSubsystems(){
 
 	InitializeFS();
 
+	//Also with the first active flag. It's here just because we first needed to init the FS.
 	if(firstActiveFlag) Delete_allTMFilesFromSD();
 
 	InitSavePeriodTimes();
