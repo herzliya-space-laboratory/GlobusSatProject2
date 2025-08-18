@@ -86,6 +86,9 @@ static Boolean softResetVUTest(void)
  * */
 static Boolean vutc_sendBeacon(void)
 {
+	unsigned char data[5] = {0xF1, 0xB8, 0x42, 0xF1, 0xB8};
+
+	IsisTrxvu_tcSetAx25BeaconDefClSign(MICROCHIP_SLAVE, data, sizeof(data), 20);
 	return TRUE;
 }
 /**
@@ -93,6 +96,7 @@ static Boolean vutc_sendBeacon(void)
  * */
 static Boolean vutc_stopSendingBeacon(void)
 {
+	IsisTrxvu_tcClearBeacon(MICROCHIP_SLAVE);
 	return TRUE;
 }
 
