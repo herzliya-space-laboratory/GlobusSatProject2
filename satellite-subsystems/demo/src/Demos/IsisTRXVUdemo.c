@@ -473,7 +473,7 @@ static Boolean TransponderOn()
 	char nominal = 0x38;
 	char transponder = 0x02;
 	unsigned char data[2] = {nominal, transponder};
-	I2C_write(MICROCHIP_SLAVE, data,sizeof(data));
+	I2C_write(MICROCHIP_SLAVE, data, sizeof(data));
 
 	return TRUE;
 }
@@ -482,7 +482,10 @@ static Boolean TransponderOn()
  * */
 static Boolean TransponderOff()
 {
-	I2C_stop();
+	char nominal=0x38;
+	char mode=0x01;
+	unsigned char data={nominal, mode};
+	I2C_write(MICROCHIP_SLAVE, data, sizeof(data));
 	return TRUE;
 }
 /*
