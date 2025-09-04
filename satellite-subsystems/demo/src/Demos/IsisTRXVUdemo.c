@@ -128,13 +128,18 @@ static Boolean vutc_sendEmptyPacketTest(void)
 	return TRUE;
 }
 
+static Boolean Erease_Tamar(void)
+{
+	printf("True");
+	return TRUE;
+}
 
 /**
  * get from user packet the size of 10 in Hexa32 and send the packet the times the user wants between 1 to 1000
  * */
 static Boolean vutc_sendPacketInsertedByTheUser(void)
 {
-	unsigned char data[10]={0xF1, 0xB8, 0x42, 0xF1, 0xB8,0xF1, 0xB8, 0x42, 0xF1, 0xB8};
+	unsigned char data[10];
 
 	return TRUE;
 
@@ -646,7 +651,8 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 17) prints Get Tx Telemetry Value Array \n\r");
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate\n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 19) == 0);
+	printf("\t 20) erease_Tamar\n\r");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 20) == 0);
 
 	switch(selection) {
 	case 0:
@@ -708,6 +714,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 19:
 		offerMoreTests = IsisTrxvu_tcEstimateTransmissionTimeTest();
+		break;
+	case 20:
+		offerMoreTests = Erease_Tamar();
 		break;
 	default:
 		break;
