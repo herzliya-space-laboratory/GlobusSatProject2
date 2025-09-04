@@ -134,7 +134,10 @@ static Boolean vutc_sendEmptyPacketTest(void)
  * */
 static Boolean vutc_sendPacketInsertedByTheUser(void)
 {
+	unsigned char data[10]={0xF1, 0xB8, 0x42, 0xF1, 0xB8,0xF1, 0xB8, 0x42, 0xF1, 0xB8};
+
 	return TRUE;
+
 }
 
 
@@ -470,9 +473,9 @@ static Boolean vutc_getTxTelemTest_revD(void)
  * */
 static Boolean TransponderOn()
 {
-	char nominal = 0x38;
+	char set_of_commands = 0x38;
 	char transponder = 0x02;
-	unsigned char data[2] = {nominal, transponder};
+	unsigned char data[2] = {set_of_commands, transponder};
 	I2C_write(MICROCHIP_SLAVE, data, sizeof(data));
 
 	return TRUE;
@@ -482,9 +485,9 @@ static Boolean TransponderOn()
  * */
 static Boolean TransponderOff()
 {
-	char nominal=0x38;
+	char set_of_commands=0x38;
 	char mode=0x01;
-	unsigned char data[2]={nominal, mode};
+	unsigned char data[2]={set_of_commands, mode};
 	I2C_write(MICROCHIP_SLAVE, data, sizeof(data));
 	return TRUE;
 }
@@ -492,6 +495,17 @@ static Boolean TransponderOff()
  * Brief sets the RSSI of the transmitter.
  * */
 static Boolean SetTransponderThreshold(void){
+	// 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 19) == 0);
+	char voltage_checking=0x52;
+	int selection;
+	printf("what is the value of the voltage \r\n");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 4095) == 0);
+	short thresh = (short)selection;
+	unsigned char data[3]={voltage_checking, 0, 0};
+	memcpy(data+1,&thresh,sizeof(thresh));
+	I2C_write(MICROCHIP_SLAVE, data, sizeof(data));
+
+
 	return TRUE;
 }
 /*
