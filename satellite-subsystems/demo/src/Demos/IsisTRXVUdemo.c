@@ -133,7 +133,11 @@ static Boolean Erease_Tamar(void)
 	printf("True");
 	return TRUE;
 }
-
+static Boolean Check_Tamar(void)
+{
+	print("alone");
+	return TRUE;
+}
 /**
  * get from user packet the size of 10 in Hexa32 and send the packet the times the user wants between 1 to 1000
  * */
@@ -652,7 +656,8 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate\n\r");
 	printf("\t 20) erease_Tamar\n\r");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 20) == 0);
+	printf("\t 21) checking TamAR")
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 21) == 0);
 
 	switch(selection) {
 	case 0:
@@ -717,6 +722,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 20:
 		offerMoreTests = Erease_Tamar();
+		break;
+	case 21:
+		offerMoreTests=Check_Tamar();
 		break;
 	default:
 		break;
