@@ -130,12 +130,12 @@ static Boolean vutc_sendEmptyPacketTest(void)
 
 static Boolean Erease_Tamar(void)
 {
-	printf("True");
+	printf("True\r\n");
 	return TRUE;
 }
 static Boolean Check_Tamar(void)
 {
-	print("alone");
+	printf("alone\r\n");
 	return TRUE;
 }
 /**
@@ -656,7 +656,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 18) print Transmitter State \n\r");
 	printf("\t 19) checks for estimate time 8 bytes by 9600 bitrate\n\r");
 	printf("\t 20) erease_Tamar\n\r");
-	printf("\t 21) checking TamAR")
+	printf("\t 21) checking TamAR");
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 21) == 0);
 
 	switch(selection) {
