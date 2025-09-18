@@ -133,6 +133,11 @@ static Boolean done_Tamar(void)
 	return TRUE;
 }
 
+static Boolean jjjj_Tamar(void)
+{
+	printf("done1\r\n");
+	return TRUE;
+}
 static Boolean delete_Tamar(void)
 {
 	printf("clean\r\n");
@@ -669,7 +674,8 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 21) checking TamAR\n\r");
 	printf("\t 22) delete \n\r");
 	printf("\t 23) done \r\n");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 23) == 0);
+	printf("\t 24 jjj \r\n");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 24) == 0);
 
 	switch(selection) {
 	case 0:
@@ -743,6 +749,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 23:
 		offerMoreTests = done_Tamar();
+		break;
+	case 24:
+		offerMoreTests= jjjj_Tamar();
 		break;
 	default:
 		break;
