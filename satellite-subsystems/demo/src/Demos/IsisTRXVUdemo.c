@@ -740,6 +740,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 22:
 		offerMoreTests=done_Tamar();
+		break;
 	default:
 		break;
 	}
