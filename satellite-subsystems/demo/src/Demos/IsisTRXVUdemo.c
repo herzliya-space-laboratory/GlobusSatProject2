@@ -129,7 +129,7 @@ static Boolean vutc_sendEmptyPacketTest(void)
 }
 static Boolean done_Tamar(void)
 {
-	print("done\r\n");
+	printf("done\r\n");
 	return TRUE;
 }
 
@@ -668,7 +668,7 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 20) erease_Tamar\n\r");
 	printf("\t 21) checking TamAR\n\r");
 	printf("\t 22) delete \n\r");
-	printf("\t 23) know how to use this ")
+	printf("\t 23) done \r\n");
 	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 23) == 0);
 
 	switch(selection) {
@@ -739,7 +739,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests=Check_Tamar();
 		break;
 	case 22:
-		offerMoreTests=done_Tamar();
+		offerMoreTests=delete_Tamar();
+		break;
+	case 23:
+		offerMoreTests = done_Tamar();
 		break;
 	default:
 		break;
