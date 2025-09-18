@@ -188,13 +188,10 @@ static Boolean WriteAndReadFromFRAM(void){
 	return TRUE;
 }
 
-
 static Boolean CheckTamar(void){
 	printf(" Tamar\r\n");
 	return TRUE;
 }
-
-
 /*
  * Asks the user which test he wants or if he wants to exit the test loop.
  * All the functions returns TRUE while the exit is FALSE.
