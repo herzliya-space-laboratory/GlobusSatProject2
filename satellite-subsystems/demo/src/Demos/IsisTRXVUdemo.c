@@ -153,6 +153,11 @@ static Boolean Check_Tamar(void)
 	printf("alone\r\n");
 	return TRUE;
 }
+static Boolean C_T(void)
+{
+	printf("lastttt\r\n");
+	return TRUE;
+}
 /**
  * get from user packet the size of 10 in Hexa32 and send the packet the times the user wants between 1 to 1000
  * */
@@ -675,7 +680,8 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 22) delete \n\r");
 	printf("\t 23) done \r\n");
 	printf("\t 24 jjj \r\n");
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 24) == 0);
+	printf("\t 25) kdkdk \r\n");
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 25) == 0);
 
 	switch(selection) {
 	case 0:
@@ -752,6 +758,9 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		break;
 	case 24:
 		offerMoreTests= jjjj_Tamar();
+		break;
+	case 25:
+		offerMoreTests=C_T();
 		break;
 	default:
 		break;
