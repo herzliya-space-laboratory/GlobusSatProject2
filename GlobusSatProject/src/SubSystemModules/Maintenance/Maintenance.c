@@ -8,6 +8,7 @@
 #include "Maintenance.h"
 #include <hal/Timing/Time.h>
 #include <hal/Timing/WatchDogTimer.h>
+#include <hcc/api_fat.h>
 #include "SubSystemModules/Communication/AckHandler.h"
 #include "utils.h"
 #include <String.h>
@@ -134,7 +135,7 @@ void DeleteOldFiles()
 	if(logError(f_getfreespace(sd, &space), "Maintenance - f_getfreespace")) return; //gets the variables to the struct
 	if(space.free >= ((space.total * MIN_FREE_SPACE_PERCENTAGE) / 100)) return; //if we only left 20% free
 	F_FIND find; // we delete until we have 25% free
-	f_findfirst("*.*", &find);
+	f_findfirst("*.*", &find); // get the oldest file.
 	do
 	{
 		f_delete(find.filename); //delete
@@ -142,6 +143,7 @@ void DeleteOldFiles()
 
 	}
 	while((space.free < (space.total * MIN_FREE_SPACE_PERCENTAGE_TO_DELETE) / 100) && !f_findnext(&find));
+	// the while check if we still have more then 25% space used and we have more files to delete we get the next one after the oldest.
 
 }
 
