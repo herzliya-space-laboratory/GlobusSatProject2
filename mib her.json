@@ -546,11 +546,6 @@
                         "params": []
                     },
                     {
-                        "name": "ACK_ANT_CANCEL_DEPLOY",
-                        "id": 105,
-                        "params": []
-                    },
-                    {
                         "name": "ACK_FS_RESET",
                         "id": 112,
                         "params": []
