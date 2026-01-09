@@ -54,14 +54,6 @@ int BetweenCruiseToPowerSafeMode();
  */
 int EnterPowerSafeMode();
 
-/*!
- * @brief Sets the channel state according to the bitwise 'logic on'
- * if the 2'nd bit is '1' the second channel will turn on (channel = 0b01000000)
- * @note please use the defines defined in this header to turn on/off channels
- * @return	0 on success
- * 			errors according to <hal/errors.h>
- */
-//int SetEPS_Channels(channel_t channel);
 
 /*!
  * returns the current system state according to the EpsState_t enumeration
@@ -69,11 +61,6 @@ int EnterPowerSafeMode();
  */
 EpsState_t GetSystemState();
 
-///*
-// * Gets the current system channel state
-// * @return current system channel state
-// */
-//channel_t GetSystemChannelState();
 
 /*
  * Get if the Tx flag is on or off for us to put in the CheckAllowed in the TRXVU.c code.

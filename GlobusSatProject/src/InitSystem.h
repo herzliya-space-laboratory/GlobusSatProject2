@@ -12,7 +12,6 @@
 #include <hal/Drivers/I2C.h>
 #include <hal/Drivers/SPI.h>
 #include <hal/Timing/Time.h>
-#include <hal/Utility/util.h>
 #include <hal/supervisor.h>
 
 #include <hcc/api_fat.h>

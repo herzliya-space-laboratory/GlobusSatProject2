@@ -39,25 +39,6 @@ typedef enum {
 	FS_FAIL
 } FileSystemResult;
 
-/*
- typedef struct imageInfo
- {
- unsigned short imageID;
- unsigned short numberChunks;
- char imageType;
- } imageInfo_t;
-
- typedef struct imageData
- {
- unsigned short chunkID;
- char data[IMG_CHUNK_SIZE];
- } imageData_t;
-
- */
-
-/*int CMD_getInfoImage(sat_packet_t *cmd);
-
- int CMD_getDataImage(sat_packet_t *cmd);*/
 
 /*
  * write to a file and create a file if not exist the file we need to write to
@@ -131,10 +112,6 @@ int ReadTLMFiles(tlm_type_t tlmType, Time startDate, int numOfDays, int cmd_id, 
  * */
 int GetPeriodTimeAccordingToTlmType(tlm_type_t type);
 
-/*
-int ReadTLMFileTimeRange(tlm_type_t tlmType, time_t from_time, time_t to_time,
-		int cmd_id, int resolution);
-*/
 
 /*
  * Formating the SD we are on and then call to init
@@ -156,11 +133,5 @@ FileSystemResult InitializeFS();
  */
 void DeInitializeFS();
 
-/*void PrintTLM(void* element, tlm_type_t tlmType);
-
-char* GetName();
-void print_file(char* c_file_name);
-int FS_test();
-void test_i();*/
 #endif /* TM_MANAGMENT_H_ */
 

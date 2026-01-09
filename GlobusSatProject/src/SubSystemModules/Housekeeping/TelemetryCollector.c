@@ -12,7 +12,7 @@
 #include <satellite-subsystems/IsisSolarPanelv2.h>
 #include "utils.h"
 
-time_unix lastTimeSave[sizeof(tlm_type_t)] = {0};
+time_unix lastTimeSave[NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS] = {0};
 
 /*
  * get unix_time

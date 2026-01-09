@@ -13,7 +13,7 @@
 #include "TLM_management.h"
 
 #include "utils.h"
-#define NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS 7
+#define NUM_OF_SUBSYSTEMS_SAVE_FUNCTIONS 9
 
 typedef union __attribute__ ((__packed__)) _PeriodTimes
 {
