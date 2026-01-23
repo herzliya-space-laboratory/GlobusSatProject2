@@ -8,10 +8,9 @@
 
 /*!
  * @brief routes the data into the appropriate trxvu command according to the command sub type
- * @param[in] cmd command pertaining to the TRXVU system, to be executed.
- * @note the type and subtype of the command are already inside cmd
- * @see sat_packet_t structure
- * @return errors according to <hal/errors.h>
+ * @param[in] name=cmd; type=sat_packet_t*: command pertaining to the TRXVU system, to be executed.
+ * @note if subtype not exist an unknown subtype ack is send.
+ * @return errors according to <hal/errors.h> and -1 on cmd NULL
  */
 int trxvu_command_router(sat_packet_t *cmd);
 

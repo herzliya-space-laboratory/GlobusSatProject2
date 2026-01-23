@@ -115,20 +115,4 @@ int CMD_SetTLMPeriodTimes_default(sat_packet_t *cmd);
 int CMD_GetTLMPeriodTimes(sat_packet_t *cmd);
 
 
-
-/*int CMD_GetFileLengthByTime(sat_packet_t *cmd);*/
-
-/*int CMD_GetTimeOfLastElementInFile(sat_packet_t *cmd);*/
-
-/*int CMD_GetTimeOfFirstElement(sat_packet_t *cmd);*/
-
-/*int CMD_ForceDumpAbort(sat_packet_t *cmd); */
-
-/*int CMD_GetNumOfFilesInTimeRange(sat_packet_t *cmd);*/
-
-//int CMD_GetNumOfFilesByType(sat_packet_t *cmd);
-
-//int CMD_DeleteFileByTime(sat_packet_t *cmd);
-
-
 #endif /* FS_COMMANDS_H_ */

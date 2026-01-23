@@ -56,7 +56,7 @@ int CMD_RestoreDefaultAlpha(sat_packet_t *cmd);
  * Get alpha value.
 * @param[in and out] name=cmd; type=sat_packet_t*; The packet the sat got and use to find all the required information (the headers we add)
 * @return type=int; return type of error
-* 										-2 on FRAM_read error, and TransmitDataAsSPL_Packet errors
+* 										1 on FRAM_read error, and TransmitDataAsSPL_Packet errors
  * */
 int CMD_GetAlpha(sat_packet_t *cmd);
 

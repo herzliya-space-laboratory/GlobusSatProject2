@@ -35,53 +35,29 @@ typedef struct __attribute__ ((__packed__)) sat_packet_t
 
 }sat_packet_t;
 
-/*!
- * @brief parses given frame from TRXVU into 'sat_command_t' structure.
- * @param[in] data raw data from which to parse the SPL packet
- * @param[out] cmd pointer to parsed command buffer
- * @return	errors according to CMD_ERR
- */
+/*
+ * Change the packet we get to sat_packet_t struct
+ *
+ * @param[in] name= data; type= unsigned char *; The packet we get after reading from the frame (without the headers of the Ax25 protocol).
+ * @param[out] name= cmd; type= sat_packet_t *; The struct we put all the info we get from the packet.
+ * @return error according to CMD_ERR
+ *
+ * */
 CMD_ERR ParseDataToCommand(unsigned char * data, sat_packet_t *cmd);
 
-/*!
- * @brief parses given frame from TRXVU into 'sat_command_t' SPL structure.
- * @param[in] data data field of the SPL packet
- * @param[in] data_length length of data packet in bytes
- * @param[in] type command type
- * @param[in] subtype command subtype
- * @param[in] id the id of the specific command
- * @param[out] cmd pointer to parsed command buffer
- * @return	errors according to CMD_ERR
- */
+/*
+ * Create a sat_packet_t struct that in the end the sat send to us
+ *
+ * @param[in] name= data; type= unsigned char *; The data part in the struct
+ * @param[in] name= data_length; type= unsigned short; The length of the data that going to in the struct. Also it will be in the length part in the struct
+ * @param[in] name= type; type= char; The cmd_type part in the struct. Says which subsystem its from.
+ * @param[in] name= subtype; type= char; The cmd_subtype part in the struct. Says which commend of the subsystem its from.
+ * @param[in] name= id; type= unsigned int;  The ID part in the struct. Have the id of the sat and some other things.
+ * @param[out] name= cmd; type= sat_packet_t *; The struct we put all the info we get from the params.
+ * @return error according to CMD_ERR
+ *
+ * */
 CMD_ERR AssembleCommand(unsigned char *data, unsigned short data_length, char type, char subtype, unsigned int id, sat_packet_t *cmd);
-
-/*!
- * @brief returns a command to be executed if there is one in the delayed command buffer
- * @param[out] cmd pointer to parsed command
- * @return	errors according to CMD_ERR
- */
-int GetDelayedCommand(sat_packet_t *cmd);
-
-/*!
- * @brief sets the command to the first empty slot or the command with the farthest execution time
- * @param[in] cmd command to be added into the delated command buffer
- * @return	errors according to CMD_ERR
- */
-int AddDelayedCommand(sat_packet_t *cmd);
-
-/*!
- * @brief returns number of commands in the delayed command buffer
- * @return	#number number of delayed commands in buffer
- * @return	errors according to CMD_ERR
- */
-int GetDelayedCommandBufferCount();
-
-
-int GetDelayedCommandByIndex(unsigned int index, sat_packet_t *cmd);
-
-int DeleteDelayedCommandByIndex(unsigned int index);
-
-int DeleteDelayedBuffer();
 
 /*
  * According to the type in the cmd struct goes to the right type and there do the commend.

@@ -208,13 +208,6 @@ int BeaconLogic();
 int SetIdleState(isis_vu_e__onoff_t state, time_unix duration);
 
 
-/*!
- * @brief checks if the Trxvu mute time has terminated
- * @return	TRUE if the termination time has arrived
- * 			FALSE else
- */
-/*Boolean CheckForMuteEnd();*/
-
 /*
  * Gets number of packets in waiting.
  * @return type=int; -1 on error
