@@ -58,7 +58,6 @@ int InitTrxvuAndAnts(){
 	//Initialize the trxvu subsystem
 	rv = ISIS_VU_E_Init(myTRXVU, 1);
 	SetTRXVU_config_param();
-	//TODO: transponder set freq
 
 	InitTxModule();
 
